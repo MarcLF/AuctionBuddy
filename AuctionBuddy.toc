@@ -1,0 +1,38 @@
+## Interface: 80200
+## Title: AuctionBuddy
+## Version: 8.2.0
+## Author: Erazhen
+## Notes: Auction house addon
+## SavedVariables: AB_BuyOptions, AB_RecentSearches, AB_FavoriteSearchesLists
+
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+
+Libs\AceAddon-3.0\AceAddon-3.0.xml
+Libs\AceConsole-3.0\AceConsole-3.0.xml
+Libs\AceEvent-3.0\AceEvent-3.0.xml
+Libs\AceHook-3.0\AceHook-3.0.xml
+Libs\AceTimer-3.0\AceTimer-3.0.xml
+Libs\LibGratuity-3.0\LibGratuity-3.0.lua
+Libs\StdUi\StdUi.xml
+Libs\LibGraph-2.0\LibGraph-2.0.lua
+
+AuctionBuddy.lua
+
+Modules\Database.lua
+Modules\Items.lua
+Modules\Navigation.lua
+Modules\Container.lua
+Modules\ResultsTable.lua
+Modules\CurrentAuctionsTable.lua
+Modules\Searches.lua
+
+AuctionBuddy_Interface\InterfaceFunctions.lua
+
+AuctionBuddy_Interface\Options\OptionsFunctions.lua
+AuctionBuddy_Interface\Options\OptionsPanel.lua
+
+AuctionBuddy_Interface\Buy\BuyInterface.lua
+AuctionBuddy_Interface\Buy\BuyInterfaceDropDownMenus.lua
+
+AuctionBuddy_Interface\Sell\SellInterface.lua
