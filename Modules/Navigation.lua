@@ -48,7 +48,6 @@ function NavigationModule:CheckSearchActive(parentFrame)
 	
 end
 
-
 function NavigationModule:MovePage(isNext, parentFrame)
 	
 	if isNext then

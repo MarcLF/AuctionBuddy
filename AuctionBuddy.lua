@@ -31,7 +31,7 @@ local OptionsPanelModule = nil
 local OptionsFunctionsModule = nil
 
 function AuctionBuddy:OnInitialize()
-	
+
 	self:RegisterEvent("VARIABLES_LOADED")
 	self:RegisterEvent("AUCTION_HOUSE_SHOW")
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
@@ -40,7 +40,7 @@ function AuctionBuddy:OnInitialize()
 end
 
 function AuctionBuddy:VARIABLES_LOADED()
-	
+
 	self:EnableModule("DatabaseModule")
 	self:EnableModule("OptionsFunctionsModule")
 	self:EnableModule("OptionsPanelModule")
@@ -159,7 +159,7 @@ function AuctionBuddy:AuctionFrameTab_OnClick(tab)
 end
 		
 function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
-
+		
 	if textToSearch ~= self.searchText and textToSearch ~= nil then
 		NavigationModule.page = 0
 	end
@@ -191,31 +191,17 @@ function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
 			filterData = 0
         end
 
-		if exactMatch == true then
-			QueryAuctionItems(	
-				self.searchText, 
-				BuyInterfaceModule.mainFrame.minILvl:GetNumber(),
-				BuyInterfaceModule.mainFrame.maxILvl:GetNumber(), 
-				NavigationModule.page, 
-				_,
-				BuyInterfaceModule.mainFrame.rarity.value,
-				_,
-				exactMatch,
-				filterData
-			)
-		else
-			QueryAuctionItems(	
-				self.searchText, 
-				BuyInterfaceModule.mainFrame.minILvl:GetNumber(),
-				BuyInterfaceModule.mainFrame.maxILvl:GetNumber(), 
-				NavigationModule.page, 
-				_,
-				BuyInterfaceModule.mainFrame.rarity.value,
-				_,
-				DatabaseModule.buyOptions.exactMatch,
-				filterData
-			)
-		end
+		QueryAuctionItems(	
+			self.searchText, 
+			BuyInterfaceModule.mainFrame.minILvl:GetNumber(),
+			BuyInterfaceModule.mainFrame.maxILvl:GetNumber(), 
+			NavigationModule.page,
+			_,
+			BuyInterfaceModule.mainFrame.rarity.value,
+			_,
+			DatabaseModule.buyOptions.exactMatch,
+			filterData
+		)
 	end
 	
 end

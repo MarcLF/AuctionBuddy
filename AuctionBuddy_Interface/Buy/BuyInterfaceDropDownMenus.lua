@@ -14,14 +14,12 @@ local itemTypeTable =
 	"Weapon (All)",
 	"Armor (All)",
 	"Container (All)",
-	"Gem (All)",
-	"Item Enhancement (All)",
 	"Consumable (All)",
-	"Glyph (All)",
 	"Trade Goods (All)",
+	"Projectile (All)",
+	"Quiver (All)",
 	"Recipe (All)",
-	"Battle Pet (All)",
-	"Quest Item (All)",
+	"Reagent (All)",
 	"Miscellaneous (All)"
 }
 
@@ -72,169 +70,68 @@ local miscellaneousWeaponsTable =
 -- Armor Tables
 local armorTypeTable =
 {
-	"Plate",
-	"Mail",
-	"Leather",
+	"Miscellaneous",
 	"Cloth",
-	"Misc Armor",
-	"Cosmetic"
+	"Leather",
+	"Mail",
+	"Plate",
+	"Shields",
+	"Librams",
+	"Idols",
+	"Totems"
 }
 
 local armorSlotsTable =
 {
 	"Head",
+	"Neck",
 	"Shoulder",
+	"Shirt",
 	"Chest",
 	"Waist",
 	"Legs",
 	"Feet",
 	"Wrist",
-	"Hands"
-}
-
-local armorMiscTable = 
-{
-	"Neck",
-	"Cloak",
+	"Hands",
 	"Finger",
 	"Trinket",
-	"Held in Off-Hand",
-	"Shield",
-	"Shirt",
-	"Head"
+	"Back",
+	"Held In Off-hand"
 }
 --
+
+local projectileTable = 
+{
+	"Arrow",
+	"Bullet"
+}
+
+local quiverTable = 
+{
+	"Quiver",
+	"Ammo Pouch"
+}
 
 local containersTypeTable = 
 {
 	"Bag",
+	"Soul Bag",
 	"Herb Bag",
-	"Enchanting Bag",
-	"Engineering Bag",
-	"Gem Bag",
-	"Mining Bag",
-	"Leatherworking Bag",
-	"Inscription Bag",
-	"Tackle Box",
-	"Cooking Bag"
-}
-
-local gemsTypeTable =
-{
-	"Artifact Relic",
-	"Intellect",
-	"Agility",
-	"Strength",
-	"Stamina",
-	"Critical Strike",
-	"Mastery",
-	"Haste",
-	"Versatility",
-	"Other",
-	"Multiple Stats"
-}
-
-local itemEnhancementsTypeTable =
-{
-	"Head",
-	"Neck",
-	"Shoulder",
-	"Cloak",
-	"Chest",
-	"Wrist",
-	"Hands",
-	"Waist",
-	"Legs",
-	"Feet",
-	"Finger",
-	"Weapon",
-	"Two-Handed Weapon",
-	"Shield/Off-hand",
-	"Misc Enhance"
-}
-
-local consumablesTypeTable =
-{
-	"Explosives and Devices",
-	"Potion",
-	"Elixir",
-	"Flask",
-	"Food & Drink",
-	"Bandage",
-	"Vantus Runes",
-	"Other"
-}
-
-local glyphsTypeTable =
-{
-	"Warrior",
-	"Paladin",
-	"Hunter",
-	"Rogue",
-	"Priest",
-	"Shaman",
-	"Mage",
-	"Warlock",
-	"Druid",
-	"Death Knight",
-	"Monk",
-	"Demon Hunter"
-}
-
-local tradeGoodsTypeTable =
-{
-	"Cloth Reagent",
-	"Leather Reagent",
-	"Metal & Stone",
-	"Cooking Reagent",
-	"Herb",
-	"Enchanting Reagent",
-	"Inscription",
-	"Jewelcrafting",
-	"Parts",
-	"Elemental Reagent",
-	"Other"
+	"Enchanting Bag"
 }
 
 local recipesTypeTable =
 {
+	"Book",
 	"Leatherworking",
 	"Tailoring",
 	"Engineering",
 	"Blacksmithing",
-	"Alchemy",
-	"Enchanting",
-	"Jewelcrafting",
-	"Inscription",
 	"Cooking",
+	"Alchemy",
 	"First Aid",
-	"Fishing",
-	"Book"
-}
-
-local battlePetsTypeTable =
-{
-	"Humanoid",
-	"Dragonkin",
-	"Flying",
-	"Undead",
-	"Critter",
-	"Magic",
-	"Elemental",
-	"Beast",
-	"Aquatic",
-	"Mechanical",
-	"Companion Pets"
-}
-
-local miscTypeTable =
-{
-	"Junk",
-	"Reagent",
-	"Holiday",
-	"Other",
-	"Mount",
-	"Mount Equipment"
+	"Enchanting",
+	"Fishing"
 }
 
 local rarityTable = 
@@ -243,9 +140,7 @@ local rarityTable =
 	"Common",
 	"Uncommon",
 	"Rare",
-	"Epic",
-	"Legendary",
-	"Artifact"
+	"Epic"
 }
 
 function BuyInterfaceDropDownMenusModule:Enable()
@@ -285,7 +180,8 @@ function BuyInterfaceDropDownMenusModule:CreateItemClassDropDownMenu(parentFrame
 				info.arg1 = key		
 				info.checked = BuyInterfaceModule.mainFrame.itemClasses.value == key
 
-				if key ~= 0 and itemTypeTable[key] ~= "Quest Item (All)" then
+				if key ~= 0 and itemTypeTable[key] ~= "Consumable (All)" and itemTypeTable[key] ~= "Trade Goods (All)" 
+				 and itemTypeTable[key] ~= "Reagent (All)"  and itemTypeTable[key] ~= "Miscellaneous (All)" then
 					info.menuList, info.hasArrow = key, true
 				else
 					info.hasArrow = false
@@ -380,68 +276,55 @@ function BuyInterfaceDropDownMenusModule:GetNestedTableInfoFromMenuValue(menuVal
 			nestedOfNestedTable = miscellaneousWeaponsTable
 		end	
 
-	elseif menuValue == "Armor (All)" or menuValue == "Plate" or menuValue == "Mail" or menuValue == "Leather" or menuValue == "Cloth" or menuValue == "Misc Armor" or menuValue == "Cosmetic" then
+	elseif menuValue == "Armor (All)" or menuValue == "Plate" or menuValue == "Mail" or menuValue == "Leather" or menuValue == "Cloth" or menuValue == "Miscellaneous" or menuValue == "Idols" 
+	or menuValue == "Librams" or menuValue == "Totems" or menuValue == "Shields" then
 		itemTypeValue = 2
 		nestedTable = armorTypeTable
 		
-		if menuValue == "Plate" then
+		if menuValue == "Miscellaneous"  or menuValue == "Cloth" or menuValue == "Leather" or menuValue == "Mail" or menuValue == "Plate" or menuValue == "Mail" or menuValue == "Mail" then
 			nestedOfNestedTable = armorSlotsTable
-		elseif menuValue == "Mail" then
-			nestedOfNestedTable = armorSlotsTable
-		elseif menuValue == "Leather" then
-			nestedOfNestedTable = armorSlotsTable
-		elseif menuValue == "Cloth" then
-			nestedOfNestedTable = armorSlotsTable
-		elseif menuValue == "Misc Armor" then
-			nestedOfNestedTable = armorMiscTable
-		elseif menuValue == "Cosmetic" then
+		else
 			nestedOfNestedTable = {}
 		end	
 
 	elseif menuValue == "Container (All)" then
-
 		itemTypeValue = 3
 		nestedTable = containersTypeTable
 		nestedOfNestedTable = {}
 
-	elseif menuValue == "Gem (All)" then
-		itemTypeValue = 4
-		nestedTable = gemsTypeTable
-		nestedOfNestedTable = {}
-
-	elseif menuValue == "Item Enhancement (All)" then
-		itemTypeValue = 5
-		nestedTable = itemEnhancementsTypeTable
-		nestedOfNestedTable = {}
-
 	elseif menuValue == "Consumable (All)" then
-		itemTypeValue = 6
-		nestedTable = consumablesTypeTable
-		nestedOfNestedTable = {}
-
-	elseif menuValue == "Glyph (All)" then
-		itemTypeValue = 7
-		nestedTable = glyphsTypeTable
+		itemTypeValue = 4
+		nestedTable = {}
 		nestedOfNestedTable = {}
 
 	elseif menuValue == "Trade Goods (All)" then
-		itemTypeValue = 8
-		nestedTable = tradeGoodsTypeTable
+		itemTypeValue = 5
+		nestedTable = {}
+		nestedOfNestedTable = {}
+
+	elseif menuValue == "Projectile (All)" then
+		itemTypeValue = 6
+		nestedTable = projectileTable
+		nestedOfNestedTable = {}
+
+	elseif menuValue == "Quiver (All)" then
+		itemTypeValue = 7
+		nestedTable = quiverTable
 		nestedOfNestedTable = {}
 
 	elseif menuValue == "Recipe (All)" then
-		itemTypeValue = 9
+		itemTypeValue = 8
 		nestedTable = recipesTypeTable
 		nestedOfNestedTable = {}
-	
-	elseif menuValue == "Battle Pet (All)" then
-		itemTypeValue = 10
-		nestedTable = battlePetsTypeTable
+
+	elseif menuValue == "Reagent (All)" then
+		itemTypeValue = 9
+		nestedTable = {}
 		nestedOfNestedTable = {}
 
 	elseif menuValue == "Miscellaneous (All)" then
-		itemTypeValue = 12
-		nestedTable = miscTypeTable
+		itemTypeValue = 10
+		nestedTable = {}
 		nestedOfNestedTable = {}
 	end
 

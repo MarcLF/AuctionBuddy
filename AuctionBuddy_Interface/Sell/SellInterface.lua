@@ -156,7 +156,7 @@ function SellInterfaceModule:CreateItemToSellParameters(parentFrame)
 	parentFrame.itemPrice = CreateFrame("Frame", "AB_SellInterface_MainFrame_ItemToSell_ItemPrice", parentFrame, "MoneyInputFrameTemplate")
 	InterfaceFunctionsModule:SetFrameParameters(parentFrame.itemPrice, nil, nil, nil, "CENTER", 100, -70, nil, parentFrame.itemToSellButton)
 	parentFrame.itemPrice:SetScript("OnShow", function() 
-		MoneyInputFrame_SetCopper( parentFrame.itemPrice, self.itemPriceValue ) 
+		MoneyInputFrame_SetCopper( parentFrame.itemPrice, self.itemPriceValue) 
 		MoneyInputFrame_SetOnValueChangedFunc(parentFrame.itemPrice, function() InterfaceFunctionsModule:ItemPriceUpdated(parentFrame) end) 
 	end)
 	
@@ -206,7 +206,7 @@ function SellInterfaceModule:CreateItemToSellParameters(parentFrame)
 	parentFrame.auctionDuration = CreateFrame("Frame", "AB_SellInterface_MainFrame_ItemToSell_AuctionDuration", parentFrame, "UIDropDownMenuTemplate")
 	parentFrame.auctionDuration:SetPoint("CENTER", parentFrame.itemToSellButton, "CENTER", 85, -220)
 	parentFrame.auctionDuration.durationValue = 2
-	parentFrame.auctionDuration.durationText = "24 Hours"
+	parentFrame.auctionDuration.durationText = "8 Hours"
 	UIDropDownMenu_SetWidth(parentFrame.auctionDuration, 100)
 	UIDropDownMenu_SetText(parentFrame.auctionDuration, parentFrame.auctionDuration.durationText) 
 	UIDropDownMenu_Initialize(parentFrame.auctionDuration, SellInterfaceModule.AuctionDurationDropDown)
@@ -244,13 +244,13 @@ local function SelectAuctionDuration(self, arg1, checked, value)
 	SellInterfaceModule.mainFrame.auctionDuration.durationValue = arg1
 
 	if arg1 == 1 then
-		SellInterfaceModule.mainFrame.auctionDuration.durationText = "12 Hours"
+		SellInterfaceModule.mainFrame.auctionDuration.durationText = "2 Hours"
 		
 	elseif arg1 == 2 then
-		SellInterfaceModule.mainFrame.auctionDuration.durationText = "24 Hours"
+		SellInterfaceModule.mainFrame.auctionDuration.durationText = "8 Hours"
 		
 	elseif arg1 == 3 then
-		SellInterfaceModule.mainFrame.auctionDuration.durationText = "48 Hours"
+		SellInterfaceModule.mainFrame.auctionDuration.durationText = "24 Hours"
 	end
 	
 	UIDropDownMenu_SetText(SellInterfaceModule.mainFrame.auctionDuration, SellInterfaceModule.mainFrame.auctionDuration.durationText) 
@@ -261,17 +261,17 @@ function SellInterfaceModule:AuctionDurationDropDown(frame, level, menuList)
 	local info = UIDropDownMenu_CreateInfo()
 	info.func = SelectAuctionDuration
 	
-	info.text = "12 Hours"
+	info.text = "2 Hours"
 	info.arg1 = 1
 	info.checked = SellInterfaceModule.mainFrame.auctionDuration.durationValue == 1
 	UIDropDownMenu_AddButton(info)
 	
-	info.text = "24 Hours"
+	info.text = "8 Hours"
 	info.arg1 = 2
 	info.checked = SellInterfaceModule.mainFrame.auctionDuration.durationValue == 2
 	UIDropDownMenu_AddButton(info)
 	
-	info.text = "48 Hours"
+	info.text = "24 Hours"
 	info.arg1 = 3
 	info.checked = SellInterfaceModule.mainFrame.auctionDuration.durationValue == 3
 	UIDropDownMenu_AddButton(info)
