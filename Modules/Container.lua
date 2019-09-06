@@ -45,7 +45,7 @@ end
 
 function ContainerModule:AUCTION_OWNED_LIST_UPDATE()
 
-	self:ScanContainer()
+	C_Timer.After(0.5, self.ScanContainer)
 
 end
 

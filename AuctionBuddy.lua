@@ -29,6 +29,7 @@ local SellInterfaceModule = nil
 local SearchesModule = nil
 local OptionsPanelModule = nil
 local OptionsFunctionsModule = nil
+local ContainerModule = nil
 
 function AuctionBuddy:OnInitialize()
 	
@@ -50,13 +51,13 @@ end
 function AuctionBuddy:AUCTION_HOUSE_SHOW()
 
 	self:EnableModule("ResultsTableModule")
+	self:EnableModule("InterfaceFunctionsModule")
 	self:EnableModule("BuyInterfaceModule")
 	self:EnableModule("BuyInterfaceDropDownMenusModule")
 	self:EnableModule("SellInterfaceModule")
 	self:EnableModule("ItemsModule")
 	self:EnableModule("NavigationModule")
 	self:EnableModule("ContainerModule")
-	self:EnableModule("InterfaceFunctionsModule")
 	self:EnableModule("SearchesModule")
 	
 	DatabaseModule = self:GetModule("DatabaseModule")
@@ -67,6 +68,7 @@ function AuctionBuddy:AUCTION_HOUSE_SHOW()
 	BuyInterfaceModule = self:GetModule("BuyInterfaceModule")
 	SellInterfaceModule = self:GetModule("SellInterfaceModule")
 	SearchesModule = self:GetModule("SearchesModule")
+	ContainerModule = self:GetModule("ContainerModule")
 	
 	if not self.onTabClickHooked then
 			self:Hook("AuctionFrameTab_OnClick", true)
@@ -98,8 +100,8 @@ function AuctionBuddy:AUCTION_ITEM_LIST_UPDATE()
 	NavigationModule:CheckSearchActive(BuyInterfaceModule.mainFrame)
 	NavigationModule:CheckSearchActive(SellInterfaceModule.mainFrame)
 	
-	if self.total > 1 then 
-		ItemsModule:UpdateSellItemPriceAfterSearch(1)
+	if self.total > 0 then 
+		ItemsModule:UpdateSellItemPriceAfterSearch(1,  self.shown, self.total)
 	end
 	
 end
@@ -147,6 +149,7 @@ function AuctionBuddy:AuctionFrameTab_OnClick(tab)
 	
 	if tab.sellTabButton then
 		NavigationModule:CheckSearchActive(SellInterfaceModule.mainFrame)
+		ContainerModule:ScanContainer()
 		SellInterfaceModule.mainFrame:Show()
 		
 		-- Disabling CloseAuctionHouse temporarily

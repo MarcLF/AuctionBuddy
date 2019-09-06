@@ -30,7 +30,7 @@ function ItemsModule:CreateAuctionItemButtons(itemsShown, scrollTable)
 		minIncrement, buyoutPrice, bidAmount, highBidder, bidderFullName, aucOwner,
 		ownerFullName, saleStatus, itemId, hasAllInfo = GetAuctionItemInfo("list", i);
 		
-		local itemTotalPrice = buyoutPrice*aucCount
+		local buyOutPerItem = buyoutPrice/aucCount
 		
 		-- This data is compared to each index of columnType array from the CreateBuyScrollFrameTable function inside Buy.lua
 		tinsert(tableData, 
@@ -43,8 +43,8 @@ function ItemsModule:CreateAuctionItemButtons(itemsShown, scrollTable)
 			quality = itemQuality,
 			itlvl = itemLevel,
 			bid = bidAmount,
-			buy = buyoutPrice	,
-			totalPrice = itemTotalPrice
+			buy = buyOutPerItem	,
+			totalPrice = buyoutPrice
 		})
 	end
 	
@@ -53,15 +53,17 @@ function ItemsModule:CreateAuctionItemButtons(itemsShown, scrollTable)
 	
 end
 
-function ItemsModule:UpdateSellItemPriceAfterSearch(numberList)
+function ItemsModule:UpdateSellItemPriceAfterSearch(numberList, shown, total)
 	
 	local buyoutPrice = select(10, GetAuctionItemInfo("list", numberList))
+	local itemQuantity = select(3, GetAuctionItemInfo("list", numberList))
 
-	if buyoutPrice == 0 and numberList < 49 and SellInterfaceModule.mainFrame:IsShown() then
+	if buyoutPrice == 0 and total > 1 and numberList < shown and SellInterfaceModule.mainFrame:IsShown() then
 		numberList = numberList + 1
-		self:UpdateSellItemPriceAfterSearch(numberList)
+		self:UpdateSellItemPriceAfterSearch(numberList, shown, total)
+
 	elseif SellInterfaceModule.mainFrame:IsShown() then
-		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, buyoutPrice)
+		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, buyoutPrice/itemQuantity)
 	end
 	
 end
