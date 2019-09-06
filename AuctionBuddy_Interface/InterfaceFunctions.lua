@@ -137,10 +137,8 @@ function InterfaceFunctionsModule:UpdateTotalBuyoutCostBuy(selectedItemData, ite
 
 	if itemSelected == true and self.needToUpdateTotalCostText == true then
 		local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
-		local quantity = select(3, GetAuctionItemInfo("list", selectedItemData))
 		
-		local totalValue = buyoutPrice*quantity
-		local valueGoldFormat = GetCoinTextureString(totalValue, 15)
+		local valueGoldFormat = GetCoinTextureString(buyoutPrice, 15)
 
 		BuyInterfaceModule.mainFrame.totalBuyCost:SetText(valueGoldFormat)
 

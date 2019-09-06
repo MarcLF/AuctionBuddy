@@ -100,8 +100,8 @@ function AuctionBuddy:AUCTION_ITEM_LIST_UPDATE()
 	NavigationModule:CheckSearchActive(BuyInterfaceModule.mainFrame)
 	NavigationModule:CheckSearchActive(SellInterfaceModule.mainFrame)
 	
-	if self.total > 1 then 
-		ItemsModule:UpdateSellItemPriceAfterSearch(1)
+	if self.total > 0 then 
+		ItemsModule:UpdateSellItemPriceAfterSearch(1,  self.shown, self.total)
 	end
 	
 end
