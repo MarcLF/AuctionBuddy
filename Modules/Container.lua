@@ -56,19 +56,21 @@ function ContainerModule:ScanContainer()
 	
 		containerNumOfSlots = GetContainerNumSlots(i)
 		
-		for j = 0, containerNumOfSlots, 1 do
+		for j = 1, containerNumOfSlots, 1 do
 			myTexture, itemCount, locked, itemQuality, readable, lootable, itemLinkContainer = GetContainerItemInfo(i, j)
 		
-			if myTexture ~= nil and not C_Item.IsBound(ItemLocation:CreateFromBagAndSlot(i, j)) then
-				tinsert(tableData, 
-				{			
-					texture = myTexture,
-					itemLink = itemLinkContainer,
-					count = tonumber(itemCount),
-					quality = itemQuality,
-					bagID = i,
-					slot = j
-				})
+			if myTexture ~= nil then
+				if not C_Item.IsBound(ItemLocation:CreateFromBagAndSlot(i, j)) then
+					tinsert(tableData, 
+					{			
+						texture = myTexture,
+						itemLink = itemLinkContainer,
+						count = tonumber(itemCount),
+						quality = itemQuality,
+						bagID = i,
+						slot = j
+					})
+				end
 			end
 		end
 	end

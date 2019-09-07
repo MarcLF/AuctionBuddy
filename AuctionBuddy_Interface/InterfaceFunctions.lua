@@ -24,10 +24,13 @@ end
 
 function InterfaceFunctionsModule:AUCTION_ITEM_LIST_UPDATE()
 
-	BuyInterfaceModule.mainFrame.currentPlayerGold.value = GetCoinTextureString(GetMoney(), 15)
-	BuyInterfaceModule.mainFrame.currentPlayerGold:SetText(BuyInterfaceModule.mainFrame.currentPlayerGold.value)
+	C_Timer.After(0.5, function() 	
+		BuyInterfaceModule.mainFrame.currentPlayerGold.value = GetCoinTextureString(GetMoney(), 15)
+		BuyInterfaceModule.mainFrame.currentPlayerGold:SetText(BuyInterfaceModule.mainFrame.currentPlayerGold.value)
+	end)
 
 	local valueGoldFormat = GetCoinTextureString(0, 15)
+	BuyInterfaceModule.mainFrame.totalBidCost:SetText(valueGoldFormat)
 	BuyInterfaceModule.mainFrame.totalBuyCost:SetText(valueGoldFormat)
 	
 end
@@ -109,17 +112,25 @@ function InterfaceFunctionsModule:ItemPriceUpdated(parentFrame)
 	
 end
 
-function InterfaceFunctionsModule:UpdateTotalBuyoutCostBuy(selectedItemData, itemSelected)
+function InterfaceFunctionsModule:UpdateTotalBuyoutOrBidCostBuy(selectedItemData, itemSelected)
 
 	if itemSelected == true and self.needToUpdateTotalCostText == true then
-		local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
-		
-		local valueGoldFormat = GetCoinTextureString(buyoutPrice, 15)
 
-		BuyInterfaceModule.mainFrame.totalBuyCost:SetText(valueGoldFormat)
+		local minBid = select(8, GetAuctionItemInfo("list", selectedItemData))
+		local minBidIncrement = select(9, GetAuctionItemInfo("list", selectedItemData))
+		local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
+		local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemData))
+
+		local totalAmountToBid = max(minBid, bidAmount) + minBidIncrement
+
+		local bidValueGoldFormat = GetCoinTextureString(totalAmountToBid, 15)
+		local buyValueGoldFormat = GetCoinTextureString(buyoutPrice, 15)
+
+		BuyInterfaceModule.mainFrame.totalBidCost:SetText(bidValueGoldFormat)
+		BuyInterfaceModule.mainFrame.totalBuyCost:SetText(buyValueGoldFormat)
 
 	elseif self.needToUpdateTotalCostText == true then
-		self:UpdateTotalBuyoutCostBuy(0)
+		self:UpdateTotalBuyoutOrBidCostBuy(0)
 	end
 
 	self.needToUpdateTotalCostText = false

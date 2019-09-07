@@ -108,7 +108,7 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 				ItemsModule.itemSelected = true
 				InterfaceFunctionsModule.needToUpdateTotalCostText = true
 				parentFrame.scrollTable:SetSelection(rowIndex)	
-				InterfaceFunctionsModule:UpdateTotalBuyoutCostBuy(parentFrame.scrollTable:GetSelection(), ItemsModule.itemSelected)
+				InterfaceFunctionsModule:UpdateTotalBuyoutOrBidCostBuy(parentFrame.scrollTable:GetSelection(), ItemsModule.itemSelected)
 			end
 			return true
 		end,

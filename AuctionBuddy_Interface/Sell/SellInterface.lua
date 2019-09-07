@@ -104,6 +104,8 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 		BuyInterfaceModule.mainFrame.currentPlayerGold:SetText(BuyInterfaceModule.mainFrame.currentPlayerGold.value)
 		BuyInterfaceModule.mainFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
 		BuyInterfaceModule.mainFrame.totalBuyCost:SetText(BuyInterfaceModule.mainFrame.totalBuyCost.value)
+		BuyInterfaceModule.mainFrame.totalBidCost.value = GetCoinTextureString(0, 15)
+		BuyInterfaceModule.mainFrame.totalBidCost:SetText(BuyInterfaceModule.mainFrame.totalBuyCost.value)
 		ItemsModule.itemSelected = false
 		BuyInterfaceModule.mainFrame.scrollTable:ClearSelection()
 		SellInterfaceModule.mainFrame.scrollTable:ClearSelection()
