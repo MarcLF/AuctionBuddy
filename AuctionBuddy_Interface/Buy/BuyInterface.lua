@@ -22,6 +22,7 @@ function BuyInterfaceModule:Enable()
 		return
 	end
 
+	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
 	InterfaceFunctionsModule = AuctionBuddy:GetModule("InterfaceFunctionsModule")
 	ResultsTableModule = AuctionBuddy:GetModule("ResultsTableModule")
 	NavigationModule = AuctionBuddy:GetModule("NavigationModule")
@@ -37,6 +38,8 @@ function BuyInterfaceModule:Enable()
 	self:CreateSearchFilters(self.mainFrame)
 	
 	ResultsTableModule:CreateResultsScrollFrameTable(self.mainFrame, -280, -135)
+
+	self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale)
 	
 	self.interfaceCreated = true
 	
@@ -44,7 +47,6 @@ end
 
 function BuyInterfaceModule:OnInitialize()
 
-	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
 	SearchesModule = AuctionBuddy:GetModule("SearchesModule")
 	ItemsModule = AuctionBuddy:GetModule("ItemsModule")
 
@@ -63,10 +65,11 @@ function BuyInterfaceModule:CreateBuyInterface()
 	self.mainFrame:SetMovable(true)
 	self.mainFrame:EnableMouse(true)
 	self.mainFrame:RegisterForDrag("LeftButton")
-	InterfaceFunctionsModule:SetFrameParameters(self.mainFrame, 1250, 700, nil, "CENTER")
+	BuyInterfaceModule:SetFrameParameters(self.mainFrame, 1250, 700, nil, "CENTER")
 	self.mainFrame:SetFrameStrata("FULLSCREEN_DIALOG")
 	self.mainFrame:SetScript("OnDragStart",  function() self.mainFrame:StartMoving() end)
 	self.mainFrame:SetScript("OnDragStop", function() self.mainFrame:StopMovingOrSizing() end)
+	self.mainFrame:SetScript("OnShow", function() self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale) end)
 	self.mainFrame:SetScript("OnHide", function() InterfaceFunctionsModule:CloseAuctionHouseCustom() end)
 	self.mainFrame.CloseButton:SetScript("OnClick", function() CloseAuctionHouse() end)
 	tinsert(UISpecialFrames, "AB_BuyInterface_MainFrame")
@@ -77,16 +80,16 @@ function BuyInterfaceModule:CreateBuyInterface()
 	self.mainFrame.title:SetText("AuctionBuddy BUY")
 
 	self.mainFrame.resultsTableFrame = CreateFrame("Frame", "AB_SellInterface_MainFrame_ResultsFrame", self.mainFrame, "InsetFrameTemplate3")
-	InterfaceFunctionsModule:SetFrameParameters(self.mainFrame.resultsTableFrame, 668, 570, _, "CENTER", -277, -30, "BACKGROUND")
+	BuyInterfaceModule:SetFrameParameters(self.mainFrame.resultsTableFrame, 668, 570, nil, "CENTER", -277, -30, "BACKGROUND")
 	
 	self.mainFrame.containerFrame = CreateFrame("Frame", "AB_SellInterface_MainFrame_ContainerFrame", self.mainFrame, "InsetFrameTemplate3")
-	InterfaceFunctionsModule:SetFrameParameters(self.mainFrame.containerFrame, 170, 570, _, "CENTER", 150, -30, "BACKGROUND")
+	BuyInterfaceModule:SetFrameParameters(self.mainFrame.containerFrame, 170, 570, nil, "CENTER", 150, -30, "BACKGROUND")
 	
 	self.mainFrame.recentSearchesFrame = CreateFrame("Frame", "AB_SellInterface_MainFrame_RecentSearchesFrame", self.mainFrame, "InsetFrameTemplate3")
-	InterfaceFunctionsModule:SetFrameParameters(self.mainFrame.recentSearchesFrame, 320, 170, _, "CENTER", 400, 170, "BACKGROUND")
+	BuyInterfaceModule:SetFrameParameters(self.mainFrame.recentSearchesFrame, 320, 170, nil, "CENTER", 400, 170, "BACKGROUND")
 	
 	self.mainFrame.favoriteSearchesFrame = CreateFrame("Frame", "AB_SellInterface_MainFrame_FavoriteSearchesFrame", self.mainFrame, "InsetFrameTemplate3")
-	InterfaceFunctionsModule:SetFrameParameters(self.mainFrame.favoriteSearchesFrame, 320, 170, _, "CENTER", 400, -110, "BACKGROUND")
+	BuyInterfaceModule:SetFrameParameters(self.mainFrame.favoriteSearchesFrame, 320, 170, nil, "CENTER", 400, -110, "BACKGROUND")
 	
 	self:HideBuyInterface()
 	
@@ -95,7 +98,7 @@ end
 function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 
 	parentFrame.searchBar = CreateFrame("EditBox", "AB_BuyInterface_MainFrame_SearchBar", parentFrame, "InputBoxTemplate")
-	InterfaceFunctionsModule:SetFrameParameters(parentFrame.searchBar, 200, 20, nil, "TOPLEFT", 25, -40)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.searchBar, 200, 20, nil, "TOPLEFT", 25, -40)
 	parentFrame.searchBar:SetAutoFocus(false)
 	parentFrame.searchBar:SetJustifyH("LEFT")
 	parentFrame.searchBar:SetScript("OnShow", function() parentFrame.searchBar:SetFocus() end)
@@ -103,7 +106,7 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 	parentFrame.searchBar:SetScript("OnEnterPressed", function() AuctionBuddy:AuctionHouseSearch(parentFrame.searchBar:GetText()) end)
 	
 	parentFrame.searchButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_Search_Button", parentFrame, "UIPanelButtonTemplate")
-	InterfaceFunctionsModule:SetFrameParameters(parentFrame.searchButton, 80, 24, "Search", "TOPLEFT", 235, -38)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.searchButton, 80, 24, "Search", "TOPLEFT", 235, -38)
 	parentFrame.searchButton:SetScript("OnClick", function() AuctionBuddy:AuctionHouseSearch(parentFrame.searchBar:GetText()) end)
 
 	parentFrame.exactMatch = CreateFrame("CheckButton", "AB_BuyInterface_MainFrame_ExactMatchCheck", parentFrame, "ChatConfigBaseCheckButtonTemplate")
@@ -137,7 +140,7 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 	parentFrame.instaBuyCheckBox.text:SetText("Double Click to buy an item")
 	
 	parentFrame.DefaultAHButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_DefaultAH_Button", parentFrame, "UIPanelButtonTemplate")
-	InterfaceFunctionsModule:SetFrameParameters(parentFrame.DefaultAHButton, 80, 24, "Default AH", "TOPRIGHT", -25, -30)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.DefaultAHButton, 80, 24, "Default AH", "TOPRIGHT", -25, -30)
 	parentFrame.DefaultAHButton:SetScript("OnClick", function() 
 		self:ResetData()
 		InterfaceFunctionsModule:ShowDefaultAH(parentFrame) 
@@ -145,20 +148,23 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 	end)
 	
 	parentFrame.BuyFrameButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_BuyFrame_Button", parentFrame, "UIPanelButtonTemplate")
-	InterfaceFunctionsModule:SetFrameParameters(parentFrame.BuyFrameButton, 80, 24, "Show Sell", "TOPRIGHT", -105, -30)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.BuyFrameButton, 80, 24, "Show Sell", "TOPRIGHT", -105, -30)
 	parentFrame.BuyFrameButton:SetScript("OnClick", function() 
 		self:ResetData()
-		NavigationModule:CheckSearchActive(SellInterfaceModule.mainFrame) 
+		NavigationModule:CheckSearchActive(SellInterfaceModule.mainFrame)
+		ItemsModule.itemSelected = false
+		BuyInterfaceModule.mainFrame.scrollTable:ClearSelection()
+		SellInterfaceModule.mainFrame.scrollTable:ClearSelection()
 		InterfaceFunctionsModule:ChangeCurrentDisplayingFrame(parentFrame) 
 		ContainerModule:ScanContainer()
 	end)
 	
 	parentFrame.nextPageButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_NextPage_Button", parentFrame, "UIPanelButtonTemplate")
-	InterfaceFunctionsModule:SetFrameParameters(parentFrame.nextPageButton, 80, 24, "Next Page", "TOPRIGHT", -25, -60)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.nextPageButton, 80, 24, "Next Page", "TOPRIGHT", -25, -60)
 	parentFrame.nextPageButton:SetScript("OnClick", function() NavigationModule:MovePage(true, parentFrame) AuctionBuddy:AuctionHouseSearch() end)
 	
 	parentFrame.prevPageButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_PrevPage_Button", parentFrame, "UIPanelButtonTemplate")
-	InterfaceFunctionsModule:SetFrameParameters(parentFrame.prevPageButton, 80, 24, "Prev Page", "TOPRIGHT", -105, -60)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.prevPageButton, 80, 24, "Prev Page", "TOPRIGHT", -105, -60)
 	parentFrame.prevPageButton:SetScript("OnClick", function() NavigationModule:MovePage(false, parentFrame) AuctionBuddy:AuctionHouseSearch() end)
 	
 end
@@ -180,13 +186,13 @@ function BuyInterfaceModule:CreateBuyInterfaceBuyOptions(parentFrame)
 	parentFrame.totalBuyCost.text:SetText("Total Cost:")
 
 	parentFrame.buySelectedItem = CreateFrame("Button", "AB_BuyInterface_MainFrame_BuySelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
-	InterfaceFunctionsModule:SetFrameParameters(parentFrame.buySelectedItem, 125, 24, "Buy Selected Item", "RIGHT", -90, -290)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.buySelectedItem, 125, 24, "Buy Selected Item", "RIGHT", -90, -290)
 	parentFrame.buySelectedItem:SetScript("OnClick", function() ItemsModule:BuySelectedItem(parentFrame.scrollTable:GetSelection(), false) parentFrame.scrollTable:ClearSelection() end)
 	parentFrame.buySelectedItem:SetScript("OnUpdate", function() ItemsModule:ItemInsertedOrSelected(parentFrame.buySelectedItem, ItemsModule.itemSelected) end)
 	parentFrame.buySelectedItem:Disable()
 	
 	parentFrame.bidSelectedItem = CreateFrame("Button", "AB_BuyInterface_MainFrame_BidSelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
-	InterfaceFunctionsModule:SetFrameParameters(parentFrame.bidSelectedItem, 125, 24, "Bid Selected Item", "RIGHT", -230, -290)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.bidSelectedItem, 125, 24, "Bid Selected Item", "RIGHT", -230, -290)
 	parentFrame.bidSelectedItem:SetScript("OnClick", function() ItemsModule:BuySelectedItem(parentFrame.scrollTable:GetSelection(), true) parentFrame.scrollTable:ClearSelection() end)
 	parentFrame.bidSelectedItem:SetScript("OnUpdate", function() ItemsModule:ItemInsertedOrSelected(parentFrame.bidSelectedItem, ItemsModule.itemSelected) end)
 	parentFrame.bidSelectedItem:Disable()
@@ -198,6 +204,30 @@ function BuyInterfaceModule:CreateBuyInterfaceBuyOptions(parentFrame)
 	parentFrame.currentPlayerGold:SetJustifyH("LEFT")
 	parentFrame.currentPlayerGold.value = GetCoinTextureString(GetMoney(), 15)
 	parentFrame.currentPlayerGold:SetText(parentFrame.currentPlayerGold.value)
+
+	parentFrame.uiScaleSlider = CreateFrame("Slider", "AB_BuyInterface_MainFrame_UISlider", parentFrame, "OptionsSliderTemplate")
+	parentFrame.uiScaleSlider:SetPoint("TOP", 250, -50)
+	parentFrame.uiScaleSlider:SetWidth(150)
+	parentFrame.uiScaleSlider:SetHeight(20)
+	parentFrame.uiScaleSlider:SetOrientation("HORIZONTAL")
+	parentFrame.uiScaleSlider:SetMinMaxValues(0.5, 1.0)
+	parentFrame.uiScaleSlider:SetValueStep(0.1)
+	parentFrame.uiScaleSlider:SetValue(DatabaseModule.generalOptions.uiScale)
+	parentFrame.uiScaleSlider:SetObeyStepOnDrag(true)
+	parentFrame.uiScaleSlider:SetScript("OnShow", function() parentFrame.uiScaleSlider:SetValue(DatabaseModule.generalOptions.uiScale) end)
+
+	parentFrame.uiScaleSlider.text = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_UISlider_Text", "OVERLAY", "GameFontNormal")
+	parentFrame.uiScaleSlider.text:SetWidth(250)
+	parentFrame.uiScaleSlider.text:SetPoint("TOP", 250, -35)
+	parentFrame.uiScaleSlider.text:SetJustifyH("CENTER")
+	parentFrame.uiScaleSlider.text:SetText("AB UI Scale")
+
+	parentFrame.uiScaleSliderApplyButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_UISlider_ApplyButton", parentFrame, "UIPanelButtonTemplate")
+	BuyInterfaceModule:SetFrameParameters(parentFrame.uiScaleSliderApplyButton, 60, 24, "Apply", "TOP", 370, -50)
+	parentFrame.uiScaleSliderApplyButton:SetScript("OnClick", function() 
+		DatabaseModule.generalOptions.uiScale = parentFrame.uiScaleSlider:GetValue()
+		self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale) 
+	end)
 
 end
 
@@ -214,14 +244,14 @@ function BuyInterfaceModule:CreateSearchFilters(parentFrame)
 	parentFrame.scoreSign:SetText("-")
 	
 	parentFrame.minILvl = CreateFrame("EditBox", "AB_BuyInterface_MainFrame_ItemLevel_MinItemLevel", parentFrame, "InputBoxTemplate")
-	InterfaceFunctionsModule:SetFrameParameters(parentFrame.minILvl, 30, 20, nil, "CENTER", -28, -20, nil, parentFrame.iLvl)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.minILvl, 30, 20, nil, "CENTER", -28, -20, nil, parentFrame.iLvl)
 	parentFrame.minILvl:SetAutoFocus(false)
 	parentFrame.minILvl:SetJustifyH("CENTER")
 	parentFrame.minILvl:SetScript("OnEscapePressed", function() parentFrame.minILvl:ClearFocus() end)
 	parentFrame.minILvl:SetScript("OnEnterPressed", function() parentFrame.minILvl:ClearFocus() end)
 
 	parentFrame.maxILvl = CreateFrame("EditBox", "AB_BuyInterface_MainFrame_ItemLevel_MaxItemLevel", parentFrame, "InputBoxTemplate")
-	InterfaceFunctionsModule:SetFrameParameters(parentFrame.maxILvl, 30, 20, nil, "CENTER", 27, -20, nil, parentFrame.iLvl)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.maxILvl, 30, 20, nil, "CENTER", 27, -20, nil, parentFrame.iLvl)
 	parentFrame.maxILvl:SetAutoFocus(false)
 	parentFrame.maxILvl:SetJustifyH("CENTER")
 	parentFrame.maxILvl:SetScript("OnEscapePressed", function() parentFrame.maxILvl:ClearFocus() end)
@@ -232,7 +262,7 @@ function BuyInterfaceModule:CreateSearchFilters(parentFrame)
 	parentFrame.itemTypeText:SetJustifyH("CENTER")
 	parentFrame.itemTypeText:SetText("Item Type")
 
-	parentFrame.itemSubTypeText = parentFrame.maxILvl:CreateFontString("AB_BuyInterface_MainFrame_SlotType_Text", "OVERLAY", "GameFontNormal")
+	parentFrame.itemSubTypeText = parentFrame.maxILvl:CreateFontString("AB_BuyInterface_MainFrame_Rarity_Text", "OVERLAY", "GameFontNormal")
 	parentFrame.itemSubTypeText:SetPoint("CENTER", 249, 20)
 	parentFrame.itemSubTypeText:SetJustifyH("CENTER")
 	parentFrame.itemSubTypeText:SetText("Rarity")
@@ -242,14 +272,14 @@ end
 function BuyInterfaceModule:CreateBuyInterfaceSearchTablesOptions(parentFrame)
 
 	parentFrame.resetDatabase = CreateFrame("Button", "AB_BuyInterface_MainFrame_ResetTableData_Button", parentFrame, "UIPanelButtonTemplate")
-	InterfaceFunctionsModule:SetFrameParameters(parentFrame.resetDatabase, 170, 24, "Reset Search History", "RIGHT", -215, 70)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.resetDatabase, 170, 24, "Reset Search History", "RIGHT", -215, 70)
 	parentFrame.resetDatabase:SetScript("OnClick", function() 
 		DatabaseModule:ResetDatabase("AB_RecentSearches") 
 		DatabaseModule:InsertDataFromDatabase(BuyInterfaceModule.mainFrame.recentSearchesTable, DatabaseModule.recentSearches)
 	end)
 	
 	parentFrame.resetDatabase = CreateFrame("Button", "AB_BuyInterface_MainFrame_ManageFavoriteLists_Button", parentFrame, "UIPanelButtonTemplate")
-	InterfaceFunctionsModule:SetFrameParameters(parentFrame.resetDatabase, 170, 24, "Manage Favorite Lists", "RIGHT", -215, -211)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.resetDatabase, 170, 24, "Manage Favorite Lists", "RIGHT", -215, -211)
 	parentFrame.resetDatabase:SetScript("OnClick", function() 
 		parentFrame:Hide()
 		InterfaceOptionsFrame_OpenToCategory(OptionsPanelModule.favoriteLists)
@@ -257,7 +287,7 @@ function BuyInterfaceModule:CreateBuyInterfaceSearchTablesOptions(parentFrame)
 	end)
 	
 	parentFrame.addFavoriteBar = CreateFrame("EditBox", "AB_BuyInterface_MainFrame_SearchBar", parentFrame.favoriteSearchesFrame, "InputBoxTemplate")
-	InterfaceFunctionsModule:SetFrameParameters(parentFrame.addFavoriteBar, 200, 20, nil, "TOPLEFT", 5, 25)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.addFavoriteBar, 200, 20, nil, "TOPLEFT", 5, 25)
 	parentFrame.addFavoriteBar:SetAutoFocus(false)
 	parentFrame.addFavoriteBar:SetJustifyH("LEFT")
 	parentFrame.addFavoriteBar:SetScript("OnEscapePressed", function() parentFrame.addFavoriteBar:ClearFocus() end)
@@ -273,7 +303,7 @@ function BuyInterfaceModule:CreateBuyInterfaceSearchTablesOptions(parentFrame)
 	end)
 	
 	parentFrame.addFavorite = CreateFrame("Button", "AB_BuyInterface_MainFrame_AddFavorite_Button", parentFrame, "UIPanelButtonTemplate")
-	InterfaceFunctionsModule:SetFrameParameters(parentFrame.addFavorite, 100, 24, "Add Favorite", "RIGHT", -75, -11)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.addFavorite, 100, 24, "Add Favorite", "RIGHT", -75, -11)
 	parentFrame.addFavorite:SetScript("OnClick", function()  
 		if parentFrame.addFavoriteBar:GetText() ~= "" and BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu.value ~= nil then
 			DatabaseModule:InsertNewSearch(DatabaseModule.favoriteSearchesLists[BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu.value][1], parentFrame.addFavoriteBar:GetText()) 
@@ -307,6 +337,34 @@ function BuyInterfaceModule:CreateBuyTab(parentFrame)
 	tinsert(AuctionBuddy.auctionTabs, parentFrame)
 	
 	parentFrame.sellTabCreated = true
+	
+end
+
+function BuyInterfaceModule:SetFrameParameters(frame, width, height, text, point, xOffSet, yOffSet, strata, relativeTo)
+
+	if frame ~= nil then
+		if width ~= nil then 
+			frame:SetWidth(width)
+		end
+
+		if height ~= nil then 
+			frame:SetHeight(height)
+		end
+
+		if text ~= nil then 
+			frame:SetText(text)
+		end
+
+		if relativeTo == nil then
+			frame:SetPoint(point, xOffSet, yOffSet)
+		else
+			frame:SetPoint(point, relativeTo, "CENTER", xOffSet, yOffSet)
+		end
+
+		if strate ~= nil then 
+			frame:SetFrameStrata(strata)
+		end
+	end
 	
 end
 

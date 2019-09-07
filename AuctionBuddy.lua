@@ -172,6 +172,15 @@ function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
 	end
 	
 	if CanSendAuctionQuery() then
+		ItemsModule.itemSelected = false
+
+		if BuyInterfaceModule.mainFrame.scrollTable:GetSelection() ~= nil then
+			BuyInterfaceModule.mainFrame.scrollTable:ClearSelection()
+		end
+
+		if SellInterfaceModule.mainFrame.scrollTable:GetSelection() ~= nil then
+			SellInterfaceModule.mainFrame.scrollTable:ClearSelection()
+		end
 		NavigationModule.searchActive = true
 
 		if self.searchText ~= "" then
@@ -199,9 +208,9 @@ function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
 			BuyInterfaceModule.mainFrame.minILvl:GetNumber(),
 			BuyInterfaceModule.mainFrame.maxILvl:GetNumber(), 
 			NavigationModule.page,
-			_,
+			false,
 			BuyInterfaceModule.mainFrame.rarity.value,
-			_,
+			false,
 			DatabaseModule.buyOptions.exactMatch,
 			filterData
 		)

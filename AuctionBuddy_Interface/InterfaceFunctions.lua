@@ -32,30 +32,6 @@ function InterfaceFunctionsModule:AUCTION_ITEM_LIST_UPDATE()
 	
 end
 
-function InterfaceFunctionsModule:SetFrameParameters(frame, width, height, text, point, xOffSet, yOffSet, strata, relativeTo)
-
-	if width ~= nil then 
-		frame:SetWidth(width)
-	end
-	if height ~= nil then 
-		frame:SetHeight(height)
-	end
-	if text ~= nil then 
-		frame:SetText(text)
-	end
-
-	if relativeTo == nil then
-		frame:SetPoint(point, xOffSet, yOffSet)
-	else
-		frame:SetPoint(point, relativeTo, "CENTER", xOffSet, yOffSet)
-	end
-
-	if strate ~= nil then 
-		frame:SetFrameStrata(strata)
-	end
-	
-end
-
 function InterfaceFunctionsModule:CloseAuctionHouseCustom()
 
 	if self.switchingUI == false and SellInterfaceModule.interfaceCreated == true and BuyInterfaceModule.interfaceCreated == true then

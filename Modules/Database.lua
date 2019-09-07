@@ -5,10 +5,15 @@ local StdUi = LibStub('StdUi')
 
 local DatabaseModule = AuctionBuddy:NewModule("DatabaseModule")
 
+DatabaseModule.generalOptionsDefault = 
+{
+	uiScale = 1.0
+}
+
 DatabaseModule.buyOptionsDefault = 
 {
 	doubleClickToBuy = false,
-	exactMatch = false
+	exactMatch = false,
 }
 
 DatabaseModule.recentSearchesDefault = 
@@ -27,6 +32,12 @@ DatabaseModule.favoriteSearchesListsDefault =
 }
 
 function DatabaseModule:Enable()
+
+	if not AB_GeneralOptions then 
+		AB_GeneralOptions = self.generalOptionsDefault	
+	end
+
+	self.generalOptions = AB_GeneralOptions
 
 	if not AB_BuyOptions or not AB_BuyOptions.exactMatch then 
 		AB_BuyOptions = self.buyOptionsDefault	

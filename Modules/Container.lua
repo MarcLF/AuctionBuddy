@@ -73,8 +73,13 @@ function ContainerModule:ScanContainer()
 		end
 	end
 	
-	BuyInterfaceModule.mainFrame.scrollTableContainer:SetData(tableData, true)
-	SellInterfaceModule.mainFrame.scrollTableContainer:SetData(tableData, true)
+	if BuyInterfaceModule ~= nil then
+		BuyInterfaceModule.mainFrame.scrollTableContainer:SetData(tableData, true)
+	end
+
+	if BuyInterfaceModule ~= nil then
+		SellInterfaceModule.mainFrame.scrollTableContainer:SetData(tableData, true)
+	end
 	
 end
 
