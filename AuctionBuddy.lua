@@ -45,13 +45,13 @@ function AuctionBuddy:VARIABLES_LOADED()
 	self:EnableModule("DatabaseModule")
 	self:EnableModule("OptionsFunctionsModule")
 	self:EnableModule("OptionsPanelModule")
+	self:EnableModule("InterfaceFunctionsModule")
 
 end
 
 function AuctionBuddy:AUCTION_HOUSE_SHOW()
 
 	self:EnableModule("ResultsTableModule")
-	self:EnableModule("InterfaceFunctionsModule")
 	self:EnableModule("BuyInterfaceModule")
 	self:EnableModule("BuyInterfaceDropDownMenusModule")
 	self:EnableModule("SellInterfaceModule")
@@ -172,6 +172,15 @@ function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
 	end
 	
 	if CanSendAuctionQuery() then
+		ItemsModule.itemSelected = false
+
+		if BuyInterfaceModule.mainFrame.scrollTable:GetSelection() ~= nil then
+			BuyInterfaceModule.mainFrame.scrollTable:ClearSelection()
+		end
+
+		if SellInterfaceModule.mainFrame.scrollTable:GetSelection() ~= nil then
+			SellInterfaceModule.mainFrame.scrollTable:ClearSelection()
+		end
 		NavigationModule.searchActive = true
 
 		if self.searchText ~= "" then

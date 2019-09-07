@@ -22,6 +22,7 @@ function BuyInterfaceModule:Enable()
 		return
 	end
 
+	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
 	InterfaceFunctionsModule = AuctionBuddy:GetModule("InterfaceFunctionsModule")
 	ResultsTableModule = AuctionBuddy:GetModule("ResultsTableModule")
 	NavigationModule = AuctionBuddy:GetModule("NavigationModule")
@@ -44,7 +45,6 @@ end
 
 function BuyInterfaceModule:OnInitialize()
 
-	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
 	SearchesModule = AuctionBuddy:GetModule("SearchesModule")
 	ItemsModule = AuctionBuddy:GetModule("ItemsModule")
 
@@ -67,6 +67,7 @@ function BuyInterfaceModule:CreateBuyInterface()
 	self.mainFrame:SetFrameStrata("FULLSCREEN_DIALOG")
 	self.mainFrame:SetScript("OnDragStart",  function() self.mainFrame:StartMoving() end)
 	self.mainFrame:SetScript("OnDragStop", function() self.mainFrame:StopMovingOrSizing() end)
+	self.mainFrame:SetScript("OnShow", function() self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale) end)
 	self.mainFrame:SetScript("OnHide", function() InterfaceFunctionsModule:CloseAuctionHouseCustom() end)
 	self.mainFrame.CloseButton:SetScript("OnClick", function() CloseAuctionHouse() end)
 	tinsert(UISpecialFrames, "AB_BuyInterface_MainFrame")
@@ -148,7 +149,10 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 	InterfaceFunctionsModule:SetFrameParameters(parentFrame.BuyFrameButton, 80, 24, "Show Sell", "TOPRIGHT", -105, -30)
 	parentFrame.BuyFrameButton:SetScript("OnClick", function() 
 		self:ResetData()
-		NavigationModule:CheckSearchActive(SellInterfaceModule.mainFrame) 
+		NavigationModule:CheckSearchActive(SellInterfaceModule.mainFrame)
+		ItemsModule.itemSelected = false
+		BuyInterfaceModule.mainFrame.scrollTable:ClearSelection()
+		SellInterfaceModule.mainFrame.scrollTable:ClearSelection()
 		InterfaceFunctionsModule:ChangeCurrentDisplayingFrame(parentFrame) 
 		ContainerModule:ScanContainer()
 	end)
@@ -165,28 +169,42 @@ end
 
 function BuyInterfaceModule:CreateBuyInterfaceBuyOptions(parentFrame)
 	
+	parentFrame.totalBidCost = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_TotalBidCost", "OVERLAY")
+	parentFrame.totalBidCost:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
+	parentFrame.totalBidCost:SetWidth(250)
+	parentFrame.totalBidCost:SetPoint("BOTTOMRIGHT", 20, 92)
+	parentFrame.totalBidCost:SetJustifyH("LEFT")
+	parentFrame.totalBidCost.value = GetCoinTextureString(0, 15)
+	parentFrame.totalBidCost:SetText(parentFrame.totalBidCost.value)
+
+	parentFrame.totalBidCost.text = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_TotalBidCost_Text", "OVERLAY", "GameFontNormal")
+	parentFrame.totalBidCost.text:SetWidth(250)
+	parentFrame.totalBidCost.text:SetPoint("BOTTOMRIGHT", -95, 95)
+	parentFrame.totalBidCost.text:SetJustifyH("LEFT")
+	parentFrame.totalBidCost.text:SetText("Total Bid Cost:")
+
 	parentFrame.totalBuyCost = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_TotalBuyCost", "OVERLAY")
 	parentFrame.totalBuyCost:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
 	parentFrame.totalBuyCost:SetWidth(250)
-	parentFrame.totalBuyCost:SetPoint("BOTTOMRIGHT", 20, 90)
+	parentFrame.totalBuyCost:SetPoint("BOTTOMRIGHT", 20, 67)
 	parentFrame.totalBuyCost:SetJustifyH("LEFT")
 	parentFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
 	parentFrame.totalBuyCost:SetText(parentFrame.totalBuyCost.value)
 
 	parentFrame.totalBuyCost.text = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_TotalBuyCost_Text", "OVERLAY", "GameFontNormal")
 	parentFrame.totalBuyCost.text:SetWidth(250)
-	parentFrame.totalBuyCost.text:SetPoint("BOTTOMRIGHT", -50, 93)
+	parentFrame.totalBuyCost.text:SetPoint("BOTTOMRIGHT", -95, 70)
 	parentFrame.totalBuyCost.text:SetJustifyH("LEFT")
-	parentFrame.totalBuyCost.text:SetText("Total Cost:")
+	parentFrame.totalBuyCost.text:SetText("Total Buyout Cost:")
 
 	parentFrame.buySelectedItem = CreateFrame("Button", "AB_BuyInterface_MainFrame_BuySelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
-	InterfaceFunctionsModule:SetFrameParameters(parentFrame.buySelectedItem, 125, 24, "Buy Selected Item", "RIGHT", -90, -290)
+	InterfaceFunctionsModule:SetFrameParameters(parentFrame.buySelectedItem, 125, 24, "Buy Selected Item", "RIGHT", -90, -303)
 	parentFrame.buySelectedItem:SetScript("OnClick", function() ItemsModule:BuySelectedItem(parentFrame.scrollTable:GetSelection(), false) parentFrame.scrollTable:ClearSelection() end)
 	parentFrame.buySelectedItem:SetScript("OnUpdate", function() ItemsModule:ItemInsertedOrSelected(parentFrame.buySelectedItem, ItemsModule.itemSelected) end)
 	parentFrame.buySelectedItem:Disable()
 	
 	parentFrame.bidSelectedItem = CreateFrame("Button", "AB_BuyInterface_MainFrame_BidSelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
-	InterfaceFunctionsModule:SetFrameParameters(parentFrame.bidSelectedItem, 125, 24, "Bid Selected Item", "RIGHT", -230, -290)
+	InterfaceFunctionsModule:SetFrameParameters(parentFrame.bidSelectedItem, 125, 24, "Bid Selected Item", "RIGHT", -230, -303)
 	parentFrame.bidSelectedItem:SetScript("OnClick", function() ItemsModule:BuySelectedItem(parentFrame.scrollTable:GetSelection(), true) parentFrame.scrollTable:ClearSelection() end)
 	parentFrame.bidSelectedItem:SetScript("OnUpdate", function() ItemsModule:ItemInsertedOrSelected(parentFrame.bidSelectedItem, ItemsModule.itemSelected) end)
 	parentFrame.bidSelectedItem:Disable()
@@ -198,6 +216,30 @@ function BuyInterfaceModule:CreateBuyInterfaceBuyOptions(parentFrame)
 	parentFrame.currentPlayerGold:SetJustifyH("LEFT")
 	parentFrame.currentPlayerGold.value = GetCoinTextureString(GetMoney(), 15)
 	parentFrame.currentPlayerGold:SetText(parentFrame.currentPlayerGold.value)
+
+	parentFrame.uiScaleSlider = CreateFrame("Slider", "AB_BuyInterface_MainFrame_UISlider", parentFrame, "OptionsSliderTemplate")
+	parentFrame.uiScaleSlider:SetPoint("TOP", 250, -50)
+	parentFrame.uiScaleSlider:SetWidth(150)
+	parentFrame.uiScaleSlider:SetHeight(20)
+	parentFrame.uiScaleSlider:SetOrientation("HORIZONTAL")
+	parentFrame.uiScaleSlider:SetMinMaxValues(0.5, 1.0)
+	parentFrame.uiScaleSlider:SetValueStep(0.1)
+	parentFrame.uiScaleSlider:SetValue(DatabaseModule.generalOptions.uiScale)
+	parentFrame.uiScaleSlider:SetObeyStepOnDrag(true)
+	parentFrame.uiScaleSlider:SetScript("OnShow", function() parentFrame.uiScaleSlider:SetValue(DatabaseModule.generalOptions.uiScale) end)
+
+	parentFrame.uiScaleSlider.text = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_UISlider_Text", "OVERLAY", "GameFontNormal")
+	parentFrame.uiScaleSlider.text:SetWidth(250)
+	parentFrame.uiScaleSlider.text:SetPoint("TOP", 250, -35)
+	parentFrame.uiScaleSlider.text:SetJustifyH("CENTER")
+	parentFrame.uiScaleSlider.text:SetText("AB UI Scale")
+
+	parentFrame.uiScaleSliderApplyButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_UISlider_ApplyButton", parentFrame, "UIPanelButtonTemplate")
+	InterfaceFunctionsModule:SetFrameParameters(parentFrame.uiScaleSliderApplyButton, 60, 24, "Apply", "TOP", 370, -50)
+	parentFrame.uiScaleSliderApplyButton:SetScript("OnClick", function() 
+		DatabaseModule.generalOptions.uiScale = parentFrame.uiScaleSlider:GetValue()
+		self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale) 
+	end)
 
 end
 
@@ -315,6 +357,9 @@ function BuyInterfaceModule:ResetData()
 	self.mainFrame.searchBar:SetText("")
 
 	self.mainFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
+	self.mainFrame.totalBuyCost:SetText(self.mainFrame.totalBuyCost.value)
+
+	self.mainFrame.totalBidCost.value = GetCoinTextureString(0, 15)
 	self.mainFrame.totalBuyCost:SetText(self.mainFrame.totalBuyCost.value)
 	
 	UIDropDownMenu_SetText(self.mainFrame.rarity, "Any") 

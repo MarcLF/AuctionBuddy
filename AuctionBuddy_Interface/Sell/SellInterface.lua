@@ -11,6 +11,7 @@ local NavigationModule = nil
 local BuyInterfaceModule = nil
 local ItemsModule = nil
 local ContainerModule = nil
+local DatabaseModule = nil
 
 SellInterfaceModule.itemPriceValue = nil
 SellInterfaceModule.stackPriceValue = nil
@@ -24,6 +25,7 @@ function SellInterfaceModule:Enable()
 	SellInterfaceModule.itemPriceValue = 100
 	SellInterfaceModule.stackPriceValue = 100
 	
+	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
 	InterfaceFunctionsModule = AuctionBuddy:GetModule("InterfaceFunctionsModule")
 	ResultsTableModule = AuctionBuddy:GetModule("ResultsTableModule")
 	NavigationModule = AuctionBuddy:GetModule("NavigationModule")
@@ -60,10 +62,11 @@ function SellInterfaceModule:CreateSellInterface()
 	self.mainFrame:SetMovable(true)
 	self.mainFrame:EnableMouse(true)
 	self.mainFrame:RegisterForDrag("LeftButton")
-	InterfaceFunctionsModule:SetFrameParameters(self.mainFrame, 1250, 700, _, "CENTER")
+	InterfaceFunctionsModule:SetFrameParameters(self.mainFrame, 1250, 700, nil, "CENTER")
 	self.mainFrame:SetFrameStrata("FULLSCREEN_DIALOG")
 	self.mainFrame:SetScript("OnDragStart",  function() self.mainFrame:StartMoving() end)
 	self.mainFrame:SetScript("OnDragStop", function() self.mainFrame:StopMovingOrSizing() end)
+	self.mainFrame:SetScript("OnShow", function() self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale) end)
 	self.mainFrame:SetScript("OnHide", function() InterfaceFunctionsModule:CloseAuctionHouseCustom() end)
 	self.mainFrame.CloseButton:SetScript("OnClick", function() CloseAuctionHouse() end)
 	tinsert(UISpecialFrames, "AB_SellInterface_MainFrame")
@@ -74,13 +77,13 @@ function SellInterfaceModule:CreateSellInterface()
 	self.mainFrame.title:SetText("AuctionBuddy SELL")
 	
 	self.mainFrame.itemFrame = CreateFrame("Frame", "AB_SellInterface_MainFrame_ItemFrame", self.mainFrame, "InsetFrameTemplate3")
-	InterfaceFunctionsModule:SetFrameParameters(self.mainFrame.itemFrame, 285, 330, _, "LEFT", 10, 66, "BACKGROUND")
+	InterfaceFunctionsModule:SetFrameParameters(self.mainFrame.itemFrame, 285, 330, nil, "LEFT", 10, 66, "BACKGROUND")
 	
 	self.mainFrame.resultsTableFrame = CreateFrame("Frame", "AB_SellInterface_MainFrame_ResultsFrame", self.mainFrame, "InsetFrameTemplate3")
-	InterfaceFunctionsModule:SetFrameParameters(self.mainFrame.resultsTableFrame, 668, 570, _, "CENTER", 277, -30, "BACKGROUND")
+	InterfaceFunctionsModule:SetFrameParameters(self.mainFrame.resultsTableFrame, 668, 570, nil, "CENTER", 277, -30, "BACKGROUND")
 	
 	self.mainFrame.containerFrame = CreateFrame("Frame", "AB_SellInterface_MainFrame_ContainerFrame", self.mainFrame, "InsetFrameTemplate3")
-	InterfaceFunctionsModule:SetFrameParameters(self.mainFrame.containerFrame, 265, 570, _, "CENTER", -193, -30, "BACKGROUND")
+	InterfaceFunctionsModule:SetFrameParameters(self.mainFrame.containerFrame, 265, 570, nil, "CENTER", -193, -30, "BACKGROUND")
 	
 	self:HideSellInterface()
 	
@@ -97,6 +100,13 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 	parentFrame.BuyFrameButton:SetScript("OnClick", function() 
 		BuyInterfaceModule.mainFrame.currentPlayerGold.value = GetCoinTextureString(GetMoney(), 15)
 		BuyInterfaceModule.mainFrame.currentPlayerGold:SetText(BuyInterfaceModule.mainFrame.currentPlayerGold.value)
+		BuyInterfaceModule.mainFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
+		BuyInterfaceModule.mainFrame.totalBuyCost:SetText(BuyInterfaceModule.mainFrame.totalBuyCost.value)
+		BuyInterfaceModule.mainFrame.totalBidCost.value = GetCoinTextureString(0, 15)
+		BuyInterfaceModule.mainFrame.totalBidCost:SetText(BuyInterfaceModule.mainFrame.totalBuyCost.value)
+		ItemsModule.itemSelected = false
+		BuyInterfaceModule.mainFrame.scrollTable:ClearSelection()
+		SellInterfaceModule.mainFrame.scrollTable:ClearSelection()
 		NavigationModule:CheckSearchActive(BuyInterfaceModule.mainFrame) 
 		InterfaceFunctionsModule:ChangeCurrentDisplayingFrame(parentFrame) 
 	end)
@@ -148,6 +158,30 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 	parentFrame.itemToSellButton.text:SetPoint("CENTER", 90, 0)
 	parentFrame.itemToSellButton.text:SetJustifyH("LEFT")
 	parentFrame.itemToSellButton.text:SetText("<-- [Insert Item]")
+
+	parentFrame.uiScaleSlider = CreateFrame("Slider", "AB_SellInterface_MainFrame_UISlider", parentFrame, "OptionsSliderTemplate")
+	parentFrame.uiScaleSlider:SetPoint("TOP", 250, -50)
+	parentFrame.uiScaleSlider:SetWidth(150)
+	parentFrame.uiScaleSlider:SetHeight(20)
+	parentFrame.uiScaleSlider:SetOrientation("HORIZONTAL")
+	parentFrame.uiScaleSlider:SetMinMaxValues(0.5, 1.0)
+	parentFrame.uiScaleSlider:SetValueStep(0.1)
+	parentFrame.uiScaleSlider:SetValue(DatabaseModule.generalOptions.uiScale)
+	parentFrame.uiScaleSlider:SetObeyStepOnDrag(true)
+	parentFrame.uiScaleSlider:SetScript("OnShow", function() parentFrame.uiScaleSlider:SetValue(DatabaseModule.generalOptions.uiScale) end)
+
+	parentFrame.uiScaleSlider.text = parentFrame:CreateFontString("AB_SellInterface_MainFrame_UISlider_Text", "OVERLAY", "GameFontNormal")
+	parentFrame.uiScaleSlider.text:SetWidth(250)
+	parentFrame.uiScaleSlider.text:SetPoint("TOP", 250, -35)
+	parentFrame.uiScaleSlider.text:SetJustifyH("CENTER")
+	parentFrame.uiScaleSlider.text:SetText("AB UI Scale")
+
+	parentFrame.uiScaleSliderApplyButton = CreateFrame("Button", "AB_SellInterface_MainFrame_UISlider_ApplyButton", parentFrame, "UIPanelButtonTemplate")
+	InterfaceFunctionsModule:SetFrameParameters(parentFrame.uiScaleSliderApplyButton, 60, 24, "Apply", "TOP", 370, -50)
+	parentFrame.uiScaleSliderApplyButton:SetScript("OnClick", function() 
+		DatabaseModule.generalOptions.uiScale = parentFrame.uiScaleSlider:GetValue()
+		self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale) 
+	end)
 	
 end
 

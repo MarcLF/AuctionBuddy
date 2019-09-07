@@ -40,3 +40,6 @@ luac.out
 *.hex
 
 .vs/AuctionBuddy/v15/.suo
+.vs/ProjectSettings.json
+.vs/slnx.sqlite
+.vs/VSWorkspaceState.json

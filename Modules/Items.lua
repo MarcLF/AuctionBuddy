@@ -31,7 +31,15 @@ function ItemsModule:CreateAuctionItemButtons(itemsShown, scrollTable)
 		ownerFullName, saleStatus, itemId, hasAllInfo = GetAuctionItemInfo("list", i);
 		
 		local buyOutPerItem = buyoutPrice/aucCount
-		
+
+		if bidAmount == 0 then
+			bidAmount = minBid
+		end
+
+		if highBidder == true then
+			bidAmount = "Already bid"
+		end
+
 		-- This data is compared to each index of columnType array from the CreateBuyScrollFrameTable function inside Buy.lua
 		tinsert(tableData, 
 		{
@@ -82,11 +90,16 @@ function ItemsModule:BuySelectedItem(selectedItemData, isBid)
 	
 	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
 	local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemData))
-	
-	bidAmount = bidAmount*1.05
-	
+	local minIncrement = select(9, GetAuctionItemInfo("list", selectedItemData))
+	local minBid = select(8, GetAuctionItemInfo("list", selectedItemData))
+
+	local totalAmountToBid = max(bidAmount, minBid) + minIncrement
+
 	if isBid == true then
-		PlaceAuctionBid('list', selectedItemData, bidAmount)
+		PlaceAuctionBid('list', selectedItemData, totalAmountToBid)
+		if GetMoney() > totalAmountToBid then
+			AuctionBuddy:AuctionHouseSearch(nil)
+		end
 	else
 		PlaceAuctionBid('list', selectedItemData, buyoutPrice)
 	end

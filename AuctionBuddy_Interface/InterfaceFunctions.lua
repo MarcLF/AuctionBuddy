@@ -24,34 +24,41 @@ end
 
 function InterfaceFunctionsModule:AUCTION_ITEM_LIST_UPDATE()
 
-	BuyInterfaceModule.mainFrame.currentPlayerGold.value = GetCoinTextureString(GetMoney(), 15)
-	BuyInterfaceModule.mainFrame.currentPlayerGold:SetText(BuyInterfaceModule.mainFrame.currentPlayerGold.value)
+	C_Timer.After(0.5, function() 	
+		BuyInterfaceModule.mainFrame.currentPlayerGold.value = GetCoinTextureString(GetMoney(), 15)
+		BuyInterfaceModule.mainFrame.currentPlayerGold:SetText(BuyInterfaceModule.mainFrame.currentPlayerGold.value)
+	end)
 
 	local valueGoldFormat = GetCoinTextureString(0, 15)
+	BuyInterfaceModule.mainFrame.totalBidCost:SetText(valueGoldFormat)
 	BuyInterfaceModule.mainFrame.totalBuyCost:SetText(valueGoldFormat)
 	
 end
 
 function InterfaceFunctionsModule:SetFrameParameters(frame, width, height, text, point, xOffSet, yOffSet, strata, relativeTo)
 
-	if width ~= nil then 
-		frame:SetWidth(width)
-	end
-	if height ~= nil then 
-		frame:SetHeight(height)
-	end
-	if text ~= nil then 
-		frame:SetText(text)
-	end
+	if frame ~= nil then
+		if width ~= nil then 
+			frame:SetWidth(width)
+		end
 
-	if relativeTo == nil then
-		frame:SetPoint(point, xOffSet, yOffSet)
-	else
-		frame:SetPoint(point, relativeTo, "CENTER", xOffSet, yOffSet)
-	end
+		if height ~= nil then 
+			frame:SetHeight(height)
+		end
 
-	if strate ~= nil then 
-		frame:SetFrameStrata(strata)
+		if text ~= nil then 
+			frame:SetText(text)
+		end
+
+		if relativeTo == nil then
+			frame:SetPoint(point, xOffSet, yOffSet)
+		else
+			frame:SetPoint(point, relativeTo, "CENTER", xOffSet, yOffSet)
+		end
+
+		if strate ~= nil then 
+			frame:SetFrameStrata(strata)
+		end
 	end
 	
 end
@@ -133,18 +140,25 @@ function InterfaceFunctionsModule:ItemPriceUpdated(parentFrame)
 	
 end
 
-function InterfaceFunctionsModule:UpdateTotalBuyoutCostBuy(selectedItemData, itemSelected)
+function InterfaceFunctionsModule:UpdateTotalBuyoutOrBidCostBuy(selectedItemData, itemSelected)
 
 	if itemSelected == true and self.needToUpdateTotalCostText == true then
 
+		local minBid = select(8, GetAuctionItemInfo("list", selectedItemData))
+		local minBidIncrement = select(9, GetAuctionItemInfo("list", selectedItemData))
 		local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
-		
-		local valueGoldFormat = GetCoinTextureString(buyoutPrice, 15)
+		local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemData))
 
-		BuyInterfaceModule.mainFrame.totalBuyCost:SetText(valueGoldFormat)
+		local totalAmountToBid = max(minBid, bidAmount) + minBidIncrement
+
+		local bidValueGoldFormat = GetCoinTextureString(totalAmountToBid, 15)
+		local buyValueGoldFormat = GetCoinTextureString(buyoutPrice, 15)
+
+		BuyInterfaceModule.mainFrame.totalBidCost:SetText(bidValueGoldFormat)
+		BuyInterfaceModule.mainFrame.totalBuyCost:SetText(buyValueGoldFormat)
 
 	elseif self.needToUpdateTotalCostText == true then
-		self:UpdateTotalBuyoutCostBuy(0)
+		self:UpdateTotalBuyoutOrBidCostBuy(0)
 	end
 
 	self.needToUpdateTotalCostText = false
