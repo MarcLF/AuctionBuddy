@@ -7,7 +7,9 @@ local InterfaceFunctionsModule = AuctionBuddy:NewModule("InterfaceFunctionsModul
 
 InterfaceFunctionsModule.switchingUI = false
 InterfaceFunctionsModule.needToUpdateTotalCostText = false
+InterfaceFunctionsModule.autoCompleteTextPos = 1
 
+local DatabaseModule = nil
 local BuyInterfaceModule = nil
 local SellInterfaceModule = nil
 local ItemsModule = nil
@@ -16,6 +18,7 @@ function InterfaceFunctionsModule:OnInitialize()
 
 	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 
+	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
 	BuyInterfaceModule = AuctionBuddy:GetModule("BuyInterfaceModule")
 	SellInterfaceModule = AuctionBuddy:GetModule("SellInterfaceModule")
 	ItemsModule = AuctionBuddy:GetModule("ItemsModule")
@@ -142,6 +145,22 @@ function InterfaceFunctionsModule:ReturnIndexGivenTableValue(tableValue, table)
 	for key,value in pairs(table) do
 		if table[key] == tableValue then
 			return key	
+		end
+	end
+
+end
+
+function InterfaceFunctionsModule:AutoCompleteText(frame, text)
+
+	for key,value in pairs(DatabaseModule.recentSearches) do
+		for nestedKey, nestedValue in pairs(DatabaseModule.recentSearches[key]) do
+			local modNestedValue = string.sub(nestedValue, 0, InterfaceFunctionsModule.autoCompleteTextPos)
+			local modText = string.sub(text, 0, InterfaceFunctionsModule.autoCompleteTextPos)
+			if (DatabaseModule.recentSearches[key][nestedKey] and string.match(strupper(modNestedValue), strupper(modText))) then
+				frame:SetText(nestedValue)
+				frame:HighlightText(InterfaceFunctionsModule.autoCompleteTextPos, -1)
+				return
+			end
 		end
 	end
 

@@ -14,11 +14,21 @@ function OptionsPanelModule:OnEnable()
 	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
 	OptionsFunctionsModule = AuctionBuddy:GetModule("OptionsFunctionsModule")
 
+	if DatabaseModule.favoriteSearchesLists == nil then
+		C_Timer.After(1, function() self:CreatingInterfaceOnEnable() end)
+		print("AuctionBuddy encountered an error while loading the Options menu, trying again in 1 second...")
+	else
+		self:CreatingInterfaceOnEnable()
+	end
+
+end
+
+function OptionsPanelModule:CreatingInterfaceOnEnable()
+
 	self:CreateOptionsPanel()
 	self:CreateOptionsPanelChildFavoriteLists()
 	self:CreateOptionsPanelChildFavoriteListsButtons(self.manageListFrame)
 	self:CreateFavoriteSearchesScrollFrameTable(self.manageListFrame, -120, -155)
-	--self:CreateOptionsPanelChildSellParameters()
 
 end
 

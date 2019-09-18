@@ -214,6 +214,8 @@ function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
 			DatabaseModule.buyOptions.exactMatch,
 			filterData
 		)
+	else
+		print("AuctionBuddy: Can't send queries to the auction house right now, try again in few seconds.")
 	end
 	
 end

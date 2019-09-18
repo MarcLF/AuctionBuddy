@@ -102,12 +102,27 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 	parentFrame.searchBar:SetAutoFocus(false)
 	parentFrame.searchBar:SetJustifyH("LEFT")
 	parentFrame.searchBar:SetScript("OnShow", function() parentFrame.searchBar:SetFocus() end)
+	parentFrame.searchBar:SetScript("OnChar", function() 
+		if parentFrame.searchBar:GetText() ~= "" then
+			InterfaceFunctionsModule.autoCompleteTextPos = strlen(parentFrame.searchBar:GetText())
+			InterfaceFunctionsModule:AutoCompleteText(parentFrame.searchBar, parentFrame.searchBar:GetText())
+		end
+	end)
+	parentFrame.searchBar:SetScript("OnKeyDown", function(self, arg1)
+		if arg1 == "BACKSPACE" and InterfaceFunctionsModule.autoCompleteTextPos > 1 and 
+		strlen(parentFrame.searchBar:GetText()) == InterfaceFunctionsModule.autoCompleteTextPos - 1 then
+			InterfaceFunctionsModule.autoCompleteTextPos = InterfaceFunctionsModule.autoCompleteTextPos - 1
+		end
+	end)
 	parentFrame.searchBar:SetScript("OnEscapePressed", function() parentFrame.searchBar:ClearFocus() end)
 	parentFrame.searchBar:SetScript("OnEnterPressed", function() AuctionBuddy:AuctionHouseSearch(parentFrame.searchBar:GetText()) end)
 	
 	parentFrame.searchButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_Search_Button", parentFrame, "UIPanelButtonTemplate")
 	BuyInterfaceModule:SetFrameParameters(parentFrame.searchButton, 80, 24, "Search", "TOPLEFT", 235, -38)
-	parentFrame.searchButton:SetScript("OnClick", function() AuctionBuddy:AuctionHouseSearch(parentFrame.searchBar:GetText()) end)
+	parentFrame.searchButton:SetScript("OnClick", function() 
+		AuctionBuddy:AuctionHouseSearch(parentFrame.searchBar:GetText()) 
+		InterfaceFunctionsModule.autoCompleteTextPos = strlen(parentFrame.searchBar:GetText())
+	end)
 
 	parentFrame.exactMatch = CreateFrame("CheckButton", "AB_BuyInterface_MainFrame_ExactMatchCheck", parentFrame, "ChatConfigBaseCheckButtonTemplate")
 	parentFrame.exactMatch:SetWidth(24)
