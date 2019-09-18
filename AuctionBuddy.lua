@@ -228,6 +228,8 @@ function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
 				filterData
 			)
 		end
+	else
+		print("AuctionBuddy: Can't send queries to the auction house right now, try again in few seconds.")
 	end
 	
 end
