@@ -12,6 +12,7 @@ local BuyInterfaceModule = nil
 local ItemsModule = nil
 local ContainerModule = nil
 local DatabaseModule = nil
+local OptionsPanelModule = nil
 
 SellInterfaceModule.itemPriceValue = nil
 SellInterfaceModule.stackPriceValue = nil
@@ -32,15 +33,15 @@ function SellInterfaceModule:Enable()
 	BuyInterfaceModule = AuctionBuddy:GetModule("BuyInterfaceModule")
 	ItemsModule = AuctionBuddy:GetModule("ItemsModule")
 	ContainerModule = AuctionBuddy:GetModule("ContainerModule")
+	OptionsPanelModule = AuctionBuddy:GetModule("OptionsPanelModule")
 
 	self:CreateSellInterface()	
 	self:CreateSellInterfaceButtons(self.mainFrame)
+	self:CreateSellInterfaceOptions(self.mainFrame)
 	self:CreateSellTab(self.mainFrame)
 	self:CreateItemToSellParameters(self.mainFrame)
 	
 	ResultsTableModule:CreateResultsScrollFrameTable(self.mainFrame, 270, -135)
-
-	self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale)
 	
 	self.interfaceCreated = true
 	
@@ -64,11 +65,18 @@ function SellInterfaceModule:CreateSellInterface()
 	self.mainFrame:SetMovable(true)
 	self.mainFrame:EnableMouse(true)
 	self.mainFrame:RegisterForDrag("LeftButton")
-	SellInterfaceModule:SetFrameParameters(self.mainFrame, 1250, 700, nil, "CENTER")
+	self.mainFrame:SetClampedToScreen(true)
+	SellInterfaceModule:SetFrameParameters(self.mainFrame, 1250, 700, nil, DatabaseModule.generalOptions.point, DatabaseModule.generalOptions.xPosOffset, DatabaseModule.generalOptions.yPosOffset)
 	self.mainFrame:SetFrameStrata("FULLSCREEN_DIALOG")
 	self.mainFrame:SetScript("OnDragStart",  function() self.mainFrame:StartMoving() end)
-	self.mainFrame:SetScript("OnDragStop", function() self.mainFrame:StopMovingOrSizing() end)
-	self.mainFrame:SetScript("OnShow", function() self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale) end)
+	self.mainFrame:SetScript("OnDragStop", function() 
+		self.mainFrame:StopMovingOrSizing() 
+		local point, _, _, xPos, yPos = self.mainFrame:GetPoint()
+		DatabaseModule.generalOptions.point = point
+		DatabaseModule.generalOptions.xPosOffset = xPos
+		DatabaseModule.generalOptions.yPosOffset = yPos
+	end)
+	self.mainFrame:SetScript("OnShow", function() self:OnShowInterface() end)
 	self.mainFrame:SetScript("OnHide", function() InterfaceFunctionsModule:CloseAuctionHouseCustom() end)
 	self.mainFrame.CloseButton:SetScript("OnClick", function() CloseAuctionHouse() end)
 	tinsert(UISpecialFrames, "AB_SellInterface_MainFrame")
@@ -99,28 +107,41 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 	
 	parentFrame.BuyFrameButton = CreateFrame("Button", "AB_SellInterface_MainFrame_BuyFrame_Button", parentFrame, "UIPanelButtonTemplate")
 	SellInterfaceModule:SetFrameParameters(parentFrame.BuyFrameButton, 80, 24, "Show Buy", "TOPRIGHT", -105, -30)
-	parentFrame.BuyFrameButton:SetScript("OnClick", function() 
-		BuyInterfaceModule.mainFrame.currentPlayerGold.value = GetCoinTextureString(GetMoney(), 15)
-		BuyInterfaceModule.mainFrame.currentPlayerGold:SetText(BuyInterfaceModule.mainFrame.currentPlayerGold.value)
-		BuyInterfaceModule.mainFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
-		BuyInterfaceModule.mainFrame.totalBuyCost:SetText(BuyInterfaceModule.mainFrame.totalBuyCost.value)
-		BuyInterfaceModule.mainFrame.totalBidCost.value = GetCoinTextureString(0, 15)
-		BuyInterfaceModule.mainFrame.totalBidCost:SetText(BuyInterfaceModule.mainFrame.totalBuyCost.value)
-		ItemsModule.itemSelected = false
-		BuyInterfaceModule.mainFrame.scrollTable:ClearSelection()
-		SellInterfaceModule.mainFrame.scrollTable:ClearSelection()
-		NavigationModule:CheckSearchActive(BuyInterfaceModule.mainFrame) 
-		InterfaceFunctionsModule:ChangeCurrentDisplayingFrame(parentFrame) 
-	end)
+	parentFrame.BuyFrameButton:SetScript("OnClick", function() InterfaceFunctionsModule:ChangeCurrentDisplayingFrame(parentFrame) end)
 
 	parentFrame.nextPageButton = CreateFrame("Button", "AB_SellInterface_MainFrame_NextPage_Button", parentFrame, "UIPanelButtonTemplate")
 	SellInterfaceModule:SetFrameParameters(parentFrame.nextPageButton, 80, 24, "Next Page", "TOPRIGHT", -25, -60)
-	parentFrame.nextPageButton:SetScript("OnClick", function() NavigationModule:MovePage(true, parentFrame) AuctionBuddy:AuctionHouseSearch() end)
+	parentFrame.nextPageButton:SetScript("OnClick", function()
+		if CanSendAuctionQuery() then
+			NavigationModule:MovePage(true, parentFrame)
+		end
+		AuctionBuddy:AuctionHouseSearch() 
+	end)
 	
 	parentFrame.prevPageButton = CreateFrame("Button", "AB_SellInterface_MainFrame_PrevPage_Button", parentFrame, "UIPanelButtonTemplate")
 	SellInterfaceModule:SetFrameParameters(parentFrame.prevPageButton, 80, 24, "Prev Page", "TOPRIGHT", -105, -60)
-	parentFrame.prevPageButton:SetScript("OnClick", function() NavigationModule:MovePage(false, parentFrame) AuctionBuddy:AuctionHouseSearch() end)
+	parentFrame.prevPageButton:SetScript("OnClick", function()
+		if CanSendAuctionQuery() then
+			NavigationModule:MovePage(false, parentFrame)
+		end
+		AuctionBuddy:AuctionHouseSearch() 
+	end)
 	
+	parentFrame.instaBuyCheckBox = CreateFrame("CheckButton", "AB_SellInterface_MainFrame_InstaBuyCheck", parentFrame, "ChatConfigBaseCheckButtonTemplate")
+	parentFrame.instaBuyCheckBox:SetWidth(24)
+	parentFrame.instaBuyCheckBox:SetHeight(24)
+	parentFrame.instaBuyCheckBox:SetPoint("TOPLEFT", 50, -65)
+	if DatabaseModule.buyOptions.doubleClickToBuy == true then
+		parentFrame.instaBuyCheckBox:SetChecked(true)
+	end
+	parentFrame.instaBuyCheckBox:SetScript("OnClick", function() DatabaseModule.buyOptions.doubleClickToBuy = not DatabaseModule.buyOptions.doubleClickToBuy end)
+
+	parentFrame.instaBuyCheckBox.text = parentFrame.instaBuyCheckBox:CreateFontString("AB_SellInterface_MainFrame_InstaBuyCheck_Text", "OVERLAY", "GameFontNormal")
+	parentFrame.instaBuyCheckBox.text:SetWidth(250)
+	parentFrame.instaBuyCheckBox.text:SetPoint("CENTER", 140, 0)
+	parentFrame.instaBuyCheckBox.text:SetJustifyH("LEFT")
+	parentFrame.instaBuyCheckBox.text:SetText("Double Click to buy an item")
+
 	parentFrame.itemToSellButton = CreateFrame("Button", "AB_SellInterface_MainFrame_ItemToSell_Button", parentFrame)
 	SellInterfaceModule:SetFrameParameters(parentFrame.itemToSellButton, 37, 37, nil, "TOPLEFT", 80, -140)
 	parentFrame.itemToSellButton:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square")	
@@ -144,7 +165,6 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 		end
 	end)
 
-	
 	parentFrame.itemToSellButton.bgTexture = self.mainFrame.itemToSellButton:CreateTexture(nil, "ARTWORK")
 	parentFrame.itemToSellButton.bgTexture:SetPoint("CENTER")
 	parentFrame.itemToSellButton.bgTexture:SetTexture("Interface\\Buttons\\UI-EmptySlot-Disabled")
@@ -185,6 +205,68 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 		self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale) 
 	end)
 	
+end
+
+function SellInterfaceModule:CreateSellInterfaceOptions(parentFrame)
+
+	parentFrame.totalBidCost = parentFrame:CreateFontString("AB_SellInterface_MainFrame_TotalBidCost", "OVERLAY")
+	parentFrame.totalBidCost:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
+	parentFrame.totalBidCost:SetWidth(250)
+	parentFrame.totalBidCost:SetPoint("BOTTOMLEFT", 150, 192)
+	parentFrame.totalBidCost:SetJustifyH("LEFT")
+	parentFrame.totalBidCost.value = GetCoinTextureString(0, 15)
+	parentFrame.totalBidCost:SetText(parentFrame.totalBidCost.value)
+
+	parentFrame.totalBidCost.text = parentFrame:CreateFontString("AB_SellInterface_MainFrame_TotalBidCost_Text", "OVERLAY", "GameFontNormal")
+	parentFrame.totalBidCost.text:SetWidth(250)
+	parentFrame.totalBidCost.text:SetPoint("BOTTOMLEFT", 35, 195)
+	parentFrame.totalBidCost.text:SetJustifyH("LEFT")
+	parentFrame.totalBidCost.text:SetText("Total Bid Cost:")
+
+	parentFrame.totalBuyCost = parentFrame:CreateFontString("AB_SellInterface_MainFrame_TotalBuyCost", "OVERLAY")
+	parentFrame.totalBuyCost:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
+	parentFrame.totalBuyCost:SetWidth(250)
+	parentFrame.totalBuyCost:SetPoint("BOTTOMLEFT", 150, 167)
+	parentFrame.totalBuyCost:SetJustifyH("LEFT")
+	parentFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
+	parentFrame.totalBuyCost:SetText(parentFrame.totalBuyCost.value)
+
+	parentFrame.totalBuyCost.text = parentFrame:CreateFontString("AB_SellInterface_MainFrame_TotalBuyCost_Text", "OVERLAY", "GameFontNormal")
+	parentFrame.totalBuyCost.text:SetWidth(250)
+	parentFrame.totalBuyCost.text:SetPoint("BOTTOMLEFT", 35, 170)
+	parentFrame.totalBuyCost.text:SetJustifyH("LEFT")
+	parentFrame.totalBuyCost.text:SetText("Total Buyout Cost:")
+
+	parentFrame.buySelectedItem = CreateFrame("Button", "AB_SellInterface_MainFrame_BuySelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
+	SellInterfaceModule:SetFrameParameters(parentFrame.buySelectedItem, 125, 24, "Buy Selected Item", "LEFT", 20, -203)
+	parentFrame.buySelectedItem:SetScript("OnClick", function() 
+		ItemsModule:BuySelectedItem(parentFrame.scrollTable:GetSelection(), false) 
+		parentFrame.scrollTable:ClearSelection() 
+	end)
+	parentFrame.buySelectedItem:SetScript("OnUpdate", function() 
+		ItemsModule:ItemInsertedOrSelected(parentFrame.buySelectedItem, ItemsModule.itemSelected) 
+	end)
+	parentFrame.buySelectedItem:Disable()
+	
+	parentFrame.bidSelectedItem = CreateFrame("Button", "AB_SellInterface_MainFrame_BidSelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
+	SellInterfaceModule:SetFrameParameters(parentFrame.bidSelectedItem, 125, 24, "Bid Selected Item", "LEFT", 160, -203)
+	parentFrame.bidSelectedItem:SetScript("OnClick", function() 
+		ItemsModule:BuySelectedItem(parentFrame.scrollTable:GetSelection(), true) 
+		parentFrame.scrollTable:ClearSelection() 
+	end)
+	parentFrame.bidSelectedItem:SetScript("OnUpdate", function() 
+		ItemsModule:ItemInsertedOrSelected(parentFrame.bidSelectedItem, ItemsModule.itemSelected) 
+	end)
+	parentFrame.bidSelectedItem:Disable()
+
+	parentFrame.manageFavoriteLists = CreateFrame("Button", "AB_SellInterface_MainFrame_Options_Button", parentFrame, "UIPanelButtonTemplate")
+	SellInterfaceModule:SetFrameParameters(parentFrame.manageFavoriteLists, 100, 24, "Options", "LEFT", 100, -250)
+	parentFrame.manageFavoriteLists:SetScript("OnClick", function() 
+		parentFrame:Hide()
+		InterfaceOptionsFrame_OpenToCategory(OptionsPanelModule.sellParameters)
+		InterfaceOptionsFrame_OpenToCategory(OptionsPanelModule.sellParameters)
+	end)
+
 end
 
 function SellInterfaceModule:CreateItemToSellParameters(parentFrame)
@@ -231,7 +313,14 @@ function SellInterfaceModule:CreateItemToSellParameters(parentFrame)
 	parentFrame.stackSize:SetAutoFocus(false)
 	parentFrame.stackSize:SetJustifyH("CENTER")
 	parentFrame.stackSize:SetText("1")
-	parentFrame.stackSize:SetScript("OnTextChanged", function() InterfaceFunctionsModule:StackPriceUpdated(parentFrame) end)
+	parentFrame.stackSize:SetScript("OnTextChanged", function()
+		if DatabaseModule.sellOptions.stackPriceFixed == true then
+			InterfaceFunctionsModule:StackPriceUpdated(parentFrame)
+		else
+			InterfaceFunctionsModule:ItemPriceUpdated(parentFrame)
+		end
+		
+	end)
 	parentFrame.stackSize:SetScript("OnEscapePressed", function() parentFrame.stackSize:ClearFocus() end)
 	
 	parentFrame.stackSize.text = parentFrame.stackSize:CreateFontString("AB_SellInterface_MainFrame_ItemToSell_StackSize_Text", "OVERLAY", "GameFontNormal")
@@ -381,6 +470,23 @@ function SellInterfaceModule:ResetData()
 		PickupItem(ItemsModule.currentItemPostedLink) 
 		ItemsModule:RemoveInsertedItem(self.mainFrame)
 	end
+
+end
+
+function SellInterfaceModule:OnShowInterface()
+
+	self.mainFrame:ClearAllPoints()
+	self.mainFrame:SetPoint(DatabaseModule.generalOptions.point, DatabaseModule.generalOptions.xPosOffset, DatabaseModule.generalOptions.yPosOffset)
+	self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale)
+	self.mainFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
+	self.mainFrame.totalBuyCost:SetText(self.mainFrame.totalBuyCost.value)
+	self.mainFrame.totalBidCost.value = GetCoinTextureString(0, 15)
+	self.mainFrame.totalBidCost:SetText(self.mainFrame.totalBuyCost.value)
+	NavigationModule:CheckSearchActive(SellInterfaceModule.mainFrame)
+	ItemsModule.itemSelected = false
+	BuyInterfaceModule.mainFrame.scrollTable:ClearSelection()
+	self.mainFrame.scrollTable:ClearSelection()
+	ContainerModule:ScanContainer()
 
 end
 

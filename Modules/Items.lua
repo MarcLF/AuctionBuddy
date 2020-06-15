@@ -66,12 +66,14 @@ function ItemsModule:UpdateSellItemPriceAfterSearch(numberList, shown, total)
 	local buyoutPrice = select(10, GetAuctionItemInfo("list", numberList))
 	local itemQuantity = select(3, GetAuctionItemInfo("list", numberList))
 
+	local priceToSell = math.floor(buyoutPrice/itemQuantity)
+
 	if buyoutPrice == 0 and total > 1 and numberList < shown and SellInterfaceModule.mainFrame:IsShown() then
 		numberList = numberList + 1
 		self:UpdateSellItemPriceAfterSearch(numberList, shown, total)
 
 	elseif SellInterfaceModule.mainFrame:IsShown() then
-		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, buyoutPrice/itemQuantity)
+		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, priceToSell)
 	end
 	
 end

@@ -1,9 +1,9 @@
 ## Interface: 11302
 ## Title: AuctionBuddy
-## Version: 1.1.1 Beta
+## Version: 1.2
 ## Author: Erazhen
 ## Notes: Auction house addon
-## SavedVariables: AB_GeneralOptions, AB_BuyOptions, AB_RecentSearches, AB_FavoriteSearchesLists
+## SavedVariables: AB_GeneralOptions, AB_BuyOptions, AB_SellOptions, AB_RecentSearches, AB_FavoriteSearchesLists
 
 Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml

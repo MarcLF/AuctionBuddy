@@ -15,6 +15,7 @@ AuctionBuddy.auctionTabs = {}
 AuctionBuddy.searchText = nil
 AuctionBuddy.shown = nil
 AuctionBuddy.total = nil
+AuctionBuddy.isSortedBuyout = false
 
 local StdUi = LibStub("StdUi")
 
@@ -71,8 +72,8 @@ function AuctionBuddy:AUCTION_HOUSE_SHOW()
 	ContainerModule = self:GetModule("ContainerModule")
 	
 	if not self.onTabClickHooked then
-			self:Hook("AuctionFrameTab_OnClick", true)
-			self.onTabClickHooked = true
+		self:Hook("AuctionFrameTab_OnClick", true)
+		self.onTabClickHooked = true
 	end
 
 end
@@ -202,6 +203,11 @@ function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
 		else
 			filterData = 0
         end
+
+		if self.isSortedBuyout == false then
+			SortAuctionItems("list", "buyout")
+			self.isSortedBuyout = true
+		end
 
 		QueryAuctionItems(	
 			self.searchText, 

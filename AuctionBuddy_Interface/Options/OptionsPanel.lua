@@ -30,6 +30,8 @@ function OptionsPanelModule:CreatingInterfaceOnEnable()
 	self:CreateOptionsPanelChildFavoriteListsButtons(self.manageListFrame)
 	self:CreateFavoriteSearchesScrollFrameTable(self.manageListFrame, -120, -155)
 
+	self:CreateOptionsPanelChildSellParameters()
+
 end
 
 function OptionsPanelModule:CreateOptionsPanel()
@@ -205,15 +207,62 @@ end
 
 function OptionsPanelModule:CreateOptionsPanelChildSellParameters()
 
-	OptionsPanelModule.sellParameters = CreateFrame("Frame", "AuctionBuddy_OptionsPanel_SellParameters", OptionsPanelModule.panel)
-	OptionsPanelModule.sellParameters.name = "Sell Parameters"
-	OptionsPanelModule.sellParameters.parent = OptionsPanelModule.panel.name
+	self.sellParameters = CreateFrame("Frame", "AuctionBuddy_OptionsPanel_SellParameters", OptionsPanelModule.panel)
+	self.sellParameters.name = "Sell Parameters"
+	self.sellParameters.parent = OptionsPanelModule.panel.name
 
-	OptionsPanelModule.sellParameters.text = OptionsPanelModule.sellParameters:CreateFontString("AuctionBuddy_OptionsPanel_FavoriteLists_TitleText", "OVERLAY", "GameFontNormal")
-	OptionsPanelModule.sellParameters.text:SetWidth(250)
-	OptionsPanelModule.sellParameters.text:SetPoint("TOPLEFT", 15, -15)
-	OptionsPanelModule.sellParameters.text:SetJustifyH("LEFT")
-	OptionsPanelModule.sellParameters.text:SetText("Sell Parameters")
+	self.sellParameters.text = OptionsPanelModule.sellParameters:CreateFontString("AuctionBuddy_OptionsPanel_FavoriteLists_TitleText", "OVERLAY", "GameFontNormal")
+	self.sellParameters.text:SetWidth(250)
+	self.sellParameters.text:SetPoint("TOPLEFT", 15, -15)
+	self.sellParameters.text:SetJustifyH("LEFT")
+	self.sellParameters.text:SetText("Sell Parameters")
+
+	self.createSellFrame = CreateFrame("Frame", "AuctionBuddy_OptionsPanel_SellParameters_CreateSellFrame", self.sellParameters, "InsetFrameTemplate3")
+	self.createSellFrame:SetPoint("CENTER", 0, -9)
+	self.createSellFrame:SetWidth(600)
+	self.createSellFrame:SetHeight(518)
+
+	self.fixedPriceInfo = self.createSellFrame:CreateFontString("AuctionBuddy_OptionsPanel_SellParameters_FixedPriceInfoText", "OVERLAY", "GameFontNormal")
+	self.fixedPriceInfo:SetWidth(300)
+	self.fixedPriceInfo:SetPoint("TOPLEFT", 20, -20)
+	self.fixedPriceInfo:SetJustifyH("LEFT")
+	self.fixedPriceInfo:SetText("When modifying Stack Size always mantain:")
+
+	self.stackPriceFixed = CreateFrame("CheckButton", "AuctionBuddy_OptionsPanel_SellParameters_FixedStackPrice", self.createSellFrame, "ChatConfigBaseCheckButtonTemplate")
+	self.stackPriceFixed:SetWidth(24)
+	self.stackPriceFixed:SetHeight(24)
+	self.stackPriceFixed:SetPoint("TOPLEFT", 30, -50)
+	if DatabaseModule.sellOptions.stackPriceFixed == true then
+		self.stackPriceFixed:SetChecked(true)
+	end
+	self.stackPriceFixed:SetScript("OnClick", function() 
+		DatabaseModule.sellOptions.stackPriceFixed = not DatabaseModule.sellOptions.stackPriceFixed 
+		self.itemPriceFixed:SetChecked(not DatabaseModule.sellOptions.stackPriceFixed)
+	end)
+
+	self.stackPriceFixed.text = self.stackPriceFixed:CreateFontString("AuctionBuddy_OptionsPanel_SellParameters_FixedStackPriceText", "OVERLAY", "GameFontNormal")
+	self.stackPriceFixed.text:SetWidth(250)
+	self.stackPriceFixed.text:SetPoint("CENTER", 140, 0)
+	self.stackPriceFixed.text:SetJustifyH("LEFT")
+	self.stackPriceFixed.text:SetText("Stack Price")
+
+	self.itemPriceFixed = CreateFrame("CheckButton", "AuctionBuddy_OptionsPanel_SellParameters_FixedStackPrice", self.createSellFrame, "ChatConfigBaseCheckButtonTemplate")
+	self.itemPriceFixed:SetWidth(24)
+	self.itemPriceFixed:SetHeight(24)
+	self.itemPriceFixed:SetPoint("TOPLEFT", 180, -50)
+	if DatabaseModule.sellOptions.stackPriceFixed == false then
+		self.itemPriceFixed:SetChecked(true)
+	end
+	self.itemPriceFixed:SetScript("OnClick", function() 
+		DatabaseModule.sellOptions.stackPriceFixed = not DatabaseModule.sellOptions.stackPriceFixed 
+		self.stackPriceFixed:SetChecked(DatabaseModule.sellOptions.stackPriceFixed)
+	end)
+
+	self.itemPriceFixed.text = self.itemPriceFixed:CreateFontString("AuctionBuddy_OptionsPanel_SellParameters_FixedStackPriceText", "OVERLAY", "GameFontNormal")
+	self.itemPriceFixed.text:SetWidth(250)
+	self.itemPriceFixed.text:SetPoint("CENTER", 140, 0)
+	self.itemPriceFixed.text:SetJustifyH("LEFT")
+	self.itemPriceFixed.text:SetText("Item Price")
 
 	InterfaceOptions_AddCategory(OptionsPanelModule.sellParameters)
 

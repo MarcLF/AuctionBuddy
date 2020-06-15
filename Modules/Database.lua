@@ -7,13 +7,21 @@ local DatabaseModule = AuctionBuddy:NewModule("DatabaseModule")
 
 DatabaseModule.generalOptionsDefault = 
 {
-	uiScale = 1.0
+	uiScale = 1.0,
+	point = "CENTER",
+	xPosOffset = 0,
+	yPosOffset = 0
 }
 
 DatabaseModule.buyOptionsDefault = 
 {
 	doubleClickToBuy = false,
 	exactMatch = false,
+}
+
+DatabaseModule.sellOptionsDefault = 
+{
+	stackPriceFixed = false
 }
 
 DatabaseModule.recentSearchesDefault = 
@@ -33,17 +41,23 @@ DatabaseModule.favoriteSearchesListsDefault =
 
 function DatabaseModule:Enable()
 
-	if not AB_GeneralOptions then 
+	if not AB_GeneralOptions or not AB_GeneralOptions.xPosOffset or not AB_GeneralOptions.yPosOffset  or not AB_GeneralOptions.point then 
 		AB_GeneralOptions = self.generalOptionsDefault	
 	end
 
 	self.generalOptions = AB_GeneralOptions
 
-	if not AB_BuyOptions or not AB_BuyOptions.exactMatch then 
+	if not AB_BuyOptions or AB_BuyOptions.exactMatch == nil or AB_BuyOptions.doubleClickToBuy == nil then 
 		AB_BuyOptions = self.buyOptionsDefault	
 	end
 
 	self.buyOptions = AB_BuyOptions
+
+	if not AB_SellOptions then 
+		AB_SellOptions = self.sellOptionsDefault	
+	end
+
+	self.sellOptions = AB_SellOptions
 
 	if not AB_RecentSearches then 
 		AB_RecentSearches = self.recentSearchesDefault	

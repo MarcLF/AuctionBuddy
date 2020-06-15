@@ -35,6 +35,8 @@ function InterfaceFunctionsModule:AUCTION_ITEM_LIST_UPDATE()
 	local valueGoldFormat = GetCoinTextureString(0, 15)
 	BuyInterfaceModule.mainFrame.totalBidCost:SetText(valueGoldFormat)
 	BuyInterfaceModule.mainFrame.totalBuyCost:SetText(valueGoldFormat)
+	SellInterfaceModule.mainFrame.totalBidCost:SetText(valueGoldFormat)
+	SellInterfaceModule.mainFrame.totalBuyCost:SetText(valueGoldFormat)
 	
 end
 
@@ -74,13 +76,14 @@ function InterfaceFunctionsModule:UpdateDepositCost(parentFrame)
 	local itemPrice = MoneyInputFrame_GetCopper(parentFrame.itemPrice)
 	local stackPrice = MoneyInputFrame_GetCopper(parentFrame.stackPrice)
 	
-	local stackSize = parentFrame.stackSize:GetText()
-	local stackNumber = parentFrame.stackNumber:GetText()
-	
+	local stackSize = tonumber(parentFrame.stackSize:GetText())
+	local stackNumber = tonumber(parentFrame.stackNumber:GetText())
+
 	local depositCost = GetAuctionDeposit(SellInterfaceModule.mainFrame.auctionDuration.durationValue, itemPrice, stackPrice, stackSize, stackNumber)
 
 	parentFrame.auctionDepositCost.value = GetCoinTextureString(depositCost, 15)
 	parentFrame.auctionDepositCost:SetText(parentFrame.auctionDepositCost.value)
+
 end
 
 function InterfaceFunctionsModule:StackPriceUpdated(parentFrame)
@@ -129,8 +132,13 @@ function InterfaceFunctionsModule:UpdateTotalBuyoutOrBidCostBuy(selectedItemData
 		local bidValueGoldFormat = GetCoinTextureString(totalAmountToBid, 15)
 		local buyValueGoldFormat = GetCoinTextureString(buyoutPrice, 15)
 
-		BuyInterfaceModule.mainFrame.totalBidCost:SetText(bidValueGoldFormat)
-		BuyInterfaceModule.mainFrame.totalBuyCost:SetText(buyValueGoldFormat)
+		if BuyInterfaceModule.mainFrame:IsShown() then
+			BuyInterfaceModule.mainFrame.totalBidCost:SetText(bidValueGoldFormat)
+			BuyInterfaceModule.mainFrame.totalBuyCost:SetText(buyValueGoldFormat)
+		elseif SellInterfaceModule.mainFrame:IsShown() then
+			SellInterfaceModule.mainFrame.totalBidCost:SetText(bidValueGoldFormat)
+			SellInterfaceModule.mainFrame.totalBuyCost:SetText(buyValueGoldFormat)
+		end	
 
 	elseif self.needToUpdateTotalCostText == true then
 		self:UpdateTotalBuyoutOrBidCostBuy(0)

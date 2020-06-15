@@ -60,4 +60,5 @@ function NavigationModule:MovePage(isNext, parentFrame)
 			parentFrame.prevPageButton:SetEnabled(false)
 		end
 	end
+
 end
