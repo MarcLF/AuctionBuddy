@@ -9,7 +9,7 @@ local DatabaseModule = nil
 local OptionsFunctionsModule = nil
 
 
-function OptionsPanelModule:OnEnable()
+function OptionsPanelModule:Enable()
 
 	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
 	OptionsFunctionsModule = AuctionBuddy:GetModule("OptionsFunctionsModule")

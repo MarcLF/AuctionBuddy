@@ -54,9 +54,10 @@ function BuyInterfaceModule:OnInitialize()
 end
 
 function BuyInterfaceModule:AUCTION_HOUSE_CLOSED()
-	
-	self:ResetData()
-		
+
+	if self.interfaceCreated == true then
+		self:ResetData()
+	end	
 end
 
 function BuyInterfaceModule:CreateBuyInterface()

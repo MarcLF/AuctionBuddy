@@ -1,21 +1,20 @@
-## Interface: 11304
+## Interface: 11305
 ## Title: AuctionBuddy
-## Version: 1.2a
+## Version: 1.2c
 ## Author: Erazhen
 ## Notes: Auction house addon
 ## SavedVariables: AB_GeneralOptions, AB_BuyOptions, AB_SellOptions, AB_RecentSearches, AB_FavoriteSearchesLists
 
-Libs\LibStub\LibStub.lua
-Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
-
-Libs\AceAddon-3.0\AceAddon-3.0.xml
-Libs\AceConsole-3.0\AceConsole-3.0.xml
-Libs\AceEvent-3.0\AceEvent-3.0.xml
-Libs\AceHook-3.0\AceHook-3.0.xml
-Libs\AceTimer-3.0\AceTimer-3.0.xml
-Libs\LibGratuity-3.0\LibGratuity-3.0.lua
-Libs\StdUi\StdUi.xml
-Libs\LibGraph-2.0\LibGraph-2.0.lua
+AuctionBuddy_Libs\LibStub\LibStub.lua
+AuctionBuddy_Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+AuctionBuddy_Libs\AceAddon-3.0\AceAddon-3.0.xml
+AuctionBuddy_Libs\AceConsole-3.0\AceConsole-3.0.xml
+AuctionBuddy_Libs\AceEvent-3.0\AceEvent-3.0.xml
+AuctionBuddy_Libs\AceHook-3.0\AceHook-3.0.xml
+AuctionBuddy_Libs\AceTimer-3.0\AceTimer-3.0.xml
+AuctionBuddy_Libs\LibGratuity-3.0\LibGratuity-3.0.lua
+AuctionBuddy_Libs\StdUi\StdUi.xml
+AuctionBuddy_Libs\LibGraph-2.0\LibGraph-2.0.lua
 
 AuctionBuddy.lua
 
