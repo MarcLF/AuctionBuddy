@@ -55,9 +55,8 @@ end
 
 function BuyInterfaceModule:AUCTION_HOUSE_CLOSED()
 
-	if self.interfaceCreated == true then
-		self:ResetData()
-	end	
+	self:ResetData()
+
 end
 
 function BuyInterfaceModule:CreateBuyInterface()
