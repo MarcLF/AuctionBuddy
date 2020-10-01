@@ -9,12 +9,16 @@ InterfaceFunctionsModule.switchingUI = false
 InterfaceFunctionsModule.needToUpdateTotalCostText = false
 InterfaceFunctionsModule.autoCompleteTextPos = 1
 
+local DebugModule = nil
 local DatabaseModule = nil
 local BuyInterfaceModule = nil
 local SellInterfaceModule = nil
 local ItemsModule = nil
 
 function InterfaceFunctionsModule:OnInitialize()
+
+	DebugModule = AuctionBuddy:GetModule("DebugModule")
+	DebugModule:Log(self, "Enable")
 
 	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 

@@ -5,6 +5,7 @@ local StdUi = LibStub('StdUi')
 
 local ContainerModule = AuctionBuddy:NewModule("ContainerModule", "AceEvent-3.0")
 
+local DebugModule = nil
 local BuyInterfaceModule = nil
 local SellInterfaceModule = nil
 local ItemsModule = nil
@@ -17,6 +18,9 @@ ContainerModule.bagID = nil
 ContainerModule.bagSlot = nil
 
 function ContainerModule:Enable()
+
+	DebugModule = AuctionBuddy:GetModule("DebugModule")
+	DebugModule:Log(self, "Enable")
 
 	if self.interfaceCreated == true then
 		return

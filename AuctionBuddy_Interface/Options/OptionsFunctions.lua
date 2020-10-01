@@ -5,10 +5,14 @@ local StdUi = LibStub('StdUi')
 
 local OptionsFunctionsModule = AuctionBuddy:NewModule("OptionsFunctionsModule", "AceEvent-3.0")
 
+local DebugModule = nil
 local DatabaseModule = nil
 
 function OptionsFunctionsModule:Enable()
 	
+	DebugModule = AuctionBuddy:GetModule("DebugModule")
+	DebugModule:Log(self, "Enable")
+
 	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
 
 end

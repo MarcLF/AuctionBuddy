@@ -5,6 +5,8 @@ local StdUi = LibStub('StdUi')
 
 local DatabaseModule = AuctionBuddy:NewModule("DatabaseModule")
 
+local DebugModule = nil
+
 DatabaseModule.generalOptionsDefault = 
 {
 	uiScale = 1.0,
@@ -40,6 +42,9 @@ DatabaseModule.favoriteSearchesListsDefault =
 }
 
 function DatabaseModule:Enable()
+
+	DebugModule = AuctionBuddy:GetModule("DebugModule")
+	DebugModule:Log(self, "Enable")
 
 	if not AB_GeneralOptions or not AB_GeneralOptions.xPosOffset or not AB_GeneralOptions.yPosOffset  or not AB_GeneralOptions.point then 
 		AB_GeneralOptions = self.generalOptionsDefault	

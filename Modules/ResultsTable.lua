@@ -5,11 +5,15 @@ local StdUi = LibStub('StdUi')
 
 local ResultsTableModule = AuctionBuddy:NewModule("ResultsTableModule")
 
+local DebugModule = nil
 local ItemsModule = nil
 local InterfaceFunctionsModule = nil
 local DatabaseModule = nil
 
 function ResultsTableModule:Enable()
+
+	DebugModule = AuctionBuddy:GetModule("DebugModule")
+	DebugModule:Log(self, "Enable")
 
 	ItemsModule = AuctionBuddy:GetModule("ItemsModule")
 	InterfaceFunctionsModule = AuctionBuddy:GetModule("InterfaceFunctionsModule")
@@ -77,7 +81,7 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 			format       = "string",
 		},
 		{
-			name         = "Bid / Item",
+			name         = "Bid / Total",
 			width        = 80,
 			align        = "RIGHT",
 			index        = "bid",

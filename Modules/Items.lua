@@ -9,11 +9,15 @@ ItemsModule.currentItemPostedLink = nil
 ItemsModule.itemSelected = false
 ItemsModule.itemInserted = false
 
+local DebugModule = nil
 local InterfaceFunctionsModule = nil
 local BuyInterfaceModule = nil
 local SellInterfaceModule = nil
 
-function ItemsModule:OnInitialize()
+function ItemsModule:Enable()
+
+	DebugModule = AuctionBuddy:GetModule("DebugModule")
+	DebugModule:Log(self, "Enable")
 
 	InterfaceFunctionsModule = AuctionBuddy:GetModule("InterfaceFunctionsModule")
 	BuyInterfaceModule = AuctionBuddy:GetModule("BuyInterfaceModule")

@@ -9,10 +9,14 @@ NavigationModule.searchActive = nil
 NavigationModule.page = nil
 NavigationModule.maxResultsPages = nil
 
+local DebugModule = nil
 local BuyInterfaceModule = nil
 local SellInterfaceModule = nil
 
 function NavigationModule:Enable()
+
+	DebugModule = AuctionBuddy:GetModule("DebugModule")
+	DebugModule:Log(self, "Enable")
 	
 	BuyInterfaceModule = AuctionBuddy:GetModule("BuyInterfaceModule")
 	SellInterfaceModule = AuctionBuddy:GetModule("SellInterfaceModule")

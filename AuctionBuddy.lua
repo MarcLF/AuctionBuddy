@@ -19,6 +19,7 @@ AuctionBuddy.isSortedBuyout = false
 
 local StdUi = LibStub("StdUi")
 
+local DebugModule = nil
 local DatabaseModule = nil
 local NavigationModule = nil
 local ItemsModule = nil
@@ -43,6 +44,7 @@ end
 
 function AuctionBuddy:VARIABLES_LOADED()
 
+	self:EnableModule("DebugModule")
 	self:EnableModule("DatabaseModule")
 	self:EnableModule("OptionsFunctionsModule")
 	self:EnableModule("OptionsPanelModule")
@@ -61,6 +63,7 @@ function AuctionBuddy:AUCTION_HOUSE_SHOW()
 	self:EnableModule("ContainerModule")
 	self:EnableModule("SearchesModule")
 	
+	DebugModule = self:GetModule("DebugModule")
 	DatabaseModule = self:GetModule("DatabaseModule")
 	NavigationModule = self:GetModule("NavigationModule")
 	ItemsModule = self:GetModule("ItemsModule")
@@ -87,6 +90,7 @@ end
 
 function AuctionBuddy:AUCTION_ITEM_LIST_UPDATE()
 
+	DebugModule:Log(self, "AUCTION_ITEM_LIST_UPDATE")
 	self.shown, self.total = GetNumAuctionItems("list")
 
 	if self.total > 0 then
@@ -109,6 +113,8 @@ end
 
 function AuctionBuddy:ResetCurrentData()
 
+	DebugModule:Log(self, "ResetCurrentData")
+
 	if BuyInterfaceModule.mainFrame ~= nil then
 		BuyInterfaceModule.mainFrame.scrollTable:SetData({}, true)
 	end
@@ -120,6 +126,8 @@ function AuctionBuddy:ResetCurrentData()
 end
 
 function AuctionBuddy:TableCombine(keys, values)
+
+	DebugModule:Log(self, "TableCombine")
 
 	local result = {}
 	
@@ -136,6 +144,8 @@ local function NoResponse()
 end
 
 function AuctionBuddy:AuctionFrameTab_OnClick(tab)
+
+	DebugModule:Log(self, "AuctionFrameTab_OnClick")
 
 	if tab.buyTabButton then
 		NavigationModule:CheckSearchActive(BuyInterfaceModule.mainFrame)
@@ -163,7 +173,9 @@ function AuctionBuddy:AuctionFrameTab_OnClick(tab)
 end
 		
 function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
-		
+	
+	DebugModule:Log(self, "AuctionHouseSearch")
+
 	if textToSearch ~= self.searchText and textToSearch ~= nil then
 		NavigationModule.page = 0
 	end
@@ -227,6 +239,8 @@ function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
 end
 
 function AuctionBuddy:HideWindows()
+
+	DebugModule:Log(self, "HideWindows")
 
 	BuyInterfaceModule:HideBuyInterface()
 	SellInterfaceModule:HideSellInterface()

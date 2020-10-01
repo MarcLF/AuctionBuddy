@@ -5,10 +5,16 @@ local StdUi = LibStub('StdUi')
 
 local SearchesModule = AuctionBuddy:NewModule("SearchesModule", "AceEvent-3.0")
 
+local DebugModule = nil
 local BuyInterfaceModule = nil
 local DatabaseModule = nil
 
 function SearchesModule:Enable()
+
+	DebugModule = AuctionBuddy:GetModule("DebugModule")
+	DebugModule:Log(self, "Enable")
+
+	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 
 	if self.tablesCreated == true then
 		if BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu.value ~= nil then
@@ -39,20 +45,16 @@ function SearchesModule:Enable()
 	
 end
 
-function SearchesModule:OnInitialize()
-
-	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
-
-end
-
 function SearchesModule:AUCTION_HOUSE_CLOSED()
-
+	
+	DebugModule:Log(self, "AUCTION_HOUSE_CLOSED")
 	self:ResetData()
 
 end
 
 function SearchesModule:CreateRecentSearchesScrollFrameTable(parentFrame, xPos, yPos, tableName)
 	
+	DebugModule:Log(self, "CreateRecentSearchesScrollFrameTable")
 	local columnType = 
 	{
 		{
@@ -80,6 +82,7 @@ end
 
 function SearchesModule:CreateFavoriteSearchesScrollFrameTable(parentFrame, xPos, yPos, tableName)
 	
+	DebugModule:Log(self, "CreateFavoriteSearchesScrollFrameTable")
 	local columnType = {
 		{
 			name         = tableName,
@@ -106,6 +109,7 @@ end
 
 function SearchesModule:CreateFavoriteSearchesDropDownMenu(parentFrame, xPos, yPos)
 	
+	DebugModule:Log(self, "CreateFavoriteSearchesDropDownMenu")
 	parentFrame.selectFavListText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_FavoriteLists_SelectFavListText", "OVERLAY", "GameFontWhite")
 	parentFrame.selectFavListText:SetPoint("RIGHT", xPos - 195, 25)
 	parentFrame.selectFavListText:SetJustifyH("CENTER")
@@ -131,6 +135,7 @@ end
 
 function SearchesModule:FavoriteListsDropDown(frame, level, menuList)
 
+	DebugModule:Log("AuctionBuddy_SearchesModule", "FavoriteListsDropDown")
 	local info = UIDropDownMenu_CreateInfo()
 	info.func = SelectList
 
@@ -150,6 +155,7 @@ end
 
 function SearchesModule:ResetData()
 
+	DebugModule:Log(self, "ResetData")
 	BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu.value = nil
 	UIDropDownMenu_ClearAll(BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu)
 
