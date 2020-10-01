@@ -35,11 +35,7 @@ jobs:
           # you can specify how much of the commit history you want to fetch,
           # which is useful for controlling the length of the automated changelog
           fetch-depth: 50
-
-      # once cloned, we just run the GitHub Action for the packager project
-      - name: Package and release
-        uses: BigWigsMods/packager@master
-
+          
       # another example where we supply additional arguments, this example is specifically to release
       # for the Classic version of the game
       - name: Package and release for Classic
