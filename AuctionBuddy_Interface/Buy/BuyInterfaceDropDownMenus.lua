@@ -25,48 +25,27 @@ local itemTypeTable =
 }
 
 -- Weapons Tables
-local weaponsTypeTable =
-{
-	"One-Handed",
-	"Two-Handed",
-	"Ranged",
-	"Misc Weapon"
-}
 
-local oneHandedWeaponsTable = 
+local weaponsTypeTable = 
 {
 	"O.H. Axes",
-	"O.H. Maces",
-	"O.H. Swords",	
-	"Warglaives",
-	"Daggers",
-	"Fist Weapons",
-	"Wands"
-}
-
-local twoHandedWeaponsTable = 
-{
 	"T.H Axes",
-	"T.H Maces",
-	"T.H Swords",	
-	"Polearms",
-	"Staves"
-}
-
-local rangedWeaponsTable = 
-{
 	"Bows",
+	"Guns",
+	"O.H. Maces",
+	"T.H Maces",
+	"Polearms",
+	"O.H. Swords",	
+	"T.H Swords",
+	"Staves",
+	"Fist Weapons",
+	"Miscellaneous",
+	"Daggers",
+	"Thrown",
 	"Crossbows",
-	"Guns",	
-	"Thrown"
+	"Wands",
+	"Fishing Pole"
 }
-
-local miscellaneousWeaponsTable = 
-{
-	"Fishing Poles",
-	"Other",
-}
---
 
 -- Armor Tables
 local armorTypeTable =
@@ -203,7 +182,7 @@ function BuyInterfaceDropDownMenusModule:CreateItemClassDropDownMenu(parentFrame
 				info.arg2 = InterfaceFunctionsModule:ReturnIndexGivenTableValue(UIDROPDOWNMENU_MENU_VALUE, itemTypeTable)
 				info.checked = BuyInterfaceModule.mainFrame.itemClasses.valueSubList == key
 
-					if nestedTable == armorTypeTable or nestedTable == weaponsTypeTable then
+					if nestedTable == armorTypeTable then
 					info.menuList, info.hasArrow = key, true
 				end
 
@@ -242,7 +221,9 @@ function BuyInterfaceDropDownMenusModule:SelectItemClassSubMenuType(arg1, arg2, 
 	BuyInterfaceModule.mainFrame.itemClasses.valueSubList = arg1
 	BuyInterfaceModule.mainFrame.itemClasses.valueSubSubList = nil
 
-	local _, table = BuyInterfaceDropDownMenusModule:GetNestedTableInfoFromMenuValue(UIDROPDOWNMENU_MENU_VALUE)
+	local isSubList = true
+
+	local _, table = BuyInterfaceDropDownMenusModule:GetNestedTableInfoFromMenuValue(UIDROPDOWNMENU_MENU_VALUE, isSubList)
 
 	UIDropDownMenu_SetText(BuyInterfaceModule.mainFrame.itemClasses, table[arg1])
 	CloseDropDownMenus()
@@ -262,30 +243,23 @@ function BuyInterfaceDropDownMenusModule:SelectItemClassSubSubMenuType(arg1, arg
 
 end
 
-function BuyInterfaceDropDownMenusModule:GetNestedTableInfoFromMenuValue(menuValue)
+function BuyInterfaceDropDownMenusModule:GetNestedTableInfoFromMenuValue(menuValue, isSubList)
 
 	local itemTypeValue, nestedTable, nestedOfNestedTable = nil
 
-	if menuValue == "Weapon (All)" or menuValue == "One-Handed" or menuValue == "Two-Handed" or menuValue == "Ranged" or menuValue == "Misc Weapon" then
+	--TODO: Improve this code, i.e replace all these or = x for a loop
+	if menuValue == "Weapon (All)" or menuValue == "O.H. Axes" or menuValue == "T.H Axes" or menuValue == "Bows" or menuValue == "Guns" or menuValue == "O.H. Maces"
+	or menuValue ==	"T.H Maces" or menuValue ==	"Polearms"or menuValue == "O.H. Swords" or menuValue ==	"T.H Swords" or menuValue == "Staves" or menuValue == "Fist Weapons"
+	or (menuValue ==  "Miscellaneous" and isSubList) or menuValue == "Daggers" or menuValue == "Thrown" or menuValue ==	"Crossbows" or menuValue ==	"Wands" or menuValue ==	"Fishing Pole" then
 		itemTypeValue = 1
 		nestedTable = weaponsTypeTable
-		
-		if menuValue == "One-Handed" then
-			nestedOfNestedTable = oneHandedWeaponsTable
-		elseif menuValue == "Two-Handed" then
-			nestedOfNestedTable = twoHandedWeaponsTable
-		elseif menuValue == "Ranged" then
-			nestedOfNestedTable = rangedWeaponsTable
-		elseif menuValue == "Misc Weapon" then
-			nestedOfNestedTable = miscellaneousWeaponsTable
-		end	
 
-	elseif menuValue == "Armor (All)" or menuValue == "Plate" or menuValue == "Mail" or menuValue == "Leather" or menuValue == "Cloth" or menuValue == "Miscellaneous" or menuValue == "Idols" 
-	or menuValue == "Librams" or menuValue == "Totems" or menuValue == "Shields" then
+	elseif menuValue == "Armor (All)" or menuValue == "Miscellaneous" or menuValue == "Plate" or menuValue == "Mail" or menuValue == "Leather" 
+	or menuValue == "Cloth" or menuValue == "Idols" or menuValue == "Librams" or menuValue == "Totems" or menuValue == "Shields" then
 		itemTypeValue = 2
 		nestedTable = armorTypeTable
 		
-		if menuValue == "Miscellaneous"  or menuValue == "Cloth" or menuValue == "Leather" or menuValue == "Mail" or menuValue == "Plate" or menuValue == "Mail" or menuValue == "Mail" then
+		if menuValue == "Miscellaneous" or menuValue == "Cloth" or menuValue == "Leather" or menuValue == "Mail" or menuValue == "Plate" then
 			nestedOfNestedTable = armorSlotsTable
 		else
 			nestedOfNestedTable = {}

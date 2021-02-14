@@ -205,7 +205,7 @@ function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
 		local itemType = BuyInterfaceModule.mainFrame.itemClasses.value
 		local itemSubType = BuyInterfaceModule.mainFrame.itemClasses.valueSubList
 		local itemSubSubType = BuyInterfaceModule.mainFrame.itemClasses.valueSubSubList
-		
+
 		if itemType ~= nil and itemSubType ~= nil and itemSubSubType ~= nil then
 			filterData = AuctionCategories[itemType].subCategories[itemSubType].subCategories[itemSubSubType].filters
 		elseif itemType ~= nil and itemSubType ~= nil then
