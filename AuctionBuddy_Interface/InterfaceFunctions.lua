@@ -130,6 +130,7 @@ function InterfaceFunctionsModule:UpdateTotalBuyoutOrBidCostBuy(selectedItemData
 		local minBidIncrement = select(9, GetAuctionItemInfo("list", selectedItemData))
 		local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
 		local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemData))
+		local highBidder = select(12, GetAuctionItemInfo("list", selectedItemData))
 
 		local totalAmountToBid = max(minBid, bidAmount) + minBidIncrement
 
@@ -139,9 +140,22 @@ function InterfaceFunctionsModule:UpdateTotalBuyoutOrBidCostBuy(selectedItemData
 		if BuyInterfaceModule.mainFrame:IsShown() then
 			BuyInterfaceModule.mainFrame.totalBidCost:SetText(bidValueGoldFormat)
 			BuyInterfaceModule.mainFrame.totalBuyCost:SetText(buyValueGoldFormat)
+
+			if highBidder then
+				BuyInterfaceModule.mainFrame.alreadyBidText:Show()
+			else
+				BuyInterfaceModule.mainFrame.alreadyBidText:Hide()
+			end
+
 		elseif SellInterfaceModule.mainFrame:IsShown() then
 			SellInterfaceModule.mainFrame.totalBidCost:SetText(bidValueGoldFormat)
 			SellInterfaceModule.mainFrame.totalBuyCost:SetText(buyValueGoldFormat)
+
+			if highBidder then
+				SellInterfaceModule.mainFrame.alreadyBidText:Show()
+			else
+				SellInterfaceModule.mainFrame.alreadyBidText:Hide()
+			end
 		end	
 
 	elseif self.needToUpdateTotalCostText == true then

@@ -36,15 +36,7 @@ function ItemsModule:CreateAuctionItemButtons(itemsShown, scrollTable)
 		
 		local buyOutPerItem = buyoutPrice/aucCount
 
-		if bidAmount == 0 then
-			bidAmount = minBid
-		end
-
-		if highBidder == true then
-			bidAmount = "Already bid"
-		end
-
-		-- This data is compared to each index of columnType array from the CreateBuyScrollFrameTable function inside Buy.lua
+		-- This data is compared to each index of columnType array from the CreateResultsScrollFrameTable function inside ResultsTable.lua
 		tinsert(tableData, 
 		{
 			texture = myTexture,
@@ -54,8 +46,8 @@ function ItemsModule:CreateAuctionItemButtons(itemsShown, scrollTable)
 			count = aucCount,
 			quality = itemQuality,
 			itlvl = itemLevel,
-			bid = bidAmount,
-			buy = buyOutPerItem	,
+			bid = minBid,
+			buy = buyOutPerItem,
 			totalPrice = buyoutPrice
 		})
 	end
@@ -124,6 +116,8 @@ function ItemsModule:SearchSelectedContainerItem()
 end
 
 function ItemsModule:InsertSelectedItem(parentFrame)
+
+	DebugModule:Log(self, "InsertSelectedItem")
 		
 	infoType, info1, info2 = GetCursorInfo()
 	

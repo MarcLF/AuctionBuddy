@@ -213,6 +213,14 @@ end
 
 function SellInterfaceModule:CreateSellInterfaceOptions(parentFrame)
 
+	parentFrame.alreadyBidText = parentFrame:CreateFontString("AB_SellInterface_MainFrame_AlreadyBid_Text", "OVERLAY")
+	parentFrame.alreadyBidText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
+	parentFrame.alreadyBidText:SetWidth(250)
+	parentFrame.alreadyBidText:SetPoint("BOTTOMLEFT", 35, 220)
+	parentFrame.alreadyBidText:SetJustifyH("LEFT")
+	parentFrame.alreadyBidText:SetText("You have already biden on this item.")
+	parentFrame.alreadyBidText:Hide()
+
 	parentFrame.totalBidCost = parentFrame:CreateFontString("AB_SellInterface_MainFrame_TotalBidCost", "OVERLAY")
 	parentFrame.totalBidCost:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
 	parentFrame.totalBidCost:SetWidth(250)
@@ -469,6 +477,7 @@ function SellInterfaceModule:ResetData()
 	self.mainFrame.scrollTable:SetData({}, true)
 	self.mainFrame.itemToSellButton.text:SetText("<-- [Insert Item]")
 	self.mainFrame.itemToSellButton.itemTexture:SetTexture(nil)
+	self.mainFrame.alreadyBidText:Hide()
 	
 	if ItemsModule.itemInserted == true then
 		PickupItem(ItemsModule.currentItemPostedLink) 

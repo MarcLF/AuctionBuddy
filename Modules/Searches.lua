@@ -29,9 +29,9 @@ function SearchesModule:Enable()
 	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
 
 	self:CreateRecentSearchesScrollFrameTable(BuyInterfaceModule.mainFrame, 400, -120, "Recent Searches")
-	self:CreateFavoriteSearchesScrollFrameTable(BuyInterfaceModule.mainFrame, 400, -400, "Favorite Searches")
+	self:CreateFavoriteSearchesScrollFrameTable(BuyInterfaceModule.mainFrame, 400, -390, "Favorite Searches")
 
-	self:CreateFavoriteSearchesDropDownMenu(BuyInterfaceModule.mainFrame, -50, 21)
+	self:CreateFavoriteSearchesDropDownMenu(BuyInterfaceModule.mainFrame, -50, 35)
 
 	DatabaseModule:InsertDataFromDatabase(BuyInterfaceModule.mainFrame.recentSearchesTable, DatabaseModule.recentSearches)
 
@@ -111,7 +111,7 @@ function SearchesModule:CreateFavoriteSearchesDropDownMenu(parentFrame, xPos, yP
 	
 	DebugModule:Log(self, "CreateFavoriteSearchesDropDownMenu")
 	parentFrame.selectFavListText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_FavoriteLists_SelectFavListText", "OVERLAY", "GameFontWhite")
-	parentFrame.selectFavListText:SetPoint("RIGHT", xPos - 195, 25)
+	parentFrame.selectFavListText:SetPoint("RIGHT", xPos - 195, yPos + 2)
 	parentFrame.selectFavListText:SetJustifyH("CENTER")
 	parentFrame.selectFavListText:SetText("Select a favorite list:")
 

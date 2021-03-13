@@ -89,17 +89,17 @@ function BuyInterfaceModule:CreateBuyInterface()
 	self.mainFrame.title:SetJustifyH("CENTER")
 	self.mainFrame.title:SetText("AuctionBuddy BUY")
 
-	self.mainFrame.resultsTableFrame = CreateFrame("Frame", "AB_SellInterface_MainFrame_ResultsFrame", self.mainFrame, "InsetFrameTemplate3")
+	self.mainFrame.resultsTableFrame = CreateFrame("Frame", "AB_BuyInterface_MainFrame_ResultsFrame", self.mainFrame, "InsetFrameTemplate3")
 	BuyInterfaceModule:SetFrameParameters(self.mainFrame.resultsTableFrame, 668, 570, nil, "CENTER", -277, -30, "BACKGROUND")
 	
-	self.mainFrame.containerFrame = CreateFrame("Frame", "AB_SellInterface_MainFrame_ContainerFrame", self.mainFrame, "InsetFrameTemplate3")
+	self.mainFrame.containerFrame = CreateFrame("Frame", "AB_BuyInterface_MainFrame_ContainerFrame", self.mainFrame, "InsetFrameTemplate3")
 	BuyInterfaceModule:SetFrameParameters(self.mainFrame.containerFrame, 170, 570, nil, "CENTER", 150, -30, "BACKGROUND")
 	
-	self.mainFrame.recentSearchesFrame = CreateFrame("Frame", "AB_SellInterface_MainFrame_RecentSearchesFrame", self.mainFrame, "InsetFrameTemplate3")
+	self.mainFrame.recentSearchesFrame = CreateFrame("Frame", "AB_BuyInterface_MainFrame_RecentSearchesFrame", self.mainFrame, "InsetFrameTemplate3")
 	BuyInterfaceModule:SetFrameParameters(self.mainFrame.recentSearchesFrame, 320, 170, nil, "CENTER", 400, 170, "BACKGROUND")
 	
 	self.mainFrame.favoriteSearchesFrame = CreateFrame("Frame", "AB_SellInterface_MainFrame_FavoriteSearchesFrame", self.mainFrame, "InsetFrameTemplate3")
-	BuyInterfaceModule:SetFrameParameters(self.mainFrame.favoriteSearchesFrame, 320, 170, nil, "CENTER", 400, -110, "BACKGROUND")
+	BuyInterfaceModule:SetFrameParameters(self.mainFrame.favoriteSearchesFrame, 320, 170, nil, "CENTER", 400, -100, "BACKGROUND")
 	
 	self:HideBuyInterface()
 	
@@ -200,6 +200,14 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 end
 
 function BuyInterfaceModule:CreateBuyInterfaceBuyOptions(parentFrame)
+
+	parentFrame.alreadyBidText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_AlreadyBid_Text", "OVERLAY")
+	parentFrame.alreadyBidText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
+	parentFrame.alreadyBidText:SetWidth(250)
+	parentFrame.alreadyBidText:SetPoint("BOTTOMRIGHT", -95, 116)
+	parentFrame.alreadyBidText:SetJustifyH("LEFT")
+	parentFrame.alreadyBidText:SetText("You have already biden on this item.")
+	parentFrame.alreadyBidText:Hide()
 	
 	parentFrame.totalBidCost = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_TotalBidCost", "OVERLAY")
 	parentFrame.totalBidCost:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
@@ -323,7 +331,7 @@ function BuyInterfaceModule:CreateBuyInterfaceSearchTablesOptions(parentFrame)
 	end)
 	
 	parentFrame.manageFavoriteLists = CreateFrame("Button", "AB_BuyInterface_MainFrame_ManageFavoriteLists_Button", parentFrame, "UIPanelButtonTemplate")
-	BuyInterfaceModule:SetFrameParameters(parentFrame.manageFavoriteLists, 170, 24, "Manage Favorite Lists", "RIGHT", -215, -211)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.manageFavoriteLists, 170, 24, "Manage Favorite Lists", "RIGHT", -215, -205)
 	parentFrame.manageFavoriteLists:SetScript("OnClick", function() 
 		parentFrame:Hide()
 		InterfaceOptionsFrame_OpenToCategory(OptionsPanelModule.favoriteLists)
@@ -331,7 +339,7 @@ function BuyInterfaceModule:CreateBuyInterfaceSearchTablesOptions(parentFrame)
 	end)
 	
 	parentFrame.addFavoriteBar = CreateFrame("EditBox", "AB_BuyInterface_MainFrame_SearchBar", parentFrame.favoriteSearchesFrame, "InputBoxTemplate")
-	BuyInterfaceModule:SetFrameParameters(parentFrame.addFavoriteBar, 200, 20, nil, "TOPLEFT", 5, 25)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.addFavoriteBar, 200, 20, nil, "TOPLEFT", 5, 30)
 	parentFrame.addFavoriteBar:SetAutoFocus(false)
 	parentFrame.addFavoriteBar:SetJustifyH("LEFT")
 	parentFrame.addFavoriteBar:SetScript("OnEscapePressed", function() parentFrame.addFavoriteBar:ClearFocus() end)
@@ -347,7 +355,7 @@ function BuyInterfaceModule:CreateBuyInterfaceSearchTablesOptions(parentFrame)
 	end)
 	
 	parentFrame.addFavorite = CreateFrame("Button", "AB_BuyInterface_MainFrame_AddFavorite_Button", parentFrame, "UIPanelButtonTemplate")
-	BuyInterfaceModule:SetFrameParameters(parentFrame.addFavorite, 100, 24, "Add Favorite", "RIGHT", -75, -11)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.addFavorite, 100, 24, "Add Favorite", "RIGHT", -70, 5)
 	parentFrame.addFavorite:SetScript("OnClick", function()  
 		if parentFrame.addFavoriteBar:GetText() ~= "" and BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu.value ~= nil then
 			DatabaseModule:InsertNewSearch(DatabaseModule.favoriteSearchesLists[BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu.value][1], parentFrame.addFavoriteBar:GetText()) 
@@ -423,6 +431,8 @@ function BuyInterfaceModule:ResetData()
 	self.mainFrame.itemClasses.value = 0
 	self.mainFrame.itemClasses.valueSubList = nil
 	self.mainFrame.itemClasses.valueSubSubList = nil
+
+	self.mainFrame.alreadyBidText:Hide()
 
 end
 
