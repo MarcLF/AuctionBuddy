@@ -135,10 +135,10 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 	parentFrame.instaBuyCheckBox:SetWidth(24)
 	parentFrame.instaBuyCheckBox:SetHeight(24)
 	parentFrame.instaBuyCheckBox:SetPoint("TOPLEFT", 50, -65)
-	if DatabaseModule.buyOptions.doubleClickToBuy == true then
-		parentFrame.instaBuyCheckBox:SetChecked(true)
-	end
 	parentFrame.instaBuyCheckBox:SetScript("OnClick", function() DatabaseModule.buyOptions.doubleClickToBuy = not DatabaseModule.buyOptions.doubleClickToBuy end)
+	parentFrame.instaBuyCheckBox:SetScript("OnShow", function() 	
+		parentFrame.instaBuyCheckBox:SetChecked(DatabaseModule.buyOptions.doubleClickToBuy)
+	end)
 
 	parentFrame.instaBuyCheckBox.text = parentFrame.instaBuyCheckBox:CreateFontString("AB_SellInterface_MainFrame_InstaBuyCheck_Text", "OVERLAY", "GameFontNormal")
 	parentFrame.instaBuyCheckBox.text:SetWidth(250)
