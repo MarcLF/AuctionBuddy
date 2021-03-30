@@ -21,6 +21,7 @@ function InterfaceFunctionsModule:OnInitialize()
 	DebugModule:Log(self, "OnInitialize", 0)
 
 	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
+	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 	self:RegisterMessage("RESULTSTABLE_ITEM_SELECTED", self.OnResultsTableItemSelected)
 
 	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
@@ -28,6 +29,14 @@ function InterfaceFunctionsModule:OnInitialize()
 	SellInterfaceModule = AuctionBuddy:GetModule("SellInterfaceModule")
 	ItemsModule = AuctionBuddy:GetModule("ItemsModule")
 
+end
+
+function InterfaceFunctionsModule:AUCTION_HOUSE_CLOSED()
+	DebugModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
+
+	self:UnregisterAllEvents()
+	self:UnregisterAllMessages()
+	
 end
 
 function InterfaceFunctionsModule:AUCTION_ITEM_LIST_UPDATE()
