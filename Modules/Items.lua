@@ -46,7 +46,7 @@ function ItemsModule:CreateAuctionItemButtons(itemsShown, scrollTable)
 			count = aucCount,
 			quality = itemQuality,
 			itlvl = itemLevel,
-			bid = minBid,
+			bid = bidAmount,
 			buy = buyOutPerItem,
 			totalPrice = buyoutPrice
 		})
