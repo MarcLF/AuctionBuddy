@@ -54,31 +54,6 @@ function InterfaceFunctionsModule:CloseAuctionHouseCustom()
 
 end
 
-function InterfaceFunctionsModule:ChangeCurrentDisplayingFrame(currentFrame)
-	DebugModule:Log(self, "ChangeCurrentDisplayingFrame", 2)
-
-	self.switchingUI = true
-	currentFrame:Hide()
-	
-	if currentFrame == SellInterfaceModule.mainFrame then
-		BuyInterfaceModule.mainFrame:Show()
-	else
-		SellInterfaceModule.mainFrame:Show()
-	end
-
-	self.switchingUI = false
-
-end
-
-function InterfaceFunctionsModule:ShowDefaultAH(currentFrame)
-	DebugModule:Log(self, "ShowDefaultAH", 2)
-
-	self.switchingUI = true
-	currentFrame:Hide()
-	self.switchingUI = false
-
-end
-
 function InterfaceFunctionsModule:UpdateDepositCost(parentFrame)
 	DebugModule:Log(self, "UpdateDepositCost", 2)
 	

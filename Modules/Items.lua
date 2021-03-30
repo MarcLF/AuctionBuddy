@@ -7,7 +7,6 @@ local ItemsModule = AuctionBuddy:NewModule("ItemsModule", "AceEvent-3.0")
 
 ItemsModule.currentItemPostedLink = nil
 ItemsModule.itemSelected = false
-ItemsModule.itemInserted = false
 
 local DebugModule = nil
 local InterfaceFunctionsModule = nil
@@ -62,6 +61,13 @@ function ItemsModule:CreateAuctionItemButtons(itemsShown, scrollTable)
 		ownerFullName, saleStatus, itemId, hasAllInfo = GetAuctionItemInfo("list", i);
 		
 		local buyOutPerItem = buyoutPrice/aucCount
+		local totalBidItem
+
+		if bidAmount > 0 then
+			totalBidItem = bidAmount
+		else
+			totalBidItem = minBid
+		end
 
 		-- This data is compared to each index of columnType array from the CreateResultsScrollFrameTable function inside ResultsTable.lua
 		tinsert(tableData, 
@@ -73,8 +79,7 @@ function ItemsModule:CreateAuctionItemButtons(itemsShown, scrollTable)
 			count = aucCount,
 			quality = itemQuality,
 			itlvl = itemLevel,
-			--Lua lacks ternary operators explicitly, this is the standard solution to use them.
-			bid = (bidAmount and minBid or bidAmount),
+			bid = totalBidItem,
 			buy = buyOutPerItem,
 			totalPrice = buyoutPrice
 		})
@@ -101,17 +106,6 @@ function ItemsModule:UpdateSellItemPriceAfterSearch(numberList, shown, total)
 		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, priceToSell)
 	end
 	
-end
-
-function ItemsModule:ItemInsertedOrSelected(button, insertedOrSelected)
-	DebugModule:Log(self, "ItemInsertedOrSelected", 3)
-	
-	if insertedOrSelected == true then
-		button:Enable()
-	else
-		button:Disable()
-	end
-
 end
 
 function ItemsModule:BuySelectedItem(selectedItemData, isBid)
@@ -179,8 +173,9 @@ function ItemsModule:InsertSelectedItem(parentFrame)
 					
 		ClickAuctionSellItemButton()
 		
-		ItemsModule.itemInserted = true
 		InterfaceFunctionsModule:UpdateDepositCost(SellInterfaceModule.mainFrame)
+
+		parentFrame.createAuction:Enable()
 	end
 
 	ClearCursor()	
@@ -202,11 +197,12 @@ function ItemsModule:RemoveInsertedItem(parentFrame)
 		parentFrame.stackNumber:SetText(1)
 		parentFrame.stackSize:SetText(1)
 		
-		self.itemInserted = false
 		self.currentItemPostedLink = nil
 		
 		ClickAuctionSellItemButton(false)
 		ClearCursor()
+
+		parentFrame.createAuction:Disable()
 	end
 
 end

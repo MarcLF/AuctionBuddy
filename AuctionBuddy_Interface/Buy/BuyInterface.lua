@@ -21,6 +21,9 @@ function BuyInterfaceModule:Enable()
 	DebugModule = AuctionBuddy:GetModule("DebugModule")
 	DebugModule:Log(self, "Enable", 0)
 
+	self:RegisterMessage("RESULTSTABLE_ITEM_SELECTED", self.OnResultsTableItemSelected)	
+	self:RegisterMessage("SHOW_AB_BUY_FRAME", self.OnShowBuyFrame)	
+
 	if self.interfaceCreated == true then
 		return
 	end
@@ -59,6 +62,8 @@ end
 function BuyInterfaceModule:AUCTION_HOUSE_CLOSED()
 
 	self:ResetData()
+	self:UnregisterAllEvents()
+	self:UnregisterAllMessages()
 
 end
 
@@ -111,7 +116,6 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 	BuyInterfaceModule:SetFrameParameters(parentFrame.searchBar, 200, 20, nil, "TOPLEFT", 25, -40)
 	parentFrame.searchBar:SetAutoFocus(false)
 	parentFrame.searchBar:SetJustifyH("LEFT")
-	parentFrame.searchBar:SetScript("OnShow", function() parentFrame.searchBar:SetFocus() end)
 	parentFrame.searchBar:SetScript("OnChar", function() 
 		if parentFrame.searchBar:GetText() ~= "" then
 			InterfaceFunctionsModule.autoCompleteTextPos = strlen(parentFrame.searchBar:GetText())
@@ -170,7 +174,7 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 	BuyInterfaceModule:SetFrameParameters(parentFrame.DefaultAHButton, 80, 24, "Default AH", "TOPRIGHT", -25, -30)
 	parentFrame.DefaultAHButton:SetScript("OnClick", function() 
 		self:ResetData()
-		InterfaceFunctionsModule:ShowDefaultAH(parentFrame) 
+		parentFrame:Hide()
 		AuctionFrame_Show() 
 	end)
 	
@@ -178,7 +182,9 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 	BuyInterfaceModule:SetFrameParameters(parentFrame.BuyFrameButton, 80, 24, "Show Sell", "TOPRIGHT", -105, -30)
 	parentFrame.BuyFrameButton:SetScript("OnClick", function() 
 		self:ResetData()
-		InterfaceFunctionsModule:ChangeCurrentDisplayingFrame(parentFrame) 
+		InterfaceFunctionsModule.switchingUI = true
+		parentFrame:Hide()
+		self:SendMessage("SHOW_AB_SELL_FRAME")
 	end)
 	
 	parentFrame.nextPageButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_NextPage_Button", parentFrame, "UIPanelButtonTemplate")
@@ -241,14 +247,22 @@ function BuyInterfaceModule:CreateBuyInterfaceBuyOptions(parentFrame)
 
 	parentFrame.buySelectedItem = CreateFrame("Button", "AB_BuyInterface_MainFrame_BuySelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
 	BuyInterfaceModule:SetFrameParameters(parentFrame.buySelectedItem, 125, 24, "Buy Selected Item", "RIGHT", -90, -303)
-	parentFrame.buySelectedItem:SetScript("OnClick", function() ItemsModule:BuySelectedItem(parentFrame.scrollTable:GetSelection(), false) parentFrame.scrollTable:ClearSelection() end)
-	parentFrame.buySelectedItem:SetScript("OnUpdate", function() ItemsModule:ItemInsertedOrSelected(parentFrame.buySelectedItem, ItemsModule.itemSelected) end)
+	parentFrame.buySelectedItem:SetScript("OnClick", function() 
+		ItemsModule:BuySelectedItem(parentFrame.scrollTable:GetSelection(), false) 
+		parentFrame.buySelectedItem:Disable()
+		parentFrame.bidSelectedItem:Disable()
+		parentFrame.scrollTable:ClearSelection() 
+	end)
 	parentFrame.buySelectedItem:Disable()
 	
 	parentFrame.bidSelectedItem = CreateFrame("Button", "AB_BuyInterface_MainFrame_BidSelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
 	BuyInterfaceModule:SetFrameParameters(parentFrame.bidSelectedItem, 125, 24, "Bid Selected Item", "RIGHT", -230, -303)
-	parentFrame.bidSelectedItem:SetScript("OnClick", function() ItemsModule:BuySelectedItem(parentFrame.scrollTable:GetSelection(), true) parentFrame.scrollTable:ClearSelection() end)
-	parentFrame.bidSelectedItem:SetScript("OnUpdate", function() ItemsModule:ItemInsertedOrSelected(parentFrame.bidSelectedItem, ItemsModule.itemSelected) end)
+	parentFrame.bidSelectedItem:SetScript("OnClick", function() 
+		ItemsModule:BuySelectedItem(parentFrame.scrollTable:GetSelection(), true) 
+		parentFrame.buySelectedItem:Disable()
+		parentFrame.bidSelectedItem:Disable()
+		parentFrame.scrollTable:ClearSelection() 
+	end)
 	parentFrame.bidSelectedItem:Disable()
 	
 	parentFrame.currentPlayerGold = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_CurrentGold", "OVERLAY")
@@ -459,6 +473,25 @@ function BuyInterfaceModule:OnShowInterface()
 	self.mainFrame.scrollTable:ClearSelection()
 	SellInterfaceModule.mainFrame.scrollTable:ClearSelection()
 	NavigationModule:CheckSearchActive(BuyInterfaceModule.mainFrame)
+
+end
+
+function BuyInterfaceModule:OnResultsTableItemSelected()
+	DebugModule:Log("Buy_OnResultsTableItemSelected", "OnResultsTableItemSelected", 3)
+
+	BuyInterfaceModule.mainFrame.buySelectedItem:Enable()
+	BuyInterfaceModule.mainFrame.bidSelectedItem:Enable()
+
+end
+
+function BuyInterfaceModule:OnShowBuyFrame()
+	DebugModule:Log("BuyInterfaceModule", "OnShowBuyFrame", 3)
+
+	BuyInterfaceModule.mainFrame:Show()
+	BuyInterfaceModule.mainFrame.buySelectedItem:Disable()
+	BuyInterfaceModule.mainFrame.bidSelectedItem:Disable()
+
+	InterfaceFunctionsModule.switchingUI = false
 
 end
 

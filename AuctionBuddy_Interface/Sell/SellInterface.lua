@@ -23,6 +23,9 @@ function SellInterfaceModule:Enable()
 	DebugModule = AuctionBuddy:GetModule("DebugModule")
 	DebugModule:Log(self, "Enable", 0)
 
+	self:RegisterMessage("RESULTSTABLE_ITEM_SELECTED", self.OnResultsTableItemSelected)	
+	self:RegisterMessage("SHOW_AB_SELL_FRAME", self.OnShowSellFrame)	
+
 	if self.interfaceCreated == true then
 		return
 	end
@@ -60,6 +63,8 @@ end
 function SellInterfaceModule:AUCTION_HOUSE_CLOSED()
 	
 	self:ResetData()
+	self:UnregisterAllEvents()
+	self:UnregisterAllMessages()
 
 end
 
@@ -107,11 +112,18 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 	
 	parentFrame.DefaultAHButton = CreateFrame("Button", "AB_SellInterface_MainFrame_DefaultAH_Button", parentFrame, "UIPanelButtonTemplate")
 	SellInterfaceModule:SetFrameParameters(parentFrame.DefaultAHButton, 80, 24, "Default AH", "TOPRIGHT", -25, -30)
-	parentFrame.DefaultAHButton:SetScript("OnClick", function() InterfaceFunctionsModule:ShowDefaultAH(parentFrame) AuctionFrame_Show() end)
+	parentFrame.DefaultAHButton:SetScript("OnClick", function() 
+		parentFrame:Hide()
+		AuctionFrame_Show() 
+	end)
 	
 	parentFrame.BuyFrameButton = CreateFrame("Button", "AB_SellInterface_MainFrame_BuyFrame_Button", parentFrame, "UIPanelButtonTemplate")
 	SellInterfaceModule:SetFrameParameters(parentFrame.BuyFrameButton, 80, 24, "Show Buy", "TOPRIGHT", -105, -30)
-	parentFrame.BuyFrameButton:SetScript("OnClick", function() InterfaceFunctionsModule:ChangeCurrentDisplayingFrame(parentFrame) end)
+	parentFrame.BuyFrameButton:SetScript("OnClick", function()
+		InterfaceFunctionsModule.switchingUI = true
+		parentFrame:Hide()
+		self:SendMessage("SHOW_AB_BUY_FRAME")
+	end)
 
 	parentFrame.nextPageButton = CreateFrame("Button", "AB_SellInterface_MainFrame_NextPage_Button", parentFrame, "UIPanelButtonTemplate")
 	SellInterfaceModule:SetFrameParameters(parentFrame.nextPageButton, 80, 24, "Next Page", "TOPRIGHT", -25, -60)
@@ -151,7 +163,7 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 	parentFrame.itemToSellButton:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square")	
 	
 	parentFrame.itemToSellButton:SetScript("OnClick", function() 
-		if ItemsModule.itemInserted == true then
+		if CursorHasItem() == false then
 			PickupItem(ItemsModule.currentItemPostedLink) 
 			ItemsModule:RemoveInsertedItem(self.mainFrame)
 		else
@@ -262,22 +274,20 @@ function SellInterfaceModule:CreateSellInterfaceOptions(parentFrame)
 	parentFrame.buySelectedItem = CreateFrame("Button", "AB_SellInterface_MainFrame_BuySelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
 	SellInterfaceModule:SetFrameParameters(parentFrame.buySelectedItem, 125, 24, "Buy Selected Item", "LEFT", 160, -203)
 	parentFrame.buySelectedItem:SetScript("OnClick", function() 
-		ItemsModule:BuySelectedItem(parentFrame.scrollTable:GetSelection(), false) 
-		parentFrame.scrollTable:ClearSelection() 
-	end)
-	parentFrame.buySelectedItem:SetScript("OnUpdate", function() 
-		ItemsModule:ItemInsertedOrSelected(parentFrame.buySelectedItem, ItemsModule.itemSelected) 
+		ItemsModule:BuySelectedItem(parentFrame.scrollTable:GetSelection(), false)
+		parentFrame.buySelectedItem:Disable()
+		parentFrame.bidSelectedItem:Disable()
+		parentFrame.scrollTable:ClearSelection()
 	end)
 	parentFrame.buySelectedItem:Disable()
 	
 	parentFrame.bidSelectedItem = CreateFrame("Button", "AB_SellInterface_MainFrame_BidSelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
 	SellInterfaceModule:SetFrameParameters(parentFrame.bidSelectedItem, 125, 24, "Bid Selected Item", "LEFT", 20, -203)
 	parentFrame.bidSelectedItem:SetScript("OnClick", function() 
-		ItemsModule:BuySelectedItem(parentFrame.scrollTable:GetSelection(), true) 
+		ItemsModule:BuySelectedItem(parentFrame.scrollTable:GetSelection(), true)
+		parentFrame.buySelectedItem:Disable()
+		parentFrame.bidSelectedItem:Disable()
 		parentFrame.scrollTable:ClearSelection() 
-	end)
-	parentFrame.bidSelectedItem:SetScript("OnUpdate", function() 
-		ItemsModule:ItemInsertedOrSelected(parentFrame.bidSelectedItem, ItemsModule.itemSelected) 
 	end)
 	parentFrame.bidSelectedItem:Disable()
 
@@ -388,8 +398,8 @@ function SellInterfaceModule:CreateItemToSellParameters(parentFrame)
 		ItemsModule:SellSelectedItem(parentFrame) 
 		SellInterfaceModule:ResetData()
 	end)
-	parentFrame.createAuction:SetScript("OnUpdate", function() ItemsModule:ItemInsertedOrSelected(parentFrame.createAuction, ItemsModule.itemInserted) end)
-	
+	parentFrame.createAuction:Disable()
+
 end
 
 local function SelectAuctionDuration(self, arg1, checked, value)
@@ -484,24 +494,6 @@ function SellInterfaceModule:SetFrameParameters(frame, width, height, text, poin
 
 end
 
-function SellInterfaceModule:ResetData()
-
-	self.itemPriceValue = 100
-	self.stackPriceValue = 100
-	self.mainFrame.stackSize:SetText("1")
-	self.mainFrame.stackNumber:SetText("1")
-	self.mainFrame.scrollTable:SetData({}, true)
-	self.mainFrame.itemToSellButton.text:SetText("<-- [Insert Item]")
-	self.mainFrame.itemToSellButton.itemTexture:SetTexture(nil)
-	self.mainFrame.alreadyBidText:Hide()
-	
-	if ItemsModule.itemInserted == true then
-		PickupItem(ItemsModule.currentItemPostedLink) 
-		ItemsModule:RemoveInsertedItem(self.mainFrame)
-	end
-
-end
-
 function SellInterfaceModule:OnShowInterface()
 
 	self.mainFrame:ClearAllPoints()
@@ -516,6 +508,43 @@ function SellInterfaceModule:OnShowInterface()
 	BuyInterfaceModule.mainFrame.scrollTable:ClearSelection()
 	self.mainFrame.scrollTable:ClearSelection()
 	ContainerModule:ScanContainer()
+
+end
+
+function SellInterfaceModule:OnResultsTableItemSelected()
+	DebugModule:Log("Sell_OnResultsTableItemSelected", "OnResultsTableItemSelected", 3)
+
+	SellInterfaceModule.mainFrame.buySelectedItem:Enable()
+	SellInterfaceModule.mainFrame.bidSelectedItem:Enable()
+
+end
+
+function SellInterfaceModule:OnShowSellFrame()
+	DebugModule:Log("SellInterfaceModule", "OnShowSellFrame", 3)
+
+	SellInterfaceModule.mainFrame:Show()
+	SellInterfaceModule.mainFrame.buySelectedItem:Disable()
+	SellInterfaceModule.mainFrame.bidSelectedItem:Disable()
+
+	InterfaceFunctionsModule.switchingUI = false
+
+end
+
+function SellInterfaceModule:ResetData()
+
+	self.itemPriceValue = 100
+	self.stackPriceValue = 100
+	self.mainFrame.stackSize:SetText("1")
+	self.mainFrame.stackNumber:SetText("1")
+	self.mainFrame.scrollTable:SetData({}, true)
+	self.mainFrame.itemToSellButton.text:SetText("<-- [Insert Item]")
+	self.mainFrame.itemToSellButton.itemTexture:SetTexture(nil)
+	self.mainFrame.alreadyBidText:Hide()
+	
+	if ItemsModule.currentItemPostedLink ~= nil then
+		PickupItem(ItemsModule.currentItemPostedLink) 
+		ItemsModule:RemoveInsertedItem(self.mainFrame)
+	end
 
 end
 
