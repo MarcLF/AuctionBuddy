@@ -21,6 +21,7 @@ function InterfaceFunctionsModule:OnInitialize()
 	DebugModule:Log(self, "OnInitialize", 0)
 
 	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
+	self:RegisterMessage("RESULTSTABLE_ITEM_SELECTED", self.OnResultsTableItemSelected)
 
 	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
 	BuyInterfaceModule = AuctionBuddy:GetModule("BuyInterfaceModule")
@@ -43,6 +44,13 @@ function InterfaceFunctionsModule:AUCTION_ITEM_LIST_UPDATE()
 	SellInterfaceModule.mainFrame.totalBidCost:SetText(valueGoldFormat)
 	SellInterfaceModule.mainFrame.totalBuyCost:SetText(valueGoldFormat)
 	
+end
+
+function InterfaceFunctionsModule:OnResultsTableItemSelected(parentFrame)
+	DebugModule:Log("InterfaceFunctionsModule", "OnResultsTableItemSelected", 2)
+
+	InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame)
+
 end
 
 function InterfaceFunctionsModule:CloseAuctionHouseCustom()
@@ -104,48 +112,30 @@ function InterfaceFunctionsModule:ItemPriceUpdated(parentFrame)
 	
 end
 
-function InterfaceFunctionsModule:UpdateTotalBuyoutOrBidCostBuy(selectedItemData, itemSelected)
-	DebugModule:Log(self, "UpdateTotalBuyoutOrBidCostBuy", 2)
+function InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame)
+	DebugModule:Log(self, "UpdateTotalBuyoutAndBidCostBuy", 2)
 
-	if itemSelected == true and self.needToUpdateTotalCostText == true then
+	local selectedItemData = parentFrame.scrollTable:GetSelection()
 
-		local minBid = select(8, GetAuctionItemInfo("list", selectedItemData))
-		local minBidIncrement = select(9, GetAuctionItemInfo("list", selectedItemData))
-		local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
-		local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemData))
-		local highBidder = select(12, GetAuctionItemInfo("list", selectedItemData))
+	local minBid = select(8, GetAuctionItemInfo("list", selectedItemData))
+	local minBidIncrement = select(9, GetAuctionItemInfo("list", selectedItemData))
+	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
+	local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemData))
+	local highBidder = select(12, GetAuctionItemInfo("list", selectedItemData))
 
-		local totalAmountToBid = max(minBid, bidAmount) + minBidIncrement
+	local totalAmountToBid = max(minBid, bidAmount) + minBidIncrement
 
-		local bidValueGoldFormat = GetCoinTextureString(totalAmountToBid, 15)
-		local buyValueGoldFormat = GetCoinTextureString(buyoutPrice, 15)
+	local bidValueGoldFormat = GetCoinTextureString(totalAmountToBid, 15)
+	local buyValueGoldFormat = GetCoinTextureString(buyoutPrice, 15)
 
-		if BuyInterfaceModule.mainFrame:IsShown() then
-			BuyInterfaceModule.mainFrame.totalBidCost:SetText(bidValueGoldFormat)
-			BuyInterfaceModule.mainFrame.totalBuyCost:SetText(buyValueGoldFormat)
+	parentFrame.totalBidCost:SetText(bidValueGoldFormat)
+	parentFrame.totalBuyCost:SetText(buyValueGoldFormat)
 
-			if highBidder then
-				BuyInterfaceModule.mainFrame.alreadyBidText:Show()
-			else
-				BuyInterfaceModule.mainFrame.alreadyBidText:Hide()
-			end
-
-		elseif SellInterfaceModule.mainFrame:IsShown() then
-			SellInterfaceModule.mainFrame.totalBidCost:SetText(bidValueGoldFormat)
-			SellInterfaceModule.mainFrame.totalBuyCost:SetText(buyValueGoldFormat)
-
-			if highBidder then
-				SellInterfaceModule.mainFrame.alreadyBidText:Show()
-			else
-				SellInterfaceModule.mainFrame.alreadyBidText:Hide()
-			end
-		end	
-
-	elseif self.needToUpdateTotalCostText == true then
-		self:UpdateTotalBuyoutOrBidCostBuy(0)
+	if highBidder then
+		parentFrame.alreadyBidText:Show()
+	else
+		parentFrame.alreadyBidText:Hide()
 	end
-
-	self.needToUpdateTotalCostText = false
 
 end
 

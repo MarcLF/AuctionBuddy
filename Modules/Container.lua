@@ -10,7 +10,6 @@ local BuyInterfaceModule = nil
 local SellInterfaceModule = nil
 local ItemsModule = nil
 local DatabaseModule = nil
-local SearchesModule = nil
 
 local containerNumOfSlots = nil
 
@@ -30,7 +29,6 @@ function ContainerModule:Enable()
 	SellInterfaceModule = AuctionBuddy:GetModule("SellInterfaceModule")
 	ItemsModule = AuctionBuddy:GetModule("ItemsModule")
 	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
-	SearchesModule = AuctionBuddy:GetModule("SearchesModule")
 	
 	self:CreateContainerScrollFrameTable(BuyInterfaceModule.mainFrame, 145, -135)
 	self:CreateContainerScrollFrameTable(SellInterfaceModule.mainFrame, -192, -135)
