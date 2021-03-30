@@ -39,7 +39,7 @@ function AuctionBuddy:OnInitialize()
 	self:RegisterEvent("AUCTION_HOUSE_SHOW")
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
-	
+
 end
 
 function AuctionBuddy:VARIABLES_LOADED()

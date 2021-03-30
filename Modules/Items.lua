@@ -3,7 +3,7 @@ local AuctionBuddy = unpack(select(2, ...))
 
 local StdUi = LibStub('StdUi')
 
-local ItemsModule = AuctionBuddy:NewModule("ItemsModule")
+local ItemsModule = AuctionBuddy:NewModule("ItemsModule", "AceEvent-3.0")
 
 ItemsModule.currentItemPostedLink = nil
 ItemsModule.itemSelected = false
@@ -22,6 +22,8 @@ function ItemsModule:Enable()
 	InterfaceFunctionsModule = AuctionBuddy:GetModule("InterfaceFunctionsModule")
 	BuyInterfaceModule = AuctionBuddy:GetModule("BuyInterfaceModule")
 	SellInterfaceModule = AuctionBuddy:GetModule("SellInterfaceModule")
+
+	self:RegisterMessage("CONTAINER_ITEM_SELECTED", self.InsertSelectedItem)
 	
 end
 
@@ -117,11 +119,11 @@ end
 
 function ItemsModule:InsertSelectedItem(parentFrame)
 
-	DebugModule:Log(self, "InsertSelectedItem")
+	DebugModule:Log(ItemsModule, "InsertSelectedItem")
 		
 	infoType, info1, info2 = GetCursorInfo()
 	
-	self.currentItemPostedLink = info2
+	ItemsModule.currentItemPostedLink = info2
 	local buttonCurrentText = parentFrame.itemToSellButton.text:GetText()
 
 	if infoType == "item" and buttonCurrentText ~= info2 then
@@ -148,7 +150,7 @@ function ItemsModule:InsertSelectedItem(parentFrame)
 					
 		ClickAuctionSellItemButton()
 		
-		self.itemInserted = true
+		ItemsModule.itemInserted = true
 		InterfaceFunctionsModule:UpdateDepositCost(SellInterfaceModule.mainFrame)
 	end
 
@@ -162,7 +164,6 @@ function ItemsModule:RemoveInsertedItem(parentFrame)
 	
 	if infoType == "item" then
 		parentFrame.itemToSellButton:SetScript("OnEnter", function(self)
-
 		end)
 
 		parentFrame.itemToSellButton.itemTexture:SetTexture(nil)

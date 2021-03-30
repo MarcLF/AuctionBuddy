@@ -123,7 +123,6 @@ function SearchesModule:CreateFavoriteSearchesDropDownMenu(parentFrame, xPos, yP
 
 end
 
-
 local function SelectList(self, arg1, arg2, checked)
 
 	BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu.value = arg1

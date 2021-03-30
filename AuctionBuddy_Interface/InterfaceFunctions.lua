@@ -191,3 +191,15 @@ function InterfaceFunctionsModule:AutoCompleteText(frame, text)
 	end
 
 end
+
+function InterfaceFunctionsModule:AddCursorItem(frame)
+
+	local infoType, info1, info2 = GetCursorInfo()
+	local bindType = select(14, GetItemInfo(info2))
+	if bindType ~= 1 then
+		ItemsModule:InsertSelectedItem(frame.mainFrame)
+	else
+		print("AuctionBuddy: Can't auction Soulbound items")
+	end
+
+end

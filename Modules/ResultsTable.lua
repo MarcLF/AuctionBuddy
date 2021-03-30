@@ -3,7 +3,7 @@ local AuctionBuddy = unpack(select(2, ...))
 
 local StdUi = LibStub('StdUi')
 
-local ResultsTableModule = AuctionBuddy:NewModule("ResultsTableModule")
+local ResultsTableModule = AuctionBuddy:NewModule("ResultsTableModule", "AceEvent-3.0")
 
 local DebugModule = nil
 local ItemsModule = nil
@@ -109,9 +109,9 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 	parentFrame.scrollTable:RegisterEvents({
 		OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)	
 			if button == "LeftButton" then
+				parentFrame.scrollTable:SetSelection(rowIndex)
 				ItemsModule.itemSelected = true
 				InterfaceFunctionsModule.needToUpdateTotalCostText = true
-				parentFrame.scrollTable:SetSelection(rowIndex)	
 				InterfaceFunctionsModule:UpdateTotalBuyoutOrBidCostBuy(parentFrame.scrollTable:GetSelection(), ItemsModule.itemSelected)
 			end
 			return true

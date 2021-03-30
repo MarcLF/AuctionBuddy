@@ -193,7 +193,7 @@ function ContainerModule:CreateContainerScrollFrameTable(parentFrame, xPos, yPos
 					ContainerModule.bagID = rowData.bagID
 					ContainerModule.bagSlot = rowData.slot
 					
-					ItemsModule:InsertSelectedItem(parentFrame)				
+					self:SendMessage("CONTAINER_ITEM_SELECTED", parentFrame)			
 
 					parentFrame.scrollTableContainer:ClearSelection()
 				end
