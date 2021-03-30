@@ -44,6 +44,23 @@ function OptionsPanelModule:CreateOptionsPanel()
 	self.panel = CreateFrame("Frame", "AuctionBuddy_OptionsPanel", UIParent)
 	self.panel.name = "AuctionBuddy"
 
+	self.panel.text = self.panel:CreateFontString("AuctionBuddy_OptionsPanel_TitleText", "OVERLAY", "GameFontNormal")
+	self.panel.text:SetWidth(250)
+	self.panel.text:SetPoint("TOPLEFT", 15, -15)
+	self.panel.text:SetJustifyH("LEFT")
+	self.panel.text:SetText("Auction Buddy")
+
+	self.ABInfoFrame = CreateFrame("Frame", "AuctionBuddy_OptionsPanel_ABInfoFrame", self.panel, "InsetFrameTemplate3")
+	self.ABInfoFrame:SetPoint("CENTER", 0, -10)
+	self.ABInfoFrame:SetWidth(600)
+	self.ABInfoFrame:SetHeight(520)
+
+	self.ABInfoFrame.text = self.ABInfoFrame:CreateFontString("AuctionBuddy_OptionsPanel_ABInfoFrame_TitleText", "OVERLAY", "GameFontNormal")
+	self.ABInfoFrame.text:SetWidth(250)
+	self.ABInfoFrame.text:SetPoint("TOPLEFT", 15, -12)
+	self.ABInfoFrame.text:SetJustifyH("LEFT")
+	self.ABInfoFrame.text:SetText("Guide:")
+
 	InterfaceOptions_AddCategory(self.panel)
 
 end
@@ -66,7 +83,7 @@ function OptionsPanelModule:CreateOptionsPanelChildFavoriteLists()
 	self.createListFrame:SetWidth(600)
 	self.createListFrame:SetHeight(100)
 
-	self.createListFrame.text = self.createListFrame:CreateFontString("AuctionBuddy_OptionsPanel_FavoriteLists_TitleText", "OVERLAY", "GameFontNormal")
+	self.createListFrame.text = self.createListFrame:CreateFontString("AuctionBuddy_OptionsPanel_FavoriteLists_CreateList_TitleText", "OVERLAY", "GameFontNormal")
 	self.createListFrame.text:SetWidth(250)
 	self.createListFrame.text:SetPoint("TOPLEFT", 15, -12)
 	self.createListFrame.text:SetJustifyH("LEFT")
@@ -219,7 +236,7 @@ function OptionsPanelModule:CreateOptionsPanelChildSellParameters()
 	self.sellParameters.name = "Sell Parameters"
 	self.sellParameters.parent = OptionsPanelModule.panel.name
 
-	self.sellParameters.text = OptionsPanelModule.sellParameters:CreateFontString("AuctionBuddy_OptionsPanel_FavoriteLists_TitleText", "OVERLAY", "GameFontNormal")
+	self.sellParameters.text = OptionsPanelModule.sellParameters:CreateFontString("AuctionBuddy_OptionsPanel_SellParameters_TitleText", "OVERLAY", "GameFontNormal")
 	self.sellParameters.text:SetWidth(250)
 	self.sellParameters.text:SetPoint("TOPLEFT", 15, -15)
 	self.sellParameters.text:SetJustifyH("LEFT")
