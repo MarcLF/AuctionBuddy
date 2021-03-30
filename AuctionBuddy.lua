@@ -89,8 +89,8 @@ function AuctionBuddy:AUCTION_HOUSE_CLOSED()
 end
 
 function AuctionBuddy:AUCTION_ITEM_LIST_UPDATE()
+	DebugModule:Log(self, "AUCTION_ITEM_LIST_UPDATE", 0)
 
-	DebugModule:Log(self, "AUCTION_ITEM_LIST_UPDATE")
 	self.shown, self.total = GetNumAuctionItems("list")
 
 	if self.total > 0 then
@@ -112,8 +112,7 @@ function AuctionBuddy:AUCTION_ITEM_LIST_UPDATE()
 end
 
 function AuctionBuddy:ResetCurrentData()
-
-	DebugModule:Log(self, "ResetCurrentData")
+	DebugModule:Log(self, "ResetCurrentData", 1)
 
 	if BuyInterfaceModule.mainFrame ~= nil then
 		BuyInterfaceModule.mainFrame.scrollTable:SetData({}, true)
@@ -126,8 +125,7 @@ function AuctionBuddy:ResetCurrentData()
 end
 
 function AuctionBuddy:TableCombine(keys, values)
-
-	DebugModule:Log(self, "TableCombine")
+	DebugModule:Log(self, "TableCombine", 1)
 
 	local result = {}
 	
@@ -144,8 +142,7 @@ local function NoResponse()
 end
 
 function AuctionBuddy:AuctionFrameTab_OnClick(tab)
-
-	DebugModule:Log(self, "AuctionFrameTab_OnClick")
+	DebugModule:Log(self, "AuctionFrameTab_OnClick", 1)
 
 	if tab.buyTabButton then
 		NavigationModule:CheckSearchActive(BuyInterfaceModule.mainFrame)
@@ -173,8 +170,7 @@ function AuctionBuddy:AuctionFrameTab_OnClick(tab)
 end
 		
 function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
-	
-	DebugModule:Log(self, "AuctionHouseSearch")
+	DebugModule:Log(self, "AuctionHouseSearch", 0)
 
 	if textToSearch ~= self.searchText and textToSearch ~= nil then
 		NavigationModule.page = 0
@@ -239,8 +235,7 @@ function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
 end
 
 function AuctionBuddy:HideWindows()
-
-	DebugModule:Log(self, "HideWindows")
+	DebugModule:Log(self, "HideWindows", 0)
 
 	BuyInterfaceModule:HideBuyInterface()
 	SellInterfaceModule:HideSellInterface()

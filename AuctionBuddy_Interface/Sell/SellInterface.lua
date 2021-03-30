@@ -21,7 +21,7 @@ SellInterfaceModule.stackPriceValue = nil
 function SellInterfaceModule:Enable()
 
 	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable")
+	DebugModule:Log(self, "Enable", 0)
 
 	if self.interfaceCreated == true then
 		return

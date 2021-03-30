@@ -20,7 +20,7 @@ ContainerModule.bagSlot = nil
 function ContainerModule:Enable()
 
 	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable")
+	DebugModule:Log(self, "Enable", 0)
 
 	if self.interfaceCreated == true then
 		return
@@ -48,12 +48,14 @@ function ContainerModule:OnInitialize()
 end
 
 function ContainerModule:AUCTION_OWNED_LIST_UPDATE()
+	DebugModule:Log(self, "AUCTION_OWNED_LIST_UPDATE", 2)
 
 	C_Timer.After(0.5, self.ScanContainer)
 
 end
 
 function ContainerModule:ScanContainer()
+	DebugModule:Log("ContainerModule", "ScanContainer", 2)
 
 	local tableData = {}
 	for i = 0, 4, 1 do
@@ -90,6 +92,7 @@ function ContainerModule:ScanContainer()
 end
 
 function ContainerModule:CreateContainerScrollFrameTable(parentFrame, xPos, yPos)
+	DebugModule:Log(self, "CreateContainerScrollFrameTable", 2)
 	
 	if parentFrame == BuyInterfaceModule.mainFrame then
 		local columnType = 

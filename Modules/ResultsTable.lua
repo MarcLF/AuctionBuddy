@@ -13,7 +13,7 @@ local DatabaseModule = nil
 function ResultsTableModule:Enable()
 
 	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable")
+	DebugModule:Log(self, "Enable", 0)
 
 	ItemsModule = AuctionBuddy:GetModule("ItemsModule")
 	InterfaceFunctionsModule = AuctionBuddy:GetModule("InterfaceFunctionsModule")
@@ -22,6 +22,7 @@ function ResultsTableModule:Enable()
 end
 
 function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPos)
+	DebugModule:Log(self, "CreateResultsScrollFrameTable", 2)
 	
 	if parentFrame.scrollTableCreated then
 		return
@@ -110,6 +111,9 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 		OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)	
 			if button == "LeftButton" then
 				parentFrame.scrollTable:SetSelection(rowIndex)
+
+				self:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame)	
+
 				ItemsModule.itemSelected = true
 				InterfaceFunctionsModule.needToUpdateTotalCostText = true
 				InterfaceFunctionsModule:UpdateTotalBuyoutOrBidCostBuy(parentFrame.scrollTable:GetSelection(), ItemsModule.itemSelected)

@@ -17,7 +17,7 @@ local SellInterfaceModule = nil
 function ItemsModule:Enable()
 
 	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable")
+	DebugModule:Log(self, "Enable", 0)
 
 	InterfaceFunctionsModule = AuctionBuddy:GetModule("InterfaceFunctionsModule")
 	BuyInterfaceModule = AuctionBuddy:GetModule("BuyInterfaceModule")
@@ -28,6 +28,7 @@ function ItemsModule:Enable()
 end
 
 function ItemsModule:CreateAuctionItemButtons(itemsShown, scrollTable)
+	DebugModule:Log(self, "CreateAuctionItemButtons", 2)
 
 	local tableData = {}
 	
@@ -60,6 +61,7 @@ function ItemsModule:CreateAuctionItemButtons(itemsShown, scrollTable)
 end
 
 function ItemsModule:UpdateSellItemPriceAfterSearch(numberList, shown, total)
+	DebugModule:Log(self, "UpdateSellItemPriceAfterSearch", 2)
 	
 	local buyoutPrice = select(10, GetAuctionItemInfo("list", numberList))
 	local itemQuantity = select(3, GetAuctionItemInfo("list", numberList))
@@ -77,6 +79,7 @@ function ItemsModule:UpdateSellItemPriceAfterSearch(numberList, shown, total)
 end
 
 function ItemsModule:ItemInsertedOrSelected(button, insertedOrSelected)
+	DebugModule:Log(self, "ItemInsertedOrSelected", 3)
 	
 	if insertedOrSelected == true then
 		button:Enable()
@@ -87,6 +90,7 @@ function ItemsModule:ItemInsertedOrSelected(button, insertedOrSelected)
 end
 
 function ItemsModule:BuySelectedItem(selectedItemData, isBid)
+	DebugModule:Log(self, "BuySelectedItem", 2)
 	
 	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
 	local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemData))
@@ -109,6 +113,7 @@ function ItemsModule:BuySelectedItem(selectedItemData, isBid)
 end
 
 function ItemsModule:SearchSelectedContainerItem()
+	DebugModule:Log(self, "SearchSelectedContainerItem", 2)
 	
 	infoType, info1, info2 = GetCursorInfo()
 	local itemName = GetItemInfo(info2) 
@@ -118,8 +123,7 @@ function ItemsModule:SearchSelectedContainerItem()
 end
 
 function ItemsModule:InsertSelectedItem(parentFrame)
-
-	DebugModule:Log(ItemsModule, "InsertSelectedItem")
+	DebugModule:Log(self, "InsertSelectedItem", 2)
 		
 	infoType, info1, info2 = GetCursorInfo()
 	
@@ -159,6 +163,7 @@ function ItemsModule:InsertSelectedItem(parentFrame)
 end
 
 function ItemsModule:RemoveInsertedItem(parentFrame)
+	DebugModule:Log(self, "RemoveInsertedItem", 2)
 	
 	infoType, info1, info2 = GetCursorInfo()
 	
@@ -182,6 +187,7 @@ function ItemsModule:RemoveInsertedItem(parentFrame)
 end
 
 function ItemsModule:SellSelectedItem(parentFrame)
+	DebugModule:Log(self, "SellSelectedItem", 2)
 
 	local itemPrice = MoneyInputFrame_GetCopper(parentFrame.itemPrice)
 	local stackPrice = MoneyInputFrame_GetCopper(parentFrame.stackPrice)
@@ -198,6 +204,7 @@ function ItemsModule:SellSelectedItem(parentFrame)
 end
 
 function ItemsModule:ShowToolTip(frame, link, show)
+	DebugModule:Log(self, "ShowToolTip", 3)
 
 	if show == true then
 		GameTooltip:SetOwner(frame)

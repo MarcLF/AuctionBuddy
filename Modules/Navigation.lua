@@ -16,7 +16,7 @@ local SellInterfaceModule = nil
 function NavigationModule:Enable()
 
 	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable")
+	DebugModule:Log(self, "Enable", 0)
 	
 	BuyInterfaceModule = AuctionBuddy:GetModule("BuyInterfaceModule")
 	SellInterfaceModule = AuctionBuddy:GetModule("SellInterfaceModule")
@@ -28,6 +28,7 @@ function NavigationModule:Enable()
 end
 
 function NavigationModule:CheckSearchActive(parentFrame)
+	DebugModule:Log(self, "CheckSearchActive", 2)
 	
 	if self == nil then
 		self = NavigationModule
@@ -53,6 +54,7 @@ function NavigationModule:CheckSearchActive(parentFrame)
 end
 
 function NavigationModule:MovePage(isNext, parentFrame)
+	DebugModule:Log(self, "MovePage", 3)
 	
 	if isNext then
 		self.page = self.page + 1

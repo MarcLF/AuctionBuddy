@@ -18,7 +18,7 @@ local ItemsModule = nil
 function InterfaceFunctionsModule:OnInitialize()
 
 	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable")
+	DebugModule:Log(self, "OnInitialize", 0)
 
 	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 
@@ -30,6 +30,7 @@ function InterfaceFunctionsModule:OnInitialize()
 end
 
 function InterfaceFunctionsModule:AUCTION_ITEM_LIST_UPDATE()
+	DebugModule:Log(self, "AUCTION_ITEM_LIST_UPDATE", 2)
 
 	C_Timer.After(0.5, function() 	
 		BuyInterfaceModule.mainFrame.currentPlayerGold.value = GetCoinTextureString(GetMoney(), 15)
@@ -45,6 +46,7 @@ function InterfaceFunctionsModule:AUCTION_ITEM_LIST_UPDATE()
 end
 
 function InterfaceFunctionsModule:CloseAuctionHouseCustom()
+	DebugModule:Log(self, "CloseAuctionHouseCustom", 2)
 
 	if self.switchingUI == false and SellInterfaceModule.interfaceCreated == true and BuyInterfaceModule.interfaceCreated == true then
 		CloseAuctionHouse()
@@ -53,6 +55,7 @@ function InterfaceFunctionsModule:CloseAuctionHouseCustom()
 end
 
 function InterfaceFunctionsModule:ChangeCurrentDisplayingFrame(currentFrame)
+	DebugModule:Log(self, "ChangeCurrentDisplayingFrame", 2)
 
 	self.switchingUI = true
 	currentFrame:Hide()
@@ -68,6 +71,7 @@ function InterfaceFunctionsModule:ChangeCurrentDisplayingFrame(currentFrame)
 end
 
 function InterfaceFunctionsModule:ShowDefaultAH(currentFrame)
+	DebugModule:Log(self, "ShowDefaultAH", 2)
 
 	self.switchingUI = true
 	currentFrame:Hide()
@@ -76,6 +80,7 @@ function InterfaceFunctionsModule:ShowDefaultAH(currentFrame)
 end
 
 function InterfaceFunctionsModule:UpdateDepositCost(parentFrame)
+	DebugModule:Log(self, "UpdateDepositCost", 2)
 	
 	local itemPrice = MoneyInputFrame_GetCopper(parentFrame.itemPrice)
 	local stackPrice = MoneyInputFrame_GetCopper(parentFrame.stackPrice)
@@ -91,6 +96,7 @@ function InterfaceFunctionsModule:UpdateDepositCost(parentFrame)
 end
 
 function InterfaceFunctionsModule:StackPriceUpdated(parentFrame)
+	DebugModule:Log(self, "StackPriceUpdated", 2)
 
 	local stackPrice = MoneyInputFrame_GetCopper(parentFrame.stackPrice)
 	local stackSize = parentFrame.stackSize:GetNumber()
@@ -107,6 +113,7 @@ function InterfaceFunctionsModule:StackPriceUpdated(parentFrame)
 end
 
 function InterfaceFunctionsModule:ItemPriceUpdated(parentFrame)
+	DebugModule:Log(self, "ItemPriceUpdated", 2)
 
 	local itemPrice = MoneyInputFrame_GetCopper(parentFrame.itemPrice)
 	local stackSize = parentFrame.stackSize:GetNumber()
@@ -123,6 +130,7 @@ function InterfaceFunctionsModule:ItemPriceUpdated(parentFrame)
 end
 
 function InterfaceFunctionsModule:UpdateTotalBuyoutOrBidCostBuy(selectedItemData, itemSelected)
+	DebugModule:Log(self, "UpdateTotalBuyoutOrBidCostBuy", 2)
 
 	if itemSelected == true and self.needToUpdateTotalCostText == true then
 
@@ -167,6 +175,7 @@ function InterfaceFunctionsModule:UpdateTotalBuyoutOrBidCostBuy(selectedItemData
 end
 
 function InterfaceFunctionsModule:ReturnIndexGivenTableValue(tableValue, table)
+	DebugModule:Log(self, "ReturnIndexGivenTableValue", 2)
 
 	for key,value in pairs(table) do
 		if table[key] == tableValue then
@@ -177,6 +186,7 @@ function InterfaceFunctionsModule:ReturnIndexGivenTableValue(tableValue, table)
 end
 
 function InterfaceFunctionsModule:AutoCompleteText(frame, text)
+	DebugModule:Log(self, "AutoCompleteText", 3)
 
 	for key,value in pairs(DatabaseModule.recentSearches) do
 		for nestedKey, nestedValue in pairs(DatabaseModule.recentSearches[key]) do
@@ -193,6 +203,7 @@ function InterfaceFunctionsModule:AutoCompleteText(frame, text)
 end
 
 function InterfaceFunctionsModule:AddCursorItem(frame)
+	DebugModule:Log(self, "AddCursorItem", 2)
 
 	local infoType, info1, info2 = GetCursorInfo()
 	local bindType = select(14, GetItemInfo(info2))

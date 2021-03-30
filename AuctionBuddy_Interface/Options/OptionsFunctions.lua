@@ -11,13 +11,14 @@ local DatabaseModule = nil
 function OptionsFunctionsModule:Enable()
 	
 	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable")
+	DebugModule:Log(self, "Enable", 0)
 
 	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
 
 end
 
 function OptionsFunctionsModule:CreateNewList(listName)
+	DebugModule:Log(self, "CreateNewList", 1)
 
 	local totalListNumber = 1
 	local favList = 
@@ -39,6 +40,7 @@ function OptionsFunctionsModule:CreateNewList(listName)
 end
 
 function OptionsFunctionsModule:RemoveSelectedList(selectedListName, dropDownMenu)
+	DebugModule:Log(self, "RemoveSelectedList", 1)
 
 	local listSize = 0
 
@@ -66,6 +68,7 @@ function OptionsFunctionsModule:RemoveSelectedList(selectedListName, dropDownMen
 end
 
 function OptionsFunctionsModule:ChangeListName(list, newName, dropDownMenu)
+	DebugModule:Log(self, "ChangeListName", 1)
 
 	list["name"] = newName
 
@@ -78,6 +81,7 @@ function OptionsFunctionsModule:ChangeListName(list, newName, dropDownMenu)
 end
 
 function OptionsFunctionsModule:RemoveSelectedElementFromCurrentList(list, selectedElementName)
+	DebugModule:Log(self, "RemoveSelectedElementFromCurrentList", 1)
 
 	for key, value in pairs(list) do
 		if key == selectedElementName then

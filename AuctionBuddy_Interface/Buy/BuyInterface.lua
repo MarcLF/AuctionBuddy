@@ -19,7 +19,7 @@ local OptionsPanelModule = nil
 function BuyInterfaceModule:Enable()
 
 	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable")
+	DebugModule:Log(self, "Enable", 0)
 
 	if self.interfaceCreated == true then
 		return

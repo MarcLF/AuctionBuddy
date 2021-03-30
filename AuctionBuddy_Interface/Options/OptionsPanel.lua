@@ -12,7 +12,7 @@ local OptionsFunctionsModule = nil
 function OptionsPanelModule:Enable()
 
 	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable")
+	DebugModule:Log(self, "Enable", 0)
 
 	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
 	OptionsFunctionsModule = AuctionBuddy:GetModule("OptionsFunctionsModule")
@@ -27,6 +27,7 @@ function OptionsPanelModule:Enable()
 end
 
 function OptionsPanelModule:CreatingInterfaceOnEnable()
+	DebugModule:Log(self, "CreatingInterfaceOnEnable", 1)
 
 	self:CreateOptionsPanel()
 	self:CreateOptionsPanelChildFavoriteLists()
@@ -38,6 +39,7 @@ function OptionsPanelModule:CreatingInterfaceOnEnable()
 end
 
 function OptionsPanelModule:CreateOptionsPanel()
+	DebugModule:Log(self, "CreateOptionsPanel", 1)
 
 	self.panel = CreateFrame("Frame", "AuctionBuddy_OptionsPanel", UIParent)
 	self.panel.name = "AuctionBuddy"
@@ -47,6 +49,7 @@ function OptionsPanelModule:CreateOptionsPanel()
 end
 
 function OptionsPanelModule:CreateOptionsPanelChildFavoriteLists()
+	DebugModule:Log(self, "CreateOptionsPanelChildFavoriteLists", 2)
 
 	self.favoriteLists = CreateFrame("Frame", "AuctionBuddy_OptionsPanel_FavoriteLists", self.panel)
 	self.favoriteLists.name = "Favorite Lists"
@@ -136,6 +139,7 @@ function OptionsPanelModule:CreateOptionsPanelChildFavoriteLists()
 end
 
 function OptionsPanelModule:CreateOptionsPanelChildFavoriteListsButtons(parentFrame)
+	DebugModule:Log(self, "CreateOptionsPanelChildFavoriteListsButtons", 3)
 
 	parentFrame.textInputEditList = CreateFrame("EditBox", "AuctionBuddy_OptionsPanel_FavoriteLists_ManageList_EditBox", parentFrame, "InputBoxTemplate")
 	parentFrame.textInputEditList:SetWidth(200)
@@ -209,6 +213,7 @@ function OptionsPanelModule:CreateOptionsPanelChildFavoriteListsButtons(parentFr
 end
 
 function OptionsPanelModule:CreateOptionsPanelChildSellParameters()
+	DebugModule:Log(self, "CreateOptionsPanelChildSellParameters", 3)
 
 	self.sellParameters = CreateFrame("Frame", "AuctionBuddy_OptionsPanel_SellParameters", OptionsPanelModule.panel)
 	self.sellParameters.name = "Sell Parameters"
@@ -272,6 +277,7 @@ function OptionsPanelModule:CreateOptionsPanelChildSellParameters()
 end
 
 local function SelectList(self, arg1, arg2, checked)
+	DebugModule:Log("OptionsPanelModule", "SelectList", 2)
 
 	OptionsPanelModule.favoriteLists.selectList.value = arg1
 	UIDropDownMenu_SetText(OptionsPanelModule.favoriteLists.selectList, DatabaseModule.favoriteSearchesLists[arg1][arg2])
@@ -281,6 +287,7 @@ local function SelectList(self, arg1, arg2, checked)
 end
 
 function OptionsPanelModule:FavoriteListsDropDown(frame, level, menuList)
+	DebugModule:Log(self, "FavoriteListsDropDown", 3)
 
 	local info = UIDropDownMenu_CreateInfo()
 	info.func = SelectList
@@ -300,7 +307,8 @@ function OptionsPanelModule:FavoriteListsDropDown(frame, level, menuList)
 end
 
 function OptionsPanelModule:CreateFavoriteSearchesScrollFrameTable(parentFrame, xPos, yPos)
-	
+	DebugModule:Log(self, "CreateFavoriteSearchesScrollFrameTable", 3)
+
 	local columnType = {
 		{
 			name         = "List Elements",
@@ -316,5 +324,3 @@ function OptionsPanelModule:CreateFavoriteSearchesScrollFrameTable(parentFrame, 
 	parentFrame.favoriteSearchesTable:EnableSelection(true)
 	
 end
-
-
