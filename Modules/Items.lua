@@ -23,7 +23,31 @@ function ItemsModule:Enable()
 	BuyInterfaceModule = AuctionBuddy:GetModule("BuyInterfaceModule")
 	SellInterfaceModule = AuctionBuddy:GetModule("SellInterfaceModule")
 
+	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
+	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 	self:RegisterMessage("CONTAINER_ITEM_SELECTED", self.InsertSelectedItem)
+	
+end
+
+function ItemsModule:AUCTION_HOUSE_CLOSED()
+	DebugModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
+
+	self:UnregisterAllEvents()
+	self:UnregisterAllMessages()
+	
+end
+
+function ItemsModule:AUCTION_ITEM_LIST_UPDATE()
+	DebugModule:Log(self, "AUCTION_ITEM_LIST_UPDATE", 1)
+
+	self.shown, self.total = GetNumAuctionItems("list")
+
+	ItemsModule:CreateAuctionItemButtons(self.shown, BuyInterfaceModule.mainFrame.scrollTable)
+	ItemsModule:CreateAuctionItemButtons(self.shown, SellInterfaceModule.mainFrame.scrollTable)
+
+	if self.total > 0 then 
+		ItemsModule:UpdateSellItemPriceAfterSearch(1,  self.shown, self.total)
+	end
 	
 end
 
@@ -49,7 +73,8 @@ function ItemsModule:CreateAuctionItemButtons(itemsShown, scrollTable)
 			count = aucCount,
 			quality = itemQuality,
 			itlvl = itemLevel,
-			bid = bidAmount,
+			--Lua lacks ternary operators explicitly, this is the standard solution to use them.
+			bid = (bidAmount and minBid or bidAmount),
 			buy = buyOutPerItem,
 			totalPrice = buyoutPrice
 		})

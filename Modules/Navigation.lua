@@ -20,11 +20,37 @@ function NavigationModule:Enable()
 	
 	BuyInterfaceModule = AuctionBuddy:GetModule("BuyInterfaceModule")
 	SellInterfaceModule = AuctionBuddy:GetModule("SellInterfaceModule")
+
+	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
+	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 	
 	self.searchActive = false
 	self.page = 0
 	self.maxResultsPages = 0
 
+end
+
+function NavigationModule:AUCTION_HOUSE_CLOSED()
+	DebugModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
+
+	self:UnregisterAllEvents()
+	
+end
+
+function NavigationModule:AUCTION_ITEM_LIST_UPDATE()
+	DebugModule:Log(self, "AUCTION_ITEM_LIST_UPDATE", 0)
+
+	self.shown, self.total = GetNumAuctionItems("list")
+
+	if self.total > 0 then
+		NavigationModule.maxResultsPages = self.total / 50 - 1
+	else
+		NavigationModule.maxResultsPages = 0
+	end
+
+	NavigationModule:CheckSearchActive(BuyInterfaceModule.mainFrame)
+	NavigationModule:CheckSearchActive(SellInterfaceModule.mainFrame)
+	
 end
 
 function NavigationModule:CheckSearchActive(parentFrame)

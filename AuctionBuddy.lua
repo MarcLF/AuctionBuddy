@@ -38,7 +38,6 @@ function AuctionBuddy:OnInitialize()
 	self:RegisterEvent("VARIABLES_LOADED")
 	self:RegisterEvent("AUCTION_HOUSE_SHOW")
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
-	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 
 end
 
@@ -85,29 +84,6 @@ function AuctionBuddy:AUCTION_HOUSE_CLOSED()
 
 	self:ResetCurrentData()
 	self:HideWindows()
-	
-end
-
-function AuctionBuddy:AUCTION_ITEM_LIST_UPDATE()
-	DebugModule:Log(self, "AUCTION_ITEM_LIST_UPDATE", 0)
-
-	self.shown, self.total = GetNumAuctionItems("list")
-
-	if self.total > 0 then
-		NavigationModule.maxResultsPages = self.total / 50 - 1
-	else
-		NavigationModule.maxResultsPages = 0
-	end
-
-	ItemsModule:CreateAuctionItemButtons(self.shown, BuyInterfaceModule.mainFrame.scrollTable)
-	ItemsModule:CreateAuctionItemButtons(self.shown, SellInterfaceModule.mainFrame.scrollTable)
-
-	NavigationModule:CheckSearchActive(BuyInterfaceModule.mainFrame)
-	NavigationModule:CheckSearchActive(SellInterfaceModule.mainFrame)
-	
-	if self.total > 0 then 
-		ItemsModule:UpdateSellItemPriceAfterSearch(1,  self.shown, self.total)
-	end
 	
 end
 

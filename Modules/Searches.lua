@@ -46,10 +46,10 @@ function SearchesModule:Enable()
 end
 
 function SearchesModule:AUCTION_HOUSE_CLOSED()
-	DebugModule:Log(self, "AUCTION_HOUSE_CLOSED", 1)
+	DebugModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
 
 	self:ResetData()
-
+	
 end
 
 function SearchesModule:CreateRecentSearchesScrollFrameTable(parentFrame, xPos, yPos, tableName)
