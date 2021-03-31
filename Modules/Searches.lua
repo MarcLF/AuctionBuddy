@@ -49,6 +49,7 @@ function SearchesModule:AUCTION_HOUSE_CLOSED()
 	DebugModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
 
 	self:ResetData()
+	self:UnregisterAllEvents()
 	
 end
 

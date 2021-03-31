@@ -8,7 +8,6 @@ local BuyInterfaceModule = AuctionBuddy:NewModule("BuyInterfaceModule", "AceEven
 local DebugModule = nil
 local InterfaceFunctionsModule = nil
 local ResultsTableModule = nil
-local NavigationModule = nil
 local SellInterfaceModule = nil
 local ContainerModule = nil
 local DatabaseModule = nil
@@ -21,6 +20,7 @@ function BuyInterfaceModule:Enable()
 	DebugModule = AuctionBuddy:GetModule("DebugModule")
 	DebugModule:Log(self, "Enable", 0)
 
+	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 	self:RegisterMessage("RESULTSTABLE_ITEM_SELECTED", self.OnResultsTableItemSelected)	
 	self:RegisterMessage("SHOW_AB_BUY_FRAME", self.OnShowBuyFrame)	
 
@@ -31,10 +31,11 @@ function BuyInterfaceModule:Enable()
 	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
 	InterfaceFunctionsModule = AuctionBuddy:GetModule("InterfaceFunctionsModule")
 	ResultsTableModule = AuctionBuddy:GetModule("ResultsTableModule")
-	NavigationModule = AuctionBuddy:GetModule("NavigationModule")
 	SellInterfaceModule = AuctionBuddy:GetModule("SellInterfaceModule")
 	ContainerModule = AuctionBuddy:GetModule("ContainerModule")
 	OptionsPanelModule = AuctionBuddy:GetModule("OptionsPanelModule")
+	SearchesModule = AuctionBuddy:GetModule("SearchesModule")
+	ItemsModule = AuctionBuddy:GetModule("ItemsModule")
 	
 	self:CreateBuyInterface()	
 	self:CreateBuyTab(self.mainFrame)
@@ -51,16 +52,9 @@ function BuyInterfaceModule:Enable()
 	
 end
 
-function BuyInterfaceModule:OnInitialize()
-
-	SearchesModule = AuctionBuddy:GetModule("SearchesModule")
-	ItemsModule = AuctionBuddy:GetModule("ItemsModule")
-
-	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
-end
-
 function BuyInterfaceModule:AUCTION_HOUSE_CLOSED()
 
+	self:HideBuyInterface()
 	self:ResetData()
 	self:UnregisterAllEvents()
 	self:UnregisterAllMessages()
@@ -173,15 +167,15 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 	parentFrame.DefaultAHButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_DefaultAH_Button", parentFrame, "UIPanelButtonTemplate")
 	BuyInterfaceModule:SetFrameParameters(parentFrame.DefaultAHButton, 80, 24, "Default AH", "TOPRIGHT", -25, -30)
 	parentFrame.DefaultAHButton:SetScript("OnClick", function() 
-		self:ResetData()
+		InterfaceFunctionsModule.switchingUI = true
 		parentFrame:Hide()
 		AuctionFrame_Show() 
+		InterfaceFunctionsModule.switchingUI = false
 	end)
 	
 	parentFrame.BuyFrameButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_BuyFrame_Button", parentFrame, "UIPanelButtonTemplate")
 	BuyInterfaceModule:SetFrameParameters(parentFrame.BuyFrameButton, 80, 24, "Show Sell", "TOPRIGHT", -105, -30)
 	parentFrame.BuyFrameButton:SetScript("OnClick", function() 
-		self:ResetData()
 		InterfaceFunctionsModule.switchingUI = true
 		parentFrame:Hide()
 		self:SendMessage("SHOW_AB_SELL_FRAME")
@@ -191,7 +185,7 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 	BuyInterfaceModule:SetFrameParameters(parentFrame.nextPageButton, 80, 24, "Next Page", "TOPRIGHT", -25, -60)
 	parentFrame.nextPageButton:SetScript("OnClick", function()
 		if CanSendAuctionQuery() then
-			NavigationModule:MovePage(true, parentFrame)
+			self:SendMessage("ON_CLICK_NEXT_PAGE", parentFrame)
 		end
 		AuctionBuddy:AuctionHouseSearch()
 	end)
@@ -200,7 +194,7 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 	BuyInterfaceModule:SetFrameParameters(parentFrame.prevPageButton, 80, 24, "Prev Page", "TOPRIGHT", -105, -60)
 	parentFrame.prevPageButton:SetScript("OnClick", function()
 		if CanSendAuctionQuery() then
-			NavigationModule:MovePage(false, parentFrame)
+			self:SendMessage("ON_CLICK_PREV_PAGE", parentFrame)
 		end
 		AuctionBuddy:AuctionHouseSearch() 
 	end)
@@ -249,8 +243,7 @@ function BuyInterfaceModule:CreateBuyInterfaceBuyOptions(parentFrame)
 	BuyInterfaceModule:SetFrameParameters(parentFrame.buySelectedItem, 125, 24, "Buy Selected Item", "RIGHT", -90, -303)
 	parentFrame.buySelectedItem:SetScript("OnClick", function() 
 		ItemsModule:BuySelectedItem(parentFrame.scrollTable:GetSelection(), false) 
-		parentFrame.buySelectedItem:Disable()
-		parentFrame.bidSelectedItem:Disable()
+		BuyInterfaceModule:DisableBuyBidButtons()
 		parentFrame.scrollTable:ClearSelection() 
 	end)
 	parentFrame.buySelectedItem:Disable()
@@ -259,8 +252,7 @@ function BuyInterfaceModule:CreateBuyInterfaceBuyOptions(parentFrame)
 	BuyInterfaceModule:SetFrameParameters(parentFrame.bidSelectedItem, 125, 24, "Bid Selected Item", "RIGHT", -230, -303)
 	parentFrame.bidSelectedItem:SetScript("OnClick", function() 
 		ItemsModule:BuySelectedItem(parentFrame.scrollTable:GetSelection(), true) 
-		parentFrame.buySelectedItem:Disable()
-		parentFrame.bidSelectedItem:Disable()
+		BuyInterfaceModule:DisableBuyBidButtons()
 		parentFrame.scrollTable:ClearSelection() 
 	end)
 	parentFrame.bidSelectedItem:Disable()
@@ -442,9 +434,61 @@ function BuyInterfaceModule:SetFrameParameters(frame, width, height, text, point
 	
 end
 
+function BuyInterfaceModule:OnShowInterface()
+
+	self.mainFrame:ClearAllPoints()
+	self.mainFrame:SetPoint(DatabaseModule.generalOptions.point, DatabaseModule.generalOptions.xPosOffset, DatabaseModule.generalOptions.yPosOffset)
+	self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale)
+	self.mainFrame.currentPlayerGold.value = GetCoinTextureString(GetMoney(), 15)
+	self.mainFrame.currentPlayerGold:SetText(self.mainFrame.currentPlayerGold.value)
+	self.mainFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
+	self.mainFrame.totalBuyCost:SetText(self.mainFrame.totalBuyCost.value)
+	self.mainFrame.totalBidCost.value = GetCoinTextureString(0, 15)
+	self.mainFrame.totalBidCost:SetText(self.mainFrame.totalBuyCost.value)
+	BuyInterfaceModule.mainFrame.scrollTable:ClearSelection()
+	self.mainFrame.scrollTable:ClearSelection()
+	ContainerModule:ScanContainer()
+
+end
+
+function BuyInterfaceModule:OnResultsTableItemSelected()
+	DebugModule:Log("Buy_OnResultsTableItemSelected", "OnResultsTableItemSelected", 3)
+
+	BuyInterfaceModule:EnableBuyBidButtons()
+
+end
+
+function BuyInterfaceModule:OnShowBuyFrame()
+	DebugModule:Log("BuyInterfaceModule", "OnShowBuyFrame", 3)
+
+	BuyInterfaceModule.mainFrame:Show()
+	BuyInterfaceModule:DisableBuyBidButtons()
+
+	InterfaceFunctionsModule.switchingUI = false
+
+end
+
+function BuyInterfaceModule:EnableBuyBidButtons()
+
+	BuyInterfaceModule.mainFrame.buySelectedItem:Enable()
+	BuyInterfaceModule.mainFrame.bidSelectedItem:Enable()
+
+end
+
+function BuyInterfaceModule:DisableBuyBidButtons()
+
+	BuyInterfaceModule.mainFrame.buySelectedItem:Disable()
+	BuyInterfaceModule.mainFrame.bidSelectedItem:Disable()
+
+end
+
 function BuyInterfaceModule:ResetData()
 
 	self.mainFrame.searchBar:SetText("")
+
+	if BuyInterfaceModule.mainFrame ~= nil then
+		BuyInterfaceModule.mainFrame.scrollTable:SetData({}, true)
+	end
 	
 	UIDropDownMenu_SetText(self.mainFrame.rarity, "Any") 
 	self.mainFrame.rarity.value = 0
@@ -458,47 +502,10 @@ function BuyInterfaceModule:ResetData()
 
 end
 
-function BuyInterfaceModule:OnShowInterface()
-
-	self.mainFrame:ClearAllPoints()
-	self.mainFrame:SetPoint(DatabaseModule.generalOptions.point, DatabaseModule.generalOptions.xPosOffset, DatabaseModule.generalOptions.yPosOffset)
-	self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale)
-	self.mainFrame.currentPlayerGold.value = GetCoinTextureString(GetMoney(), 15)
-	self.mainFrame.currentPlayerGold:SetText(self.mainFrame.currentPlayerGold.value)
-	self.mainFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
-	self.mainFrame.totalBuyCost:SetText(self.mainFrame.totalBuyCost.value)
-	self.mainFrame.totalBidCost.value = GetCoinTextureString(0, 15)
-	self.mainFrame.totalBidCost:SetText(self.mainFrame.totalBuyCost.value)
-	ItemsModule.itemSelected = false
-	self.mainFrame.scrollTable:ClearSelection()
-	SellInterfaceModule.mainFrame.scrollTable:ClearSelection()
-	NavigationModule:CheckSearchActive(BuyInterfaceModule.mainFrame)
-
-end
-
-function BuyInterfaceModule:OnResultsTableItemSelected()
-	DebugModule:Log("Buy_OnResultsTableItemSelected", "OnResultsTableItemSelected", 3)
-
-	BuyInterfaceModule.mainFrame.buySelectedItem:Enable()
-	BuyInterfaceModule.mainFrame.bidSelectedItem:Enable()
-
-end
-
-function BuyInterfaceModule:OnShowBuyFrame()
-	DebugModule:Log("BuyInterfaceModule", "OnShowBuyFrame", 3)
-
-	BuyInterfaceModule.mainFrame:Show()
-	BuyInterfaceModule.mainFrame.buySelectedItem:Disable()
-	BuyInterfaceModule.mainFrame.bidSelectedItem:Disable()
-
-	InterfaceFunctionsModule.switchingUI = false
-
-end
-
 function BuyInterfaceModule:HideBuyInterface()
 
-	if self.mainFrame ~= nil then
-		self.mainFrame:Hide()
+	if BuyInterfaceModule.mainFrame ~= nil then
+		BuyInterfaceModule.mainFrame:Hide()
 	end
 
 end

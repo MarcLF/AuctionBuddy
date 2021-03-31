@@ -6,7 +6,6 @@ local StdUi = LibStub('StdUi')
 local ItemsModule = AuctionBuddy:NewModule("ItemsModule", "AceEvent-3.0")
 
 ItemsModule.currentItemPostedLink = nil
-ItemsModule.itemSelected = false
 
 local DebugModule = nil
 local InterfaceFunctionsModule = nil
@@ -25,6 +24,7 @@ function ItemsModule:Enable()
 	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 	self:RegisterMessage("CONTAINER_ITEM_SELECTED", self.InsertSelectedItem)
+	self:RegisterMessage("ON_CLICK_ITEM_TO_SELL", self.OnClickItemToSell)
 	
 end
 
@@ -48,6 +48,18 @@ function ItemsModule:AUCTION_ITEM_LIST_UPDATE()
 		ItemsModule:UpdateSellItemPriceAfterSearch(1,  self.shown, self.total)
 	end
 	
+end
+
+function ItemsModule:OnClickItemToSell(frameClicked)
+	DebugModule:Log("ItemsModule", "OnClickItemToSell", 1)
+
+	if CursorHasItem() == false then
+		PickupItem(ItemsModule.currentItemPostedLink) 
+		ItemsModule:RemoveInsertedItem(frameClicked.mainFrame)
+	else
+		ItemsModule:AddCursorItem(frameClicked)
+	end
+
 end
 
 function ItemsModule:CreateAuctionItemButtons(itemsShown, scrollTable)
@@ -108,29 +120,6 @@ function ItemsModule:UpdateSellItemPriceAfterSearch(numberList, shown, total)
 	
 end
 
-function ItemsModule:BuySelectedItem(selectedItemData, isBid)
-	DebugModule:Log(self, "BuySelectedItem", 2)
-	
-	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
-	local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemData))
-	local minIncrement = select(9, GetAuctionItemInfo("list", selectedItemData))
-	local minBid = select(8, GetAuctionItemInfo("list", selectedItemData))
-
-	local totalAmountToBid = max(bidAmount, minBid) + minIncrement
-
-	if isBid == true then
-		PlaceAuctionBid('list', selectedItemData, totalAmountToBid)
-		if GetMoney() > totalAmountToBid then
-			AuctionBuddy:AuctionHouseSearch(nil)
-		end
-	else
-		PlaceAuctionBid('list', selectedItemData, buyoutPrice)
-	end
-	
-	self.itemSelected = false
-	
-end
-
 function ItemsModule:SearchSelectedContainerItem()
 	DebugModule:Log(self, "SearchSelectedContainerItem", 2)
 	
@@ -182,6 +171,44 @@ function ItemsModule:InsertSelectedItem(parentFrame)
 
 end
 
+function ItemsModule:BuySelectedItem(selectedItemData, isBid)
+	DebugModule:Log(self, "BuySelectedItem", 2)
+	
+	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
+	local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemData))
+	local minIncrement = select(9, GetAuctionItemInfo("list", selectedItemData))
+	local minBid = select(8, GetAuctionItemInfo("list", selectedItemData))
+
+	local totalAmountToBid = max(bidAmount, minBid) + minIncrement
+
+	if isBid == true then
+		PlaceAuctionBid('list', selectedItemData, totalAmountToBid)
+		if GetMoney() > totalAmountToBid then
+			AuctionBuddy:AuctionHouseSearch(nil)
+		end
+	else
+		PlaceAuctionBid('list', selectedItemData, buyoutPrice)
+	end
+	
+end
+
+function ItemsModule:SellSelectedItem(parentFrame)
+	DebugModule:Log(self, "SellSelectedItem", 2)
+
+	local itemPrice = MoneyInputFrame_GetCopper(parentFrame.itemPrice)
+	local stackPrice = MoneyInputFrame_GetCopper(parentFrame.stackPrice)
+	
+	local stackSize = parentFrame.stackSize:GetText()
+	local stackNumber = parentFrame.stackNumber:GetText()
+	
+	if itemPrice > 2 then
+		PostAuction(stackPrice - 1, stackPrice, parentFrame.auctionDuration.durationValue, stackSize, stackNumber)
+	else
+		print("AuctionBuddy: Can't place auctions with an item price below 2 Coppers.")
+	end
+	
+end
+
 function ItemsModule:RemoveInsertedItem(parentFrame)
 	DebugModule:Log(self, "RemoveInsertedItem", 2)
 	
@@ -207,23 +234,6 @@ function ItemsModule:RemoveInsertedItem(parentFrame)
 
 end
 
-function ItemsModule:SellSelectedItem(parentFrame)
-	DebugModule:Log(self, "SellSelectedItem", 2)
-
-	local itemPrice = MoneyInputFrame_GetCopper(parentFrame.itemPrice)
-	local stackPrice = MoneyInputFrame_GetCopper(parentFrame.stackPrice)
-	
-	local stackSize = parentFrame.stackSize:GetText()
-	local stackNumber = parentFrame.stackNumber:GetText()
-	
-	if itemPrice > 2 then
-		PostAuction(stackPrice - 1, stackPrice, parentFrame.auctionDuration.durationValue, stackSize, stackNumber)
-	else
-		print("AuctionBuddy: Can't place auctions with an item price below 2 Coppers.")
-	end
-	
-end
-
 function ItemsModule:ShowToolTip(frame, link, show)
 	DebugModule:Log(self, "ShowToolTip", 3)
 
@@ -235,4 +245,17 @@ function ItemsModule:ShowToolTip(frame, link, show)
 		GameTooltip:Hide()
 	end
 	
+end
+
+function ItemsModule:AddCursorItem(frame)
+	DebugModule:Log(self, "AddCursorItem", 2)
+
+	local infoType, info1, info2 = GetCursorInfo()
+	local bindType = select(14, GetItemInfo(info2))
+	if bindType ~= 1 then
+		ItemsModule:InsertSelectedItem(frame.mainFrame)
+	else
+		print("AuctionBuddy: Can't auction Soulbound items")
+	end
+
 end

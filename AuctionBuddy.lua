@@ -13,8 +13,6 @@ _G[addonName] = AuctionBuddy
 AuctionBuddy.auctionTabs = {}
 
 AuctionBuddy.searchText = nil
-AuctionBuddy.shown = nil
-AuctionBuddy.total = nil
 AuctionBuddy.isSortedBuyout = false
 
 local StdUi = LibStub("StdUi")
@@ -81,23 +79,10 @@ function AuctionBuddy:AUCTION_HOUSE_SHOW()
 end
 
 function AuctionBuddy:AUCTION_HOUSE_CLOSED()
+	DebugModule:Log("AuctionBuddy", "AUCTION_HOUSE_CLOSED", 1)
 
-	self:ResetCurrentData()
-	self:HideWindows()
-	
-end
-
-function AuctionBuddy:ResetCurrentData()
-	DebugModule:Log(self, "ResetCurrentData", 1)
-
-	if BuyInterfaceModule.mainFrame ~= nil then
-		BuyInterfaceModule.mainFrame.scrollTable:SetData({}, true)
-	end
 	self.searchText = ""
-	self.shown = 0
-	self.total = 0
-	NavigationModule.page = 0
-
+	
 end
 
 function AuctionBuddy:TableCombine(keys, values)
@@ -133,7 +118,6 @@ function AuctionBuddy:AuctionFrameTab_OnClick(tab)
 	
 	if tab.sellTabButton then
 		NavigationModule:CheckSearchActive(SellInterfaceModule.mainFrame)
-		ContainerModule:ScanContainer()
 		SellInterfaceModule.mainFrame:Show()
 		
 		-- Disabling CloseAuctionHouse temporarily
@@ -148,7 +132,7 @@ end
 function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
 	DebugModule:Log(self, "AuctionHouseSearch", 0)
 
-	if textToSearch ~= self.searchText and textToSearch ~= nil then
+	if textToSearch ~= nil and textToSearch ~= self.searchText then
 		NavigationModule.page = 0
 	end
 
@@ -208,12 +192,4 @@ function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
 		print("AuctionBuddy: Can't send queries to the auction house right now, try again in few seconds.")
 	end
 	
-end
-
-function AuctionBuddy:HideWindows()
-	DebugModule:Log(self, "HideWindows", 0)
-
-	BuyInterfaceModule:HideBuyInterface()
-	SellInterfaceModule:HideSellInterface()
-
 end

@@ -21,8 +21,10 @@ function NavigationModule:Enable()
 	BuyInterfaceModule = AuctionBuddy:GetModule("BuyInterfaceModule")
 	SellInterfaceModule = AuctionBuddy:GetModule("SellInterfaceModule")
 
-	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
+	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
+	self:RegisterMessage("ON_CLICK_NEXT_PAGE", self.OnClickNextPage)
+	self:RegisterMessage("ON_CLICK_PREV_PAGE", self.OnClickPrevPage)
 	
 	self.searchActive = false
 	self.page = 0
@@ -33,6 +35,7 @@ end
 function NavigationModule:AUCTION_HOUSE_CLOSED()
 	DebugModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
 
+	self:UnregisterAllMessages()
 	self:UnregisterAllEvents()
 	
 end
@@ -51,6 +54,25 @@ function NavigationModule:AUCTION_ITEM_LIST_UPDATE()
 	NavigationModule:CheckSearchActive(BuyInterfaceModule.mainFrame)
 	NavigationModule:CheckSearchActive(SellInterfaceModule.mainFrame)
 	
+end
+
+function NavigationModule:OnClickNextPage(parentFrame)
+	DebugModule:Log(self, "OnClickNextPage", 2)
+
+	NavigationModule.page = NavigationModule.page + 1
+	parentFrame.prevPageButton:SetEnabled(true)
+
+end
+
+function NavigationModule:OnClickPrevPage(parentFrame)
+	DebugModule:Log(self, "OnClickPrevPage", 2)
+
+	if NavigationModule.page > 0 then
+		NavigationModule.page = NavigationModule.page - 1
+	else
+		parentFrame.prevPageButton:SetEnabled(false)
+	end
+
 end
 
 function NavigationModule:CheckSearchActive(parentFrame)
@@ -79,18 +101,10 @@ function NavigationModule:CheckSearchActive(parentFrame)
 	
 end
 
-function NavigationModule:MovePage(isNext, parentFrame)
-	DebugModule:Log(self, "MovePage", 3)
-	
-	if isNext then
-		self.page = self.page + 1
-		parentFrame.prevPageButton:SetEnabled(true)
-	else
-		if self.page > 0 then
-			self.page = self.page - 1
-		else
-			parentFrame.prevPageButton:SetEnabled(false)
-		end
-	end
+function NavigationModule:ResetData()
+
+	self.shown = 0
+	self.total = 0
+	self.page = 0
 
 end

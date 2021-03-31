@@ -21,6 +21,9 @@ function ContainerModule:Enable()
 	DebugModule = AuctionBuddy:GetModule("DebugModule")
 	DebugModule:Log(self, "Enable", 0)
 
+	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
+	self:RegisterEvent("AUCTION_OWNED_LIST_UPDATE")
+
 	if self.interfaceCreated == true then
 		return
 	end
@@ -39,10 +42,11 @@ function ContainerModule:Enable()
 	
 end
 
-function ContainerModule:OnInitialize()
+function ContainerModule:AUCTION_HOUSE_CLOSED()
+	DebugModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
 
-	self:RegisterEvent("AUCTION_OWNED_LIST_UPDATE")
-
+	self:UnregisterAllEvents()
+	
 end
 
 function ContainerModule:AUCTION_OWNED_LIST_UPDATE()
