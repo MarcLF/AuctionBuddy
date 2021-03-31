@@ -56,10 +56,10 @@ function OptionsPanelModule:CreateOptionsPanel()
 	self.ABInfoFrame:SetHeight(520)
 
 	self.ABInfoFrame.text = self.ABInfoFrame:CreateFontString("AuctionBuddy_OptionsPanel_ABInfoFrame_TitleText", "OVERLAY", "GameFontNormal")
-	self.ABInfoFrame.text:SetWidth(250)
+	self.ABInfoFrame.text:SetWidth(500)
 	self.ABInfoFrame.text:SetPoint("TOPLEFT", 15, -12)
 	self.ABInfoFrame.text:SetJustifyH("LEFT")
-	self.ABInfoFrame.text:SetText("Guide:")
+	self.ABInfoFrame.text:SetText("A user guide is coming in a future update. In the meanwhile, if you have any questions, please submit them in the comment section of the AuctionBuddy addon webpage.\n\nThank you.")
 
 	InterfaceOptions_AddCategory(self.panel)
 
