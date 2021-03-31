@@ -445,7 +445,6 @@ function BuyInterfaceModule:OnShowInterface()
 	self.mainFrame.totalBuyCost:SetText(self.mainFrame.totalBuyCost.value)
 	self.mainFrame.totalBidCost.value = GetCoinTextureString(0, 15)
 	self.mainFrame.totalBidCost:SetText(self.mainFrame.totalBuyCost.value)
-	BuyInterfaceModule.mainFrame.scrollTable:ClearSelection()
 	self.mainFrame.scrollTable:ClearSelection()
 	ContainerModule:ScanContainer()
 
