@@ -9,7 +9,6 @@ local DebugModule = nil
 local InterfaceFunctionsModule = nil
 local ResultsTableModule = nil
 local BuyInterfaceModule = nil
-local ItemsModule = nil
 local ContainerModule = nil
 local DatabaseModule = nil
 local OptionsPanelModule = nil
@@ -37,7 +36,6 @@ function SellInterfaceModule:Enable()
 	InterfaceFunctionsModule = AuctionBuddy:GetModule("InterfaceFunctionsModule")
 	ResultsTableModule = AuctionBuddy:GetModule("ResultsTableModule")
 	BuyInterfaceModule = AuctionBuddy:GetModule("BuyInterfaceModule")
-	ItemsModule = AuctionBuddy:GetModule("ItemsModule")
 	ContainerModule = AuctionBuddy:GetModule("ContainerModule")
 	OptionsPanelModule = AuctionBuddy:GetModule("OptionsPanelModule")
 
@@ -267,7 +265,7 @@ function SellInterfaceModule:CreateSellInterfaceOptions(parentFrame)
 	parentFrame.buySelectedItem = CreateFrame("Button", "AB_SellInterface_MainFrame_BuySelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
 	SellInterfaceModule:SetFrameParameters(parentFrame.buySelectedItem, 125, 24, "Buy Selected Item", "LEFT", 160, -203)
 	parentFrame.buySelectedItem:SetScript("OnClick", function() 
-		ItemsModule:BuySelectedItem(parentFrame.scrollTable:GetSelection(), false)
+		self:SendMessage("ON_BUY_SELECTED_ITEM", parentFrame.scrollTable:GetSelection())
 		SellInterfaceModule:DisableBuyBidButtons()
 		parentFrame.scrollTable:ClearSelection()
 	end)
@@ -276,7 +274,7 @@ function SellInterfaceModule:CreateSellInterfaceOptions(parentFrame)
 	parentFrame.bidSelectedItem = CreateFrame("Button", "AB_SellInterface_MainFrame_BidSelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
 	SellInterfaceModule:SetFrameParameters(parentFrame.bidSelectedItem, 125, 24, "Bid Selected Item", "LEFT", 20, -203)
 	parentFrame.bidSelectedItem:SetScript("OnClick", function() 
-		ItemsModule:BuySelectedItem(parentFrame.scrollTable:GetSelection(), true)
+		self:SendMessage("ON_BID_SELECTED_ITEM", parentFrame.scrollTable:GetSelection())
 		SellInterfaceModule:DisableBuyBidButtons()
 		parentFrame.scrollTable:ClearSelection() 
 	end)
@@ -386,7 +384,7 @@ function SellInterfaceModule:CreateItemToSellParameters(parentFrame)
 	parentFrame.createAuction = CreateFrame("Button", "AB_SellInterface_MainFrame_ItemToSell_CreateAuction", parentFrame.itemFrame, "UIPanelButtonTemplate")
 	SellInterfaceModule:SetFrameParameters(parentFrame.createAuction, 160, 24, "Create Auction(s)", "CENTER", 60, -260, "HIGH", parentFrame.itemToSellButton)
 	parentFrame.createAuction:SetScript("OnClick", function() 
-		ItemsModule:SellSelectedItem(parentFrame) 
+		self:SendMessage("ON_SELL_SELECTED_ITEM", parentFrame)
 		SellInterfaceModule:ResetData()
 	end)
 	parentFrame.createAuction:Disable()
@@ -542,11 +540,6 @@ function SellInterfaceModule:ResetData()
 
 	if SellInterfaceModule.mainFrame ~= nil then
 		SellInterfaceModule.mainFrame.scrollTable:SetData({}, true)
-	end
-	
-	if ItemsModule.currentItemPostedLink ~= nil then
-		PickupItem(ItemsModule.currentItemPostedLink) 
-		ItemsModule:RemoveInsertedItem(self.mainFrame)
 	end
 
 end

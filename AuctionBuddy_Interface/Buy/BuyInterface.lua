@@ -12,7 +12,6 @@ local SellInterfaceModule = nil
 local ContainerModule = nil
 local DatabaseModule = nil
 local SearchesModule = nil
-local ItemsModule = nil
 local OptionsPanelModule = nil
 
 function BuyInterfaceModule:Enable()
@@ -35,7 +34,6 @@ function BuyInterfaceModule:Enable()
 	ContainerModule = AuctionBuddy:GetModule("ContainerModule")
 	OptionsPanelModule = AuctionBuddy:GetModule("OptionsPanelModule")
 	SearchesModule = AuctionBuddy:GetModule("SearchesModule")
-	ItemsModule = AuctionBuddy:GetModule("ItemsModule")
 	
 	self:CreateBuyInterface()	
 	self:CreateBuyTab(self.mainFrame)
@@ -208,7 +206,7 @@ function BuyInterfaceModule:CreateBuyInterfaceBuyOptions(parentFrame)
 	parentFrame.alreadyBidText:SetWidth(250)
 	parentFrame.alreadyBidText:SetPoint("BOTTOMRIGHT", -95, 116)
 	parentFrame.alreadyBidText:SetJustifyH("LEFT")
-	parentFrame.alreadyBidText:SetText("You have already biden on this item.")
+	parentFrame.alreadyBidText:SetText("You already have a bid on this item.")
 	parentFrame.alreadyBidText:Hide()
 	
 	parentFrame.totalBidCost = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_TotalBidCost", "OVERLAY")
@@ -242,7 +240,7 @@ function BuyInterfaceModule:CreateBuyInterfaceBuyOptions(parentFrame)
 	parentFrame.buySelectedItem = CreateFrame("Button", "AB_BuyInterface_MainFrame_BuySelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
 	BuyInterfaceModule:SetFrameParameters(parentFrame.buySelectedItem, 125, 24, "Buy Selected Item", "RIGHT", -90, -303)
 	parentFrame.buySelectedItem:SetScript("OnClick", function() 
-		ItemsModule:BuySelectedItem(parentFrame.scrollTable:GetSelection(), false) 
+		self:SendMessage("ON_BUY_SELECTED_ITEM", parentFrame.scrollTable:GetSelection())
 		BuyInterfaceModule:DisableBuyBidButtons()
 		parentFrame.scrollTable:ClearSelection() 
 	end)
@@ -251,7 +249,7 @@ function BuyInterfaceModule:CreateBuyInterfaceBuyOptions(parentFrame)
 	parentFrame.bidSelectedItem = CreateFrame("Button", "AB_BuyInterface_MainFrame_BidSelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
 	BuyInterfaceModule:SetFrameParameters(parentFrame.bidSelectedItem, 125, 24, "Bid Selected Item", "RIGHT", -230, -303)
 	parentFrame.bidSelectedItem:SetScript("OnClick", function() 
-		ItemsModule:BuySelectedItem(parentFrame.scrollTable:GetSelection(), true) 
+		self:SendMessage("ON_BID_SELECTED_ITEM", parentFrame.scrollTable:GetSelection()) 
 		BuyInterfaceModule:DisableBuyBidButtons()
 		parentFrame.scrollTable:ClearSelection() 
 	end)

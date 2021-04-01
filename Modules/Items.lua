@@ -25,11 +25,19 @@ function ItemsModule:Enable()
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 	self:RegisterMessage("CONTAINER_ITEM_SELECTED", self.InsertSelectedItem)
 	self:RegisterMessage("ON_CLICK_ITEM_TO_SELL", self.OnClickItemToSell)
+	self:RegisterMessage("ON_BID_SELECTED_ITEM", self.OnBidSelectedItem)
+	self:RegisterMessage("ON_BUY_SELECTED_ITEM", self.OnBuySelectedItem)
+	self:RegisterMessage("ON_SELL_SELECTED_ITEM", self.OnSellSelectedItem)
 	
 end
 
 function ItemsModule:AUCTION_HOUSE_CLOSED()
 	DebugModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
+
+	if ItemsModule.currentItemPostedLink ~= nil then
+		PickupItem(ItemsModule.currentItemPostedLink) 
+		ItemsModule:RemoveInsertedItem(SellInterfaceModule.mainFrame)
+	end
 
 	self:UnregisterAllEvents()
 	self:UnregisterAllMessages()
@@ -60,6 +68,54 @@ function ItemsModule:OnClickItemToSell(frameClicked)
 		ItemsModule:AddCursorItem(frameClicked)
 	end
 
+end
+
+function ItemsModule:OnBidSelectedItem(selectedItemData)
+	DebugModule:Log("ItemsModule", "OnBidSelectedItem", 1)
+
+	local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemData))
+	local minIncrement = select(9, GetAuctionItemInfo("list", selectedItemData))
+	local minBid = select(8, GetAuctionItemInfo("list", selectedItemData))
+
+	local totalAmountToBid = max(bidAmount, minBid) + minIncrement
+
+	PlaceAuctionBid('list', selectedItemData, totalAmountToBid)
+	--Refresh ResultsTable by doing a nil AH search
+	if GetMoney() > totalAmountToBid then
+		AuctionBuddy:AuctionHouseSearch(nil)
+	end
+
+end
+
+function ItemsModule:OnBuySelectedItem(selectedItemData)
+	DebugModule:Log(self, "BuySelectedItem", 2)
+	
+	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
+
+	PlaceAuctionBid('list', selectedItemData, buyoutPrice)
+	
+end
+
+function ItemsModule:OnSellSelectedItem(parentFrame)
+	DebugModule:Log(self, "SellSelectedItem", 2)
+
+	local itemPrice = MoneyInputFrame_GetCopper(parentFrame.itemPrice)
+	local stackPrice = MoneyInputFrame_GetCopper(parentFrame.stackPrice)
+	
+	local stackSize = parentFrame.stackSize:GetText()
+	local stackNumber = parentFrame.stackNumber:GetText()
+	
+	if itemPrice > 2 then
+		PostAuction(stackPrice - 1, stackPrice, parentFrame.auctionDuration.durationValue, stackSize, stackNumber)
+	else
+		print("AuctionBuddy: Can't place auctions with an item price below 2 Coppers.")
+	end
+
+	if ItemsModule.currentItemPostedLink ~= nil then
+		PickupItem(ItemsModule.currentItemPostedLink) 
+		ItemsModule:RemoveInsertedItem(parentFrame)
+	end
+	
 end
 
 function ItemsModule:CreateAuctionItemButtons(itemsShown, scrollTable)
@@ -169,44 +225,6 @@ function ItemsModule:InsertSelectedItem(parentFrame)
 
 	ClearCursor()	
 
-end
-
-function ItemsModule:BuySelectedItem(selectedItemData, isBid)
-	DebugModule:Log(self, "BuySelectedItem", 2)
-	
-	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
-	local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemData))
-	local minIncrement = select(9, GetAuctionItemInfo("list", selectedItemData))
-	local minBid = select(8, GetAuctionItemInfo("list", selectedItemData))
-
-	local totalAmountToBid = max(bidAmount, minBid) + minIncrement
-
-	if isBid == true then
-		PlaceAuctionBid('list', selectedItemData, totalAmountToBid)
-		if GetMoney() > totalAmountToBid then
-			AuctionBuddy:AuctionHouseSearch(nil)
-		end
-	else
-		PlaceAuctionBid('list', selectedItemData, buyoutPrice)
-	end
-	
-end
-
-function ItemsModule:SellSelectedItem(parentFrame)
-	DebugModule:Log(self, "SellSelectedItem", 2)
-
-	local itemPrice = MoneyInputFrame_GetCopper(parentFrame.itemPrice)
-	local stackPrice = MoneyInputFrame_GetCopper(parentFrame.stackPrice)
-	
-	local stackSize = parentFrame.stackSize:GetText()
-	local stackNumber = parentFrame.stackNumber:GetText()
-	
-	if itemPrice > 2 then
-		PostAuction(stackPrice - 1, stackPrice, parentFrame.auctionDuration.durationValue, stackSize, stackNumber)
-	else
-		print("AuctionBuddy: Can't place auctions with an item price below 2 Coppers.")
-	end
-	
 end
 
 function ItemsModule:RemoveInsertedItem(parentFrame)

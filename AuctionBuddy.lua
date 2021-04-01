@@ -185,7 +185,7 @@ function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
 			false,
 			BuyInterfaceModule.mainFrame.rarity.value,
 			false,
-			DatabaseModule.buyOptions.exactMatch,
+			DatabaseModule.buyOptions.exactMatch or exactMatch,
 			filterData
 		)
 	else
