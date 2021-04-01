@@ -22,6 +22,7 @@ function SellInterfaceModule:Enable()
 	DebugModule:Log(self, "Enable", 0)
 
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
+	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 	self:RegisterMessage("RESULTSTABLE_ITEM_SELECTED", self.OnResultsTableItemSelected)	
 	self:RegisterMessage("SHOW_AB_SELL_FRAME", self.OnShowSellFrame)	
 
@@ -57,6 +58,12 @@ function SellInterfaceModule:AUCTION_HOUSE_CLOSED()
 	self:ResetData()
 	self:UnregisterAllEvents()
 	self:UnregisterAllMessages()
+
+end
+
+function SellInterfaceModule:AUCTION_ITEM_LIST_UPDATE()
+	
+	self:SendMessage("UPDATE_NAVIGATION_PAGES", self.mainFrame)
 
 end
 

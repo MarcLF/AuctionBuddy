@@ -106,7 +106,7 @@ function AuctionBuddy:AuctionFrameTab_OnClick(tab)
 	DebugModule:Log(self, "AuctionFrameTab_OnClick", 1)
 
 	if tab.buyTabButton then
-		NavigationModule:CheckSearchActive(BuyInterfaceModule.mainFrame)
+		self:SendMessage("UPDATE_NAVIGATION_PAGES", BuyInterfaceModule.mainFrame)
 		BuyInterfaceModule.mainFrame:Show()
 			
 		-- Disabling CloseAuctionHouse temporarily
@@ -117,7 +117,7 @@ function AuctionBuddy:AuctionFrameTab_OnClick(tab)
 	end
 	
 	if tab.sellTabButton then
-		NavigationModule:CheckSearchActive(SellInterfaceModule.mainFrame)
+		self:SendMessage("UPDATE_NAVIGATION_PAGES", SellInterfaceModule.mainFrame)
 		SellInterfaceModule.mainFrame:Show()
 		
 		-- Disabling CloseAuctionHouse temporarily
@@ -142,14 +142,6 @@ function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
 	
 	if CanSendAuctionQuery() then
 		ItemsModule.itemSelected = false
-
-		if BuyInterfaceModule.mainFrame.scrollTable:GetSelection() ~= nil then
-			BuyInterfaceModule.mainFrame.scrollTable:ClearSelection()
-		end
-
-		if SellInterfaceModule.mainFrame.scrollTable:GetSelection() ~= nil then
-			SellInterfaceModule.mainFrame.scrollTable:ClearSelection()
-		end
 		NavigationModule.searchActive = true
 
 		if self.searchText ~= "" then
@@ -157,7 +149,7 @@ function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
 			DatabaseModule:InsertDataFromDatabase(BuyInterfaceModule.mainFrame.recentSearchesTable, DatabaseModule.recentSearches)
 		end
 		
-		local filterData
+		local filterData = nil
 		local itemType = BuyInterfaceModule.mainFrame.itemClasses.value
 		local itemSubType = BuyInterfaceModule.mainFrame.itemClasses.valueSubList
 		local itemSubSubType = BuyInterfaceModule.mainFrame.itemClasses.valueSubSubList

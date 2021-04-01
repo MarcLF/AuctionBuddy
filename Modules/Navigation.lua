@@ -10,8 +10,6 @@ NavigationModule.page = nil
 NavigationModule.maxResultsPages = nil
 
 local DebugModule = nil
-local BuyInterfaceModule = nil
-local SellInterfaceModule = nil
 
 function NavigationModule:Enable()
 
@@ -25,6 +23,7 @@ function NavigationModule:Enable()
 	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 	self:RegisterMessage("ON_CLICK_NEXT_PAGE", self.OnClickNextPage)
 	self:RegisterMessage("ON_CLICK_PREV_PAGE", self.OnClickPrevPage)
+	self:RegisterMessage("UPDATE_NAVIGATION_PAGES", self.OnUpdateNavigationPages)
 	
 	self.searchActive = false
 	self.page = 0
@@ -50,9 +49,6 @@ function NavigationModule:AUCTION_ITEM_LIST_UPDATE()
 	else
 		NavigationModule.maxResultsPages = 0
 	end
-
-	NavigationModule:CheckSearchActive(BuyInterfaceModule.mainFrame)
-	NavigationModule:CheckSearchActive(SellInterfaceModule.mainFrame)
 	
 end
 
@@ -75,21 +71,17 @@ function NavigationModule:OnClickPrevPage(parentFrame)
 
 end
 
-function NavigationModule:CheckSearchActive(parentFrame)
-	DebugModule:Log(self, "CheckSearchActive", 2)
-	
-	if self == nil then
-		self = NavigationModule
-	end
+function NavigationModule:OnUpdateNavigationPages(parentFrame)
+	DebugModule:Log(self, "OnUpdateNavigationPages", 2)
 	
 	if NavigationModule.searchActive then
-		if self.page < self.maxResultsPages then
+		if NavigationModule.page < NavigationModule.maxResultsPages then
 			parentFrame.nextPageButton:SetEnabled(true)
 		else
 			parentFrame.nextPageButton:SetEnabled(false)
 		end
 		
-		if self.page > 0 then
+		if NavigationModule.page > 0 then
 			parentFrame.prevPageButton:SetEnabled(true)
 		else
 			parentFrame.prevPageButton:SetEnabled(false)
