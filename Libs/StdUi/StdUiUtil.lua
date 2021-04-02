@@ -133,8 +133,8 @@ StdUi.Util.formatMoney = function(money)
 
 	money = tonumber(money);
 	local goldColor = '|cfffff209';
-	local silverColor = '|cff7b7b7a';
-	local copperColor = '|cffac7248';
+	local silverColor = '|cffb3b3b3';
+	local copperColor = '|cffff9142';
 
 	local gold = floor(money / COPPER_PER_GOLD);
 	local silver = floor((money - (gold * COPPER_PER_GOLD)) / COPPER_PER_SILVER);
