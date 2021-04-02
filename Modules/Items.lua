@@ -269,12 +269,11 @@ function ItemsModule:UpdateMaxStackValues(parentFrame)
 	local itemStackCount = select(8, GetItemInfo(itemLink)) or 1
 
 	local stackSizeValue = 1
+	local stackQuantityValue = 1
 
 	if parentFrame.stackSize:GetText() ~= "" then
 		stackSizeValue = tonumber(parentFrame.stackSize:GetText())
 	end
-
-	local stackQuantityValue = 1
 
 	if parentFrame.stackQuantity:GetText() ~= "" then
 		stackQuantityValue = tonumber(parentFrame.stackQuantity:GetText())
