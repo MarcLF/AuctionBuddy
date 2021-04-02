@@ -1,10 +1,10 @@
 --- @type StdUi
 local StdUi = LibStub and LibStub('StdUi', true);
 if not StdUi then
-	return;
+	return
 end
 
-local module, version = 'Grid', 1;
+local module, version = 'Grid', 4;
 if not StdUi:UpgradeNeeded(module, version) then return end;
 
 --- Creates frame list that reuses frames and is based on array data
@@ -15,7 +15,9 @@ if not StdUi:UpgradeNeeded(module, version) then return end;
 --- @param padding number
 --- @param oX number
 --- @param oY number
-function StdUi:ObjectList(parent, itemsTable, create, update, data, padding, oX, oY)
+--- @param limitFn function
+function StdUi:ObjectList(parent, itemsTable, create, update, data, padding, oX, oY, limitFn)
+	local this = self;
 	oX = oX or 1;
 	oY = oY or -1;
 	padding = padding or 0;
@@ -30,32 +32,39 @@ function StdUi:ObjectList(parent, itemsTable, create, update, data, padding, oX,
 
 	local totalHeight = -oY;
 
-	for i = 1, #data do
+	local i = 1;
+	for key, value in pairs(data) do
 		local itemFrame = itemsTable[i];
 
 		if not itemFrame then
 			if type(create) == 'string' then
 				-- create a widget and anchor it to
-				itemsTable[i] = self[create](self, parent);
+				itemsTable[i] = this[create](this, parent);
 			else
-				itemsTable[i] = create(parent, data[i], i);
+				itemsTable[i] = create(parent, value, i, key);
 			end
 			itemFrame = itemsTable[i];
 		end
 
 		-- If you create simple widget you need to handle anchoring yourself
-		update(parent, itemFrame, data[i], i);
+		update(parent, itemFrame, value, i, key);
 		itemFrame:Show();
 
 		totalHeight = totalHeight + itemFrame:GetHeight();
 		if i == 1 then
 			-- glue first item to offset
-			self:GlueTop(itemFrame, parent, oX, oY, 'LEFT');
+			this:GlueTop(itemFrame, parent, oX, oY, 'LEFT');
 		else
 			-- glue next items to previous
-			self:GlueBelow(itemFrame, itemsTable[i - 1], 0, -padding);
+			this:GlueBelow(itemFrame, itemsTable[i - 1], 0, -padding);
 			totalHeight = totalHeight + padding;
 		end
+
+		if limitFn and limitFn(i, totalHeight, itemFrame:GetHeight()) then
+			break;
+		end
+
+		i = i + 1;
 	end
 
 	return itemsTable, totalHeight;
@@ -66,8 +75,8 @@ end
 --- @param create function
 --- @param update function
 --- @param data table
---- @param size number - size of each wi
---- @param padding number
+--- @param paddingX number
+--- @param paddingY number
 --- @param oX number
 --- @param oY number
 function StdUi:ObjectGrid(parent, itemsMatrix, create, update, data, paddingX, paddingY, oX, oY)

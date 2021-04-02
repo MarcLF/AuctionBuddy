@@ -1,19 +1,99 @@
 --- @type StdUi
 local StdUi = LibStub and LibStub('StdUi', true);
 if not StdUi then
-	return;
+	return
 end
-local module, version = 'Checkbox', 2;
-if not StdUi:UpgradeNeeded(module, version) then return end;
+
+local module, version = 'Checkbox', 5;
+if not StdUi:UpgradeNeeded(module, version) then
+	return
+end
+
+----------------------------------------------------
+--- Checkbox
+----------------------------------------------------
+
+local CheckboxMethods = {
+	--- Set checkbox state
+	---
+	--- @param flag boolean
+	--- @param internal boolean - indicates to not run OnValueChanged
+	SetChecked = function(self, flag, internal)
+		self.isChecked = flag;
+
+		if not internal and self.OnValueChanged then
+			self:OnValueChanged(flag, self.value);
+		end
+
+		if not flag then
+			self.checkedTexture:Hide();
+			self.disabledCheckedTexture:Hide();
+			return
+		end
+
+		if self.isDisabled then
+			self.checkedTexture:Hide();
+			self.disabledCheckedTexture:Show();
+		else
+			self.checkedTexture:Show();
+			self.disabledCheckedTexture:Hide();
+		end
+	end,
+
+	GetChecked = function(self)
+		return self.isChecked;
+	end,
+
+	SetText    = function(self, t)
+		self.text:SetText(t);
+	end,
+
+	SetValue   = function(self, value)
+		self.value = value;
+	end,
+
+	GetValue   = function(self)
+		if self:GetChecked() then
+			return self.value;
+		else
+			return nil;
+		end
+	end,
+
+	Disable    = function(self)
+		self.isDisabled = true;
+		self:SetChecked(self.isChecked);
+	end,
+
+	Enable     = function(self)
+		self.isDisabled = false;
+		self:SetChecked(self.isChecked);
+	end,
+
+	AutoWidth  = function(self)
+		self:SetWidth(self.target:GetWidth() + 15 + self.text:GetWidth());
+	end
+};
+
+local CheckboxEvents = {
+	OnClick = function(self)
+		if not self.isDisabled then
+			self:SetChecked(not self:GetChecked());
+		end
+	end
+}
 
 ---@return CheckButton
 function StdUi:Checkbox(parent, text, width, height)
 	local checkbox = CreateFrame('Button', nil, parent);
+	checkbox.stdUi = self;
+
 	checkbox:EnableMouse(true);
 	self:SetObjSize(checkbox, width, height or 20);
 	self:InitWidget(checkbox);
 
 	checkbox.target = self:Panel(checkbox, 16, 16);
+	checkbox.target.stdUi = self;
 	checkbox.target:SetPoint('LEFT', 0, 0);
 
 	checkbox.value = true;
@@ -33,60 +113,8 @@ function StdUi:Checkbox(parent, text, width, height)
 	checkbox.disabledCheckedTexture:SetAllPoints();
 	checkbox.disabledCheckedTexture:Hide();
 
-	function checkbox:GetChecked()
-		return self.isChecked;
-	end
-
-	function checkbox:SetChecked(flag)
-		self.isChecked = flag;
-
-		if self.OnValueChanged then
-			self:OnValueChanged(flag, self.value);
-		end
-
-		if not flag then
-			self.checkedTexture:Hide();
-			self.disabledCheckedTexture:Hide();
-			return;
-		end
-
-		if self.isDisabled then
-			self.checkedTexture:Hide();
-			self.disabledCheckedTexture:Show();
-		else
-			self.checkedTexture:Show();
-			self.disabledCheckedTexture:Hide();
-		end
-	end
-
-	function checkbox:SetText(text)
-		self.text:SetText(text);
-	end
-
-	function checkbox:SetValue(value)
-		self.value = value;
-	end
-
-	function checkbox:GetValue()
-		if self:GetChecked() then
-			return self.value;
-		else
-			return nil;
-		end
-	end
-
-	function checkbox:Disable()
-		self.isDisabled = true;
-		self:SetChecked(self.isChecked);
-	end
-
-	function checkbox:Enable()
-		self.isDisabled = false;
-		self:SetChecked(self.isChecked);
-	end
-
-	function checkbox:AutoWidth()
-		self:SetWidth(self.target:GetWidth() + 15 + self.text:GetWidth());
+	for k, v in pairs(CheckboxMethods) do
+		checkbox[k] = v;
 	end
 
 	self:ApplyBackdrop(checkbox.target);
@@ -97,14 +125,41 @@ function StdUi:Checkbox(parent, text, width, height)
 		checkbox:AutoWidth();
 	end
 
-	checkbox:SetScript('OnClick', function(frame)
-		if not frame.isDisabled then
-			frame:SetChecked(not frame:GetChecked());
-		end
-	end);
+	for k, v in pairs(CheckboxEvents) do
+		checkbox:SetScript(k, v);
+	end
 
 	return checkbox;
 end
+
+----------------------------------------------------
+--- IconCheckbox
+----------------------------------------------------
+
+function StdUi:IconCheckbox(parent, icon, text, width, height, iconSize)
+	iconSize = iconSize or 16
+	local checkbox = self:Checkbox(parent, text, width, height);
+	checkbox.icon = self:Texture(checkbox, iconSize, iconSize, icon);
+	checkbox.icon:SetPoint('LEFT', checkbox.target, 'RIGHT', 5, 0);
+
+	checkbox.text:ClearAllPoints();
+	checkbox.text:SetPoint('LEFT', checkbox.target, 'RIGHT', iconSize + 5, 0);
+	checkbox.text:SetPoint('RIGHT', checkbox, 'RIGHT', -5, 0);
+
+	return checkbox;
+end
+
+----------------------------------------------------
+--- Radio
+----------------------------------------------------
+
+local RadioEvents = {
+	OnClick = function(self)
+		if not self.isDisabled then
+			self:SetChecked(true);
+		end
+	end
+};
 
 ---@return CheckButton
 function StdUi:Radio(parent, text, groupName, width, height)
@@ -121,25 +176,28 @@ function StdUi:Radio(parent, text, groupName, width, height)
 	radio.disabledCheckedTexture:Hide();
 	radio.disabledCheckedTexture:SetTexCoord(0.75, 1, 0, 1);
 
-	radio:SetScript('OnClick', function(frame)
-		if not frame.isDisabled then
-			frame:SetChecked(true);
-		end
-	end);
+	for k, v in pairs(RadioEvents) do
+		radio:SetScript(k, v);
+	end
 
 	if groupName then
-		self:AddToRadioGroup(groupName, radio);
+		self:AddToRadioGroup(radio, groupName);
 	end
 
 	return radio;
 end
 
 StdUi.radioGroups = {};
+StdUi.radioGroupValues = {};
 
 ---@return CheckButton[]
 function StdUi:RadioGroup(groupName)
 	if not self.radioGroups[groupName] then
 		self.radioGroups[groupName] = {};
+	end
+
+	if not self.radioGroupValues[groupName] then
+		self.radioGroupValues[groupName] = {};
 	end
 
 	return self.radioGroups[groupName];
@@ -169,47 +227,62 @@ function StdUi:SetRadioGroupValue(groupName, value)
 	return nil;
 end
 
-function StdUi:OnRadioGroupValueChanged(groupName, callback)
-	local group = self:RadioGroup(groupName);
+local radioGroupOnValueChanged = function(radio)
+	radio.notified = true;
+	local group = radio.radioGroup;
+	local groupName = radio.radioGroupName;
 
-	local function changed(radio, flag, value)
-		radio.notified = true;
-
-		-- We must get all notifications from group
-		for i = 1, #group do
-			if not group[i].notified then
-				return;
-			end
-		end
-
-		callback(self:GetRadioGroupValue(groupName), groupName);
-
-		for i = 1, #group do
-			group[i].notified = false;
+	-- We must get all notifications from group
+	for i = 1, #group do
+		if not group[i].notified then
+			return
 		end
 	end
 
+	local newValue = radio.stdUi:GetRadioGroupValue(groupName);
+	if radio.stdUi.radioGroupValues[groupName] ~= newValue then
+		radio.OnValueChangedCallback(newValue, groupName);
+	end
+	radio.stdUi.radioGroupValues[groupName] = newValue;
+
+	for i = 1, #group do
+		group[i].notified = false;
+	end
+end
+
+function StdUi:OnRadioGroupValueChanged(groupName, callback)
+	local group = self:RadioGroup(groupName);
+
 	for i = 1, #group do
 		local radio = group[i];
-		radio.OnValueChanged = changed;
+		radio.OnValueChangedCallback = callback;
+		radio.OnValueChanged = radioGroupOnValueChanged;
 	end
 
 	return nil;
 end
 
-function StdUi:AddToRadioGroup(groupName, frame)
-	local group = self:RadioGroup(groupName);
-	tinsert(group, frame);
-	frame.radioGroup = group;
-
-	frame:HookScript('OnClick', function(radio)
+local RadioGroupEvents = {
+	OnClick = function(radio)
 		for i = 1, #radio.radioGroup do
 			local otherRadio = radio.radioGroup[i];
+
 			if otherRadio ~= radio then
 				otherRadio:SetChecked(false);
 			end
 		end
-	end);
+	end
+};
+
+function StdUi:AddToRadioGroup(radio, groupName)
+	local group = self:RadioGroup(groupName);
+	tinsert(group, radio);
+	radio.radioGroup = group;
+	radio.radioGroupName = groupName;
+
+	for k, v in pairs(RadioGroupEvents) do
+		radio:HookScript(k, v);
+	end
 end
 
 StdUi:RegisterModule(module, version);
