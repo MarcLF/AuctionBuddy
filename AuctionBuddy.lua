@@ -50,12 +50,12 @@ end
 
 function AuctionBuddy:AUCTION_HOUSE_SHOW()
 
+	self:EnableModule("ItemsModule")
 	self:EnableModule("ResultsTableModule")
 	self:EnableModule("InterfaceFunctionsModule")
 	self:EnableModule("BuyInterfaceModule")
 	self:EnableModule("BuyInterfaceDropDownMenusModule")
 	self:EnableModule("SellInterfaceModule")
-	self:EnableModule("ItemsModule")
 	self:EnableModule("NavigationModule")
 	self:EnableModule("ContainerModule")
 	self:EnableModule("SearchesModule")

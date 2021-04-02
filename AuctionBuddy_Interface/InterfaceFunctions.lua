@@ -91,7 +91,7 @@ function InterfaceFunctionsModule:UpdateDepositCost(parentFrame)
 	local stackPrice = MoneyInputFrame_GetCopper(parentFrame.stackPrice)
 
 	local stackSize = tonumber(parentFrame.stackSize:GetText())
-	local stackNumber = tonumber(parentFrame.stackNumber:GetText())
+	local stackNumber = tonumber(parentFrame.stackQuantity:GetText())
 
 	local depositCost = GetAuctionDeposit(SellInterfaceModule.mainFrame.auctionDuration.durationValue, itemPrice, stackPrice, stackSize, stackNumber)
 

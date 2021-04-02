@@ -28,6 +28,9 @@ function ItemsModule:Enable()
 	self:RegisterMessage("ON_BID_SELECTED_ITEM", self.OnBidSelectedItem)
 	self:RegisterMessage("ON_BUY_SELECTED_ITEM", self.OnBuySelectedItem)
 	self:RegisterMessage("ON_SELL_SELECTED_ITEM", self.OnSellSelectedItem)
+	self:RegisterMessage("UPDATE_MAX_STACK_VALUES", self.UpdateMaxStackValues)
+	self:RegisterMessage("ON_CLICK_MAX_STACK_SIZE", self.OnClickMaxStackSize)
+	self:RegisterMessage("ON_CLICK_MAX_STACK_QUANTITY", self.OnClickMaxStackQuantity)
 	
 end
 
@@ -111,7 +114,7 @@ function ItemsModule:OnSellSelectedItem(parentFrame)
 	local stackPrice = MoneyInputFrame_GetCopper(parentFrame.stackPrice)
 	
 	local stackSize = parentFrame.stackSize:GetText()
-	local stackNumber = parentFrame.stackNumber:GetText()
+	local stackNumber = parentFrame.stackQuantity:GetText()
 	
 	if itemPrice > 2 and tonumber(stackSize) > 0 and tonumber(stackNumber) > 0 then
 		PostAuction(stackPrice - 1, stackPrice, parentFrame.auctionDuration.durationValue, stackSize, stackNumber)
@@ -218,7 +221,7 @@ function ItemsModule:InsertSelectedItem(parentFrame)
 		parentFrame.itemToSellButton.itemTexture:SetTexture(itemIcon)
 		parentFrame.itemToSellButton.text:SetText(info2)
 		
-		parentFrame.stackNumber:SetText(1)
+		parentFrame.stackQuantity:SetText(1)
 		parentFrame.stackSize:SetText(1)
 		
 		local itemName = GetItemInfo(info2) 
@@ -238,10 +241,73 @@ end
 function ItemsModule:CalculateMaxStackValues(parentFrame, bagID, bagSlot)
 	DebugModule:Log(self, "CalculateMaxStackValues", 0)
 
-	local itemCount = 0
+	local itemAmountInBag = 0
 	local itemLink = select(7, GetContainerItemInfo(bagID, bagSlot))
 	
 	local itemStackCount = select(8, GetItemInfo(itemLink))
+
+	itemAmountInBag = ItemsModule:GetTotalItemAmountInBag(parentFrame, itemLink)
+
+	local maxStackSizeValue = math.min(itemAmountInBag, itemStackCount)
+	local maxStackNumberValue = math.max(math.floor(itemAmountInBag / tonumber(parentFrame.stackSize:GetText())), 1)
+
+	parentFrame.stackSize.maxStackValue:SetText(tostring(maxStackSizeValue))
+	parentFrame.stackQuantity.maxStackValue:SetText(tostring(maxStackNumberValue))
+
+	parentFrame.stackSize.maxStackBtn:Enable()
+	parentFrame.stackQuantity.maxStackBtn:Enable()
+
+end
+
+function ItemsModule:UpdateMaxStackValues(parentFrame)
+	DebugModule:Log(self, "CalculateMaxStackValues", 0)
+
+	local itemLink = parentFrame.itemToSellButton.text:GetText()
+	local itemAmountInBag = 0
+	itemAmountInBag = ItemsModule:GetTotalItemAmountInBag(parentFrame, itemLink)
+
+	local itemStackCount = select(8, GetItemInfo(itemLink)) or 1
+
+	local stackSizeValue = 1
+
+	if parentFrame.stackSize:GetText() ~= "" then
+		stackSizeValue = tonumber(parentFrame.stackSize:GetText())
+	end
+
+	local stackQuantityValue = 1
+
+	if parentFrame.stackQuantity:GetText() ~= "" then
+		stackQuantityValue = tonumber(parentFrame.stackQuantity:GetText())
+	end
+
+	local maxStackSizeValue = math.max(math.floor(itemAmountInBag / stackQuantityValue), 1)
+	local maxStackQuantityValue = itemAmountInBag
+
+	maxStackSizeValue = math.min(maxStackSizeValue, itemStackCount)
+	maxStackQuantityValue = math.floor(math.max(maxStackQuantityValue / stackSizeValue, 1))
+
+	parentFrame.stackSize.maxStackValue:SetText(tostring(maxStackSizeValue))
+	parentFrame.stackQuantity.maxStackValue:SetText(tostring(maxStackQuantityValue))
+
+end
+
+function ItemsModule:OnClickMaxStackSize(parentFrame)
+	DebugModule:Log(self, "OnClickMaxStackSize", 0)
+
+	parentFrame.stackSize:SetText(parentFrame.stackSize.maxStackValue:GetText())
+
+end
+
+function ItemsModule:OnClickMaxStackQuantity(parentFrame)
+	DebugModule:Log(self, "OnClickMaxStackQuantity", 0)
+
+	parentFrame.stackQuantity:SetText(parentFrame.stackQuantity.maxStackValue:GetText())
+
+end
+
+function ItemsModule:GetTotalItemAmountInBag(parentFrame, itemLink)
+	
+	local itemAmountInBag = 0
 
 	for index, data in ipairs(parentFrame.scrollTableContainer.data) do
 		local totalBagItemAmount = 0
@@ -256,18 +322,11 @@ function ItemsModule:CalculateMaxStackValues(parentFrame, bagID, bagSlot)
 		end
 
 		if tostring(bagItemName) == itemLink then
-			itemCount = itemCount + totalBagItemAmount
+			itemAmountInBag = itemAmountInBag + totalBagItemAmount
 		end
 	end
 
-	local maxStackSizeValue = math.min(itemCount, itemStackCount)
-	local maxStackNumberValue = math.max(math.floor(itemCount / tonumber(parentFrame.stackSize:GetText())), 1)
-
-	parentFrame.stackSize.maxStackValue:SetText(tostring(maxStackSizeValue))
-	parentFrame.stackNumber.maxStackValue:SetText(tostring(maxStackNumberValue))
-
-	parentFrame.stackSize.maxStackBtn:Enable()
-	parentFrame.stackNumber.maxStackBtn:Enable()
+	return itemAmountInBag
 
 end
 
@@ -282,12 +341,12 @@ function ItemsModule:RemoveInsertedItem(parentFrame)
 
 		parentFrame.itemToSellButton.itemTexture:SetTexture(nil)
 		parentFrame.itemToSellButton.text:SetText("<-- [Insert Item]")
-		parentFrame.stackNumber:SetText(1)
+		parentFrame.stackQuantity:SetText(1)
 		parentFrame.stackSize:SetText(1)
 		parentFrame.stackSize.maxStackValue:SetText("1")
-		parentFrame.stackNumber.maxStackValue:SetText("1")
+		parentFrame.stackQuantity.maxStackValue:SetText("1")
 		parentFrame.stackSize.maxStackBtn:Disable()
-		parentFrame.stackNumber.maxStackBtn:Disable()
+		parentFrame.stackQuantity.maxStackBtn:Disable()
 		
 		self.currentItemPostedLink = nil
 		
