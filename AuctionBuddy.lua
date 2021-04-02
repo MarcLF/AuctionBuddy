@@ -109,7 +109,7 @@ function AuctionBuddy:AuctionFrameTab_OnClick(tab)
 		self:SendMessage("UPDATE_NAVIGATION_PAGES", BuyInterfaceModule.mainFrame)
 		BuyInterfaceModule.mainFrame:Show()
 			
-		-- Disabling CloseAuctionHouse temporarily
+		-- Disabling CloseAuctionHouse temporarily while we switch the current active tab
 		local CloseAuctionHouseFunctional = CloseAuctionHouse
 		CloseAuctionHouse = NoResponse
 		AuctionFrame_Hide()
@@ -120,7 +120,7 @@ function AuctionBuddy:AuctionFrameTab_OnClick(tab)
 		self:SendMessage("UPDATE_NAVIGATION_PAGES", SellInterfaceModule.mainFrame)
 		SellInterfaceModule.mainFrame:Show()
 		
-		-- Disabling CloseAuctionHouse temporarily
+		-- Disabling CloseAuctionHouse temporarily while we switch the current active tab
 		local CloseAuctionHouseFunctional = CloseAuctionHouse
 		CloseAuctionHouse = NoResponse
 		AuctionFrame_Hide()

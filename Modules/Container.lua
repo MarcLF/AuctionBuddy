@@ -33,8 +33,8 @@ function ContainerModule:Enable()
 	ItemsModule = AuctionBuddy:GetModule("ItemsModule")
 	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
 	
-	self:CreateContainerScrollFrameTable(BuyInterfaceModule.mainFrame, 145, -135)
-	self:CreateContainerScrollFrameTable(SellInterfaceModule.mainFrame, -192, -135)
+	self:CreateBuyContainerScrollFrameTable(BuyInterfaceModule.mainFrame, 145, -135)
+	self:CreateSellContainerScrollFrameTable(SellInterfaceModule.mainFrame, -192, -135)
 	
 	self:ScanContainer()
 	
@@ -65,7 +65,7 @@ function ContainerModule:ScanContainer()
 		containerNumOfSlots = GetContainerNumSlots(i)
 		
 		for j = 1, containerNumOfSlots, 1 do
-			myTexture, itemCount, locked, itemQuality, readable, lootable, itemLinkContainer = GetContainerItemInfo(i, j)
+			local myTexture, itemCount, locked, itemQuality, readable, lootable, itemLinkContainer = GetContainerItemInfo(i, j)
 		
 			if myTexture ~= nil then
 				if not C_Item.IsBound(ItemLocation:CreateFromBagAndSlot(i, j)) then
@@ -93,118 +93,120 @@ function ContainerModule:ScanContainer()
 	
 end
 
-function ContainerModule:CreateContainerScrollFrameTable(parentFrame, xPos, yPos)
-	DebugModule:Log(self, "CreateContainerScrollFrameTable", 2)
+function ContainerModule:CreateBuyContainerScrollFrameTable(parentFrame, xPos, yPos)
+	DebugModule:Log(self, "CreateBuyContainerScrollFrameTable", 2)
 	
-	if parentFrame == BuyInterfaceModule.mainFrame then
-		local columnType = 
+	local columnType = 
+	{
 		{
-			{
-				name         = "Icon",
-				width        = 48,
-				align        = "LEFT",
-				index        = "texture",
-				format       = "icon",
-				events		 = {
-					OnEnter = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex)
-							ItemsModule:ShowToolTip(cellFrame, rowData.itemLink, true)
-							return false
-					end,
-					OnLeave = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex)
-							ItemsModule:ShowToolTip(cellFrame, rowData.itemLink, false)
-							return false
-					end
-				},
-			},
-			{
-				name         = "Name",
-				width        = 80,
-				align        = "LEFT",
-				index        = "itemLink",
-				format       = "string",
-			}
-		}
-		
-		parentFrame.scrollTableContainer = StdUi:ScrollTable(parentFrame, columnType, 16, 32)
-		StdUi:GlueTop(parentFrame.scrollTableContainer, parentFrame, xPos, yPos, 0, 0)
-		parentFrame.scrollTableContainer:EnableSelection(false)
-		parentFrame.scrollTableContainer:RegisterEvents({
-			OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)
-				if button == "LeftButton" then	
-					local itemName = GetItemInfo(rowData.itemLink) 
-					AuctionBuddy:AuctionHouseSearch(itemName, true)
+			name         = "Icon",
+			width        = 48,
+			align        = "LEFT",
+			index        = "texture",
+			format       = "icon",
+			events		 = {
+				OnEnter = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex)
+						ItemsModule:ShowToolTip(cellFrame, rowData.itemLink, true)
+						return false
+				end,
+				OnLeave = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex)
+						ItemsModule:ShowToolTip(cellFrame, rowData.itemLink, false)
+						return false
 				end
-				if button == "RightButton" then	
-					if BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu.value ~= nil then
-						local itemName = GetItemInfo(rowData.itemLink) 	
-						DatabaseModule:InsertNewSearch(DatabaseModule.favoriteSearchesLists[BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu.value][1], itemName) 
-						DatabaseModule:InsertDataFromDatabase(BuyInterfaceModule.mainFrame.favoriteSearchesTable, DatabaseModule.favoriteSearchesLists[BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu.value][1])
-					end
+			},
+		},
+		{
+			name         = "Name",
+			width        = 80,
+			align        = "LEFT",
+			index        = "itemLink",
+			format       = "string",
+		}
+	}
+		
+	parentFrame.scrollTableContainer = StdUi:ScrollTable(parentFrame, columnType, 16, 32)
+	StdUi:GlueTop(parentFrame.scrollTableContainer, parentFrame, xPos, yPos, 0, 0)
+	parentFrame.scrollTableContainer:EnableSelection(false)
+	parentFrame.scrollTableContainer:RegisterEvents({
+		OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)
+			if button == "LeftButton" then	
+				local itemName = GetItemInfo(rowData.itemLink) 
+				AuctionBuddy:AuctionHouseSearch(itemName, true)
+			end
+			if button == "RightButton" then	
+				if BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu.value ~= nil then
+					local itemName = GetItemInfo(rowData.itemLink) 	
+					DatabaseModule:InsertNewSearch(DatabaseModule.favoriteSearchesLists[BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu.value][1], itemName) 
+					DatabaseModule:InsertDataFromDatabase(BuyInterfaceModule.mainFrame.favoriteSearchesTable, DatabaseModule.favoriteSearchesLists[BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu.value][1])
 				end
 			end
+		end
 			
-		})
+	})
 	
-	else
-		local columnType = 
-		{
-			{
-				name         = "Icon",
-				width        = 48,
-				align        = "LEFT",
-				index        = "texture",
-				format       = "icon",
-				events		 = {
-					OnEnter = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex)
-							ItemsModule:ShowToolTip(cellFrame, rowData.itemLink, true)
-							return false
-					end,
-					OnLeave = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex)
-							ItemsModule:ShowToolTip(cellFrame, rowData.itemLink, false)
-							return false
-					end
-				},
-			},
-			{
-				name         = "Name",
-				width        = 80,
-				align        = "LEFT",
-				index        = "itemLink",
-				format       = "string",
-			},
-			{
-				name         = "Qty",
-				width        = 40,
-				align        = "LEFT",
-				index        = "count",
-				format       = "number",
-			},
-			{
-				name         = "Quality",
-				width        = 60,
-				align        = "RIGHT",
-				index        = "quality",
-				format       = "string",
-			}
-		}
-		
-		parentFrame.scrollTableContainer = StdUi:ScrollTable(parentFrame, columnType, 16, 32)
-		StdUi:GlueTop(parentFrame.scrollTableContainer, parentFrame, xPos, yPos, 0, 0)
-		parentFrame.scrollTableContainer:EnableSelection(true)
-		parentFrame.scrollTableContainer:RegisterEvents({
-			OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)
-				if button == "LeftButton" and ItemsModule.currentItemPostedLink ~= rowData.itemLink then
-					PickupContainerItem(rowData.bagID, rowData.slot)
-					ContainerModule.bagID = rowData.bagID
-					ContainerModule.bagSlot = rowData.slot
-					
-					self:SendMessage("CONTAINER_ITEM_SELECTED", parentFrame)			
+end
 
-					parentFrame.scrollTableContainer:ClearSelection()
+function ContainerModule:CreateSellContainerScrollFrameTable(parentFrame, xPos, yPos)
+	DebugModule:Log(self, "CreateSellContainerScrollFrameTable", 2)
+	
+	local columnType = 
+	{
+		{
+			name         = "Icon",
+			width        = 48,
+			align        = "LEFT",
+			index        = "texture",
+			format       = "icon",
+			events		 = {
+				OnEnter = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex)
+						ItemsModule:ShowToolTip(cellFrame, rowData.itemLink, true)
+						return false
+				end,
+				OnLeave = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex)
+						ItemsModule:ShowToolTip(cellFrame, rowData.itemLink, false)
+						return false
 				end
-				return true
+			},
+		},
+		{
+			name         = "Name",
+			width        = 80,
+			align        = "LEFT",
+			index        = "itemLink",
+			format       = "string",
+		},
+		{
+			name         = "Qty",
+			width        = 40,
+			align        = "LEFT",
+			index        = "count",
+			format       = "number",
+		},
+		{
+			name         = "Quality",
+			width        = 60,
+			align        = "RIGHT",
+			index        = "quality",
+			format       = "string",
+		}
+	}
+		
+	parentFrame.scrollTableContainer = StdUi:ScrollTable(parentFrame, columnType, 16, 32)
+	StdUi:GlueTop(parentFrame.scrollTableContainer, parentFrame, xPos, yPos, 0, 0)
+	parentFrame.scrollTableContainer:EnableSelection(true)
+	parentFrame.scrollTableContainer:RegisterEvents({
+		OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)
+			if button == "LeftButton" and ItemsModule.currentItemPostedLink ~= rowData.itemLink then
+				PickupContainerItem(rowData.bagID, rowData.slot)
+				ContainerModule.bagID = rowData.bagID
+				ContainerModule.bagSlot = rowData.slot
+					
+				self:SendMessage("CONTAINER_ITEM_SELECTED", parentFrame, ContainerModule.bagID, ContainerModule.bagSlot)			
+
+				parentFrame.scrollTableContainer:ClearSelection()
 			end
-		})
-	end
+			return true
+		end
+	})
 	
 end

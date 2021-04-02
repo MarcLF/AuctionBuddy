@@ -108,6 +108,7 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 	parentFrame.scrollTable:RegisterEvents({
 		OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)	
 			if button == "LeftButton" then
+				DebugModule:Log(self, "OnLeftClickResultsTable", 2)
 				parentFrame.scrollTable:SetSelection(rowIndex)
 				self:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame)	
 			end

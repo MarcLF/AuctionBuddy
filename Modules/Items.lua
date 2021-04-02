@@ -21,9 +21,9 @@ function ItemsModule:Enable()
 	BuyInterfaceModule = AuctionBuddy:GetModule("BuyInterfaceModule")
 	SellInterfaceModule = AuctionBuddy:GetModule("SellInterfaceModule")
 
-	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
-	self:RegisterMessage("CONTAINER_ITEM_SELECTED", self.InsertSelectedItem)
+	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
+	self:RegisterMessage("CONTAINER_ITEM_SELECTED", self.OnContainerItemSelected)
 	self:RegisterMessage("ON_CLICK_ITEM_TO_SELL", self.OnClickItemToSell)
 	self:RegisterMessage("ON_BID_SELECTED_ITEM", self.OnBidSelectedItem)
 	self:RegisterMessage("ON_BUY_SELECTED_ITEM", self.OnBuySelectedItem)
@@ -56,6 +56,14 @@ function ItemsModule:AUCTION_ITEM_LIST_UPDATE()
 		ItemsModule:UpdateSellItemPriceAfterSearch(1,  self.shown, self.total)
 	end
 	
+end
+
+function ItemsModule:OnContainerItemSelected(parentFrame, bagID, bagSlot)
+	DebugModule:Log(self, "OnContainerItemSelected", 1)
+
+	ItemsModule:InsertSelectedItem(parentFrame)
+	ItemsModule:CalculateMaxStackValues(parentFrame, bagID, bagSlot)
+
 end
 
 function ItemsModule:OnClickItemToSell(frameClicked)
@@ -105,10 +113,10 @@ function ItemsModule:OnSellSelectedItem(parentFrame)
 	local stackSize = parentFrame.stackSize:GetText()
 	local stackNumber = parentFrame.stackNumber:GetText()
 	
-	if itemPrice > 2 then
+	if itemPrice > 2 and tonumber(stackSize) > 0 and tonumber(stackNumber) > 0 then
 		PostAuction(stackPrice - 1, stackPrice, parentFrame.auctionDuration.durationValue, stackSize, stackNumber)
 	else
-		print("AuctionBuddy: Can't place auctions with an item price below 2 Coppers.")
+		print("AuctionBuddy: Can't place auctions with an item price below 2 Coppers or without a valid stack size and quantity.")
 	end
 
 	if ItemsModule.currentItemPostedLink ~= nil then
@@ -227,6 +235,42 @@ function ItemsModule:InsertSelectedItem(parentFrame)
 
 end
 
+function ItemsModule:CalculateMaxStackValues(parentFrame, bagID, bagSlot)
+	DebugModule:Log(self, "CalculateMaxStackValues", 0)
+
+	local itemCount = 0
+	local itemLink = select(7, GetContainerItemInfo(bagID, bagSlot))
+	
+	local itemStackCount = select(8, GetItemInfo(itemLink))
+
+	for index, data in ipairs(parentFrame.scrollTableContainer.data) do
+		local totalBagItemAmount = 0
+		local bagItemName = nil
+		for key, value in pairs(data) do
+			if tostring(key) == "count" then
+				totalBagItemAmount = totalBagItemAmount + value
+			end
+			if tostring(key) == "itemLink" then
+				bagItemName = value
+			end
+		end
+
+		if tostring(bagItemName) == itemLink then
+			itemCount = itemCount + totalBagItemAmount
+		end
+	end
+
+	local maxStackSizeValue = math.min(itemCount, itemStackCount)
+	local maxStackNumberValue = math.max(math.floor(itemCount / tonumber(parentFrame.stackSize:GetText())), 1)
+
+	parentFrame.stackSize.maxStackValue:SetText(tostring(maxStackSizeValue))
+	parentFrame.stackNumber.maxStackValue:SetText(tostring(maxStackNumberValue))
+
+	parentFrame.stackSize.maxStackBtn:Enable()
+	parentFrame.stackNumber.maxStackBtn:Enable()
+
+end
+
 function ItemsModule:RemoveInsertedItem(parentFrame)
 	DebugModule:Log(self, "RemoveInsertedItem", 2)
 	
@@ -238,9 +282,12 @@ function ItemsModule:RemoveInsertedItem(parentFrame)
 
 		parentFrame.itemToSellButton.itemTexture:SetTexture(nil)
 		parentFrame.itemToSellButton.text:SetText("<-- [Insert Item]")
-		
 		parentFrame.stackNumber:SetText(1)
 		parentFrame.stackSize:SetText(1)
+		parentFrame.stackSize.maxStackValue:SetText("1")
+		parentFrame.stackNumber.maxStackValue:SetText("1")
+		parentFrame.stackSize.maxStackBtn:Disable()
+		parentFrame.stackNumber.maxStackBtn:Disable()
 		
 		self.currentItemPostedLink = nil
 		
