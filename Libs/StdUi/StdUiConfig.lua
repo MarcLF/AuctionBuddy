@@ -32,7 +32,7 @@ function StdUi:ResetConfig()
 		},
 
 		backdrop    = {
-			texture        = [[Interface\Buttons\WHITE8X8]],
+			texture        = nil,
 			panel          = { r = 0.0588, g = 0.0588, b = 0, a = 0.8 },
 			slider         = { r = 0.15, g = 0.15, b = 0.15, a = 1 },
 
