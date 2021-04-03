@@ -165,8 +165,8 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 	parentFrame.itemToSellButton = CreateFrame("Button", "AB_SellInterface_MainFrame_ItemToSell_Button", parentFrame)
 	SellInterfaceModule:SetFrameParameters(parentFrame.itemToSellButton, 37, 37, nil, "TOPLEFT", 80, -140)
 	parentFrame.itemToSellButton:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square")	
-	
 	parentFrame.itemToSellButton:SetScript("OnClick", function() 
+		self:ResetData()
 		self:SendMessage("ON_CLICK_ITEM_TO_SELL", self)
 	end)
 	parentFrame.itemToSellButton:SetScript("OnLoad", function() 
@@ -533,17 +533,18 @@ end
 
 function SellInterfaceModule:OnShowInterface()
 
-	SellInterfaceModule.mainFrame.nextPageButton:Disable()
-	SellInterfaceModule.mainFrame.prevPageButton:Disable()
-	SellInterfaceModule.mainFrame:ClearAllPoints()
-	SellInterfaceModule.mainFrame:SetPoint(DatabaseModule.generalOptions.point, DatabaseModule.generalOptions.xPosOffset, DatabaseModule.generalOptions.yPosOffset)
-	SellInterfaceModule.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale)
-	SellInterfaceModule.mainFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
-	SellInterfaceModule.mainFrame.totalBuyCost:SetText(self.mainFrame.totalBuyCost.value)
-	SellInterfaceModule.mainFrame.totalBidCost.value = GetCoinTextureString(0, 15)
-	SellInterfaceModule.mainFrame.totalBidCost:SetText(self.mainFrame.totalBuyCost.value)
-	SellInterfaceModule.mainFrame.alreadyBidText:Hide()
-	SellInterfaceModule.mainFrame.scrollTable:ClearSelection()
+	self.mainFrame.nextPageButton:Disable()
+	self.mainFrame.prevPageButton:Disable()
+
+	self.mainFrame:ClearAllPoints()
+	self.mainFrame:SetPoint(DatabaseModule.generalOptions.point, DatabaseModule.generalOptions.xPosOffset, DatabaseModule.generalOptions.yPosOffset)
+	self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale)
+	self.mainFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
+	self.mainFrame.totalBuyCost:SetText(self.mainFrame.totalBuyCost.value)
+	self.mainFrame.totalBidCost.value = GetCoinTextureString(0, 15)
+	self.mainFrame.totalBidCost:SetText(self.mainFrame.totalBuyCost.value)
+	self.mainFrame.scrollTable:ClearSelection()
+	self.mainFrame.alreadyBidText:Hide()
 	ContainerModule:ScanContainer()
 
 end
@@ -579,18 +580,27 @@ function SellInterfaceModule:DisableBuyBidButtons()
 end
 
 function SellInterfaceModule:ResetData()
+	DebugModule:Log("SellInterfaceModule", "ResetData", 1)
 
 	self.itemPriceValue = 100
 	self.stackPriceValue = 100
-	self.mainFrame.stackSize:SetText("1")
-	self.mainFrame.stackQuantity:SetText("1")
-	self.mainFrame.scrollTable:SetData({}, true)
+
+	self.mainFrame.itemToSellButton:SetScript("OnEnter", function(self)
+	end)
 	self.mainFrame.itemToSellButton.itemTexture:SetTexture(nil)
 	self.mainFrame.itemToSellButton.text:SetText("<-- [Insert Item]")
+
+	self.mainFrame.stackSize:SetText("1")
+	self.mainFrame.stackQuantity:SetText("1")
 	self.mainFrame.stackSize.maxStackValue:SetText("1")
 	self.mainFrame.stackQuantity.maxStackValue:SetText("1")
+	self.mainFrame.stackQuantity:SetText(1)
+	self.mainFrame.stackSize:SetText(1)
+
 	self.mainFrame.stackSize.maxStackBtn:Disable()
 	self.mainFrame.stackQuantity.maxStackBtn:Disable()
+
+	self.mainFrame.createAuction:Disable()
 
 	if SellInterfaceModule.mainFrame ~= nil then
 		SellInterfaceModule.mainFrame.scrollTable:SetData({}, true)

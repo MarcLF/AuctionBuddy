@@ -444,8 +444,9 @@ end
 
 function BuyInterfaceModule:OnShowInterface()
 	
-	BuyInterfaceModule.mainFrame.nextPageButton:Disable()
-	BuyInterfaceModule.mainFrame.prevPageButton:Disable()
+	self.mainFrame.nextPageButton:Disable()
+	self.mainFrame.prevPageButton:Disable()
+
 	self.mainFrame:ClearAllPoints()
 	self.mainFrame:SetPoint(DatabaseModule.generalOptions.point, DatabaseModule.generalOptions.xPosOffset, DatabaseModule.generalOptions.yPosOffset)
 	self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale)

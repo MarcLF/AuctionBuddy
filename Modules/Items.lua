@@ -40,7 +40,7 @@ function ItemsModule:AUCTION_HOUSE_CLOSED()
 
 	if ItemsModule.currentItemPostedLink ~= nil then
 		PickupItem(ItemsModule.currentItemPostedLink) 
-		ItemsModule:RemoveInsertedItem(SellInterfaceModule.mainFrame)
+		ItemsModule:RemoveInsertedItem()
 	end
 
 	self:UnregisterAllEvents()
@@ -77,7 +77,7 @@ function ItemsModule:OnClickItemToSell(frameClicked)
 
 	if CursorHasItem() == false then
 		PickupItem(ItemsModule.currentItemPostedLink) 
-		ItemsModule:RemoveInsertedItem(frameClicked.mainFrame)
+		ItemsModule:RemoveInsertedItem()
 	else
 		ItemsModule:AddCursorItem(frameClicked)
 	end
@@ -328,29 +328,15 @@ function ItemsModule:GetTotalItemAmountInBag(parentFrame, itemLink)
 
 end
 
-function ItemsModule:RemoveInsertedItem(parentFrame)
+function ItemsModule:RemoveInsertedItem()
 	DebugModule:Log(self, "RemoveInsertedItem", 2)
 	
 	infoType, info1, info2 = GetCursorInfo()
 
-	parentFrame.itemToSellButton:SetScript("OnEnter", function(self)
-	end)
-
-	parentFrame.itemToSellButton.itemTexture:SetTexture(nil)
-	parentFrame.itemToSellButton.text:SetText("<-- [Insert Item]")
-	parentFrame.stackQuantity:SetText(1)
-	parentFrame.stackSize:SetText(1)
-	parentFrame.stackSize.maxStackValue:SetText("1")
-	parentFrame.stackQuantity.maxStackValue:SetText("1")
-	parentFrame.stackSize.maxStackBtn:Disable()
-	parentFrame.stackQuantity.maxStackBtn:Disable()
-		
 	ItemsModule.currentItemPostedLink = nil
 		
 	ClickAuctionSellItemButton(false)
 	ClearCursor()
-
-	parentFrame.createAuction:Disable()
 
 end
 
