@@ -11,7 +11,7 @@ local DebugModule = AuctionBuddy:NewModule("DebugModule")
 -- 1 = MEDIUM
 -- 0 = LOW
 
-DebugModule.verbose = 1
+DebugModule.verbose = 3
 
 function DebugModule:Log(...)
 

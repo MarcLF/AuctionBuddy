@@ -15,6 +15,7 @@ local containerNumOfSlots = nil
 
 ContainerModule.bagID = nil
 ContainerModule.bagSlot = nil
+ContainerModule.interfaceCreated = nil
 
 function ContainerModule:Enable()
 
@@ -33,7 +34,7 @@ function ContainerModule:Enable()
 	ItemsModule = AuctionBuddy:GetModule("ItemsModule")
 	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
 	
-	self:CreateBuyContainerScrollFrameTable(BuyInterfaceModule.mainFrame, 145, -135)
+	self:CreateBuyContainerScrollFrameTable(BuyInterfaceModule.mainFrame, 150, -135)
 	self:CreateSellContainerScrollFrameTable(SellInterfaceModule.mainFrame, -192, -135)
 	
 	self:ScanContainer()
@@ -87,7 +88,7 @@ function ContainerModule:ScanContainer()
 		BuyInterfaceModule.mainFrame.scrollTableContainer:SetData(tableData, true)
 	end
 
-	if BuyInterfaceModule ~= nil then
+	if SellInterfaceModule ~= nil then
 		SellInterfaceModule.mainFrame.scrollTableContainer:SetData(tableData, true)
 	end
 	
@@ -153,8 +154,8 @@ function ContainerModule:CreateSellContainerScrollFrameTable(parentFrame, xPos, 
 	{
 		{
 			name         = "Icon",
-			width        = 48,
-			align        = "LEFT",
+			width        = 45,
+			align        = "CENTER",
 			index        = "texture",
 			format       = "icon",
 			events		 = {
@@ -170,7 +171,7 @@ function ContainerModule:CreateSellContainerScrollFrameTable(parentFrame, xPos, 
 		},
 		{
 			name         = "Name",
-			width        = 80,
+			width        = 75,
 			align        = "LEFT",
 			index        = "itemLink",
 			format       = "string",
@@ -178,7 +179,7 @@ function ContainerModule:CreateSellContainerScrollFrameTable(parentFrame, xPos, 
 		{
 			name         = "Qty",
 			width        = 40,
-			align        = "LEFT",
+			align        = "CENTER",
 			index        = "count",
 			format       = "number",
 		},

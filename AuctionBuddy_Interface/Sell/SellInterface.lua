@@ -46,7 +46,7 @@ function SellInterfaceModule:Enable()
 	self:CreateSellTab(self.mainFrame)
 	self:CreateItemToSellParameters(self.mainFrame)
 	
-	ResultsTableModule:CreateResultsScrollFrameTable(self.mainFrame, 270, -135)
+	ResultsTableModule:CreateResultsScrollFrameTable(self.mainFrame, 277, -135)
 	
 	self.interfaceCreated = true
 	
