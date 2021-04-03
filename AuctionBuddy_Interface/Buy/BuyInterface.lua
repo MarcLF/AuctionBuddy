@@ -183,6 +183,7 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 	parentFrame.BuyFrameButton:SetScript("OnClick", function() 
 		InterfaceFunctionsModule.switchingUI = true
 		parentFrame:Hide()
+		BuyInterfaceModule:ResetData()
 		self:SendMessage("SHOW_AB_SELL_FRAME")
 	end)
 	
@@ -501,6 +502,9 @@ function BuyInterfaceModule:ResetData()
 	self.mainFrame.itemClasses.value = 0
 	self.mainFrame.itemClasses.valueSubList = nil
 	self.mainFrame.itemClasses.valueSubSubList = nil
+
+	self.mainFrame.minILvl:SetText("")
+	self.mainFrame.maxILvl:SetText("")
 
 	self.mainFrame.alreadyBidText:Hide()
 

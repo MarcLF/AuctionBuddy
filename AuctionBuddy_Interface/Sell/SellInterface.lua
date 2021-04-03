@@ -123,7 +123,8 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 	parentFrame.BuyFrameButton:SetScript("OnClick", function()
 		InterfaceFunctionsModule.switchingUI = true
 		parentFrame:Hide()
-		self:SendMessage("SHOW_AB_BUY_FRAME")
+		SellInterfaceModule:ResetData()
+		self:SendMessage("SHOW_AB_BUY_FRAME", parentFrame)
 	end)
 
 	parentFrame.nextPageButton = CreateFrame("Button", "AB_SellInterface_MainFrame_NextPage_Button", parentFrame, "UIPanelButtonTemplate")

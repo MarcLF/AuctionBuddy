@@ -31,6 +31,7 @@ function ItemsModule:Enable()
 	self:RegisterMessage("UPDATE_MAX_STACK_VALUES", self.UpdateMaxStackValues)
 	self:RegisterMessage("ON_CLICK_MAX_STACK_SIZE", self.OnClickMaxStackSize)
 	self:RegisterMessage("ON_CLICK_MAX_STACK_QUANTITY", self.OnClickMaxStackQuantity)
+	self:RegisterMessage("SHOW_AB_BUY_FRAME", self.RemoveInsertedItem)
 	
 end
 
@@ -52,11 +53,13 @@ function ItemsModule:AUCTION_ITEM_LIST_UPDATE()
 
 	self.shown, self.total = GetNumAuctionItems("list")
 
-	ItemsModule:CreateAuctionItemButtons(self.shown, BuyInterfaceModule.mainFrame.scrollTable)
-	ItemsModule:CreateAuctionItemButtons(self.shown, SellInterfaceModule.mainFrame.scrollTable)
-
-	if self.total > 0 then 
-		ItemsModule:UpdateSellItemPriceAfterSearch(1,  self.shown, self.total)
+	if BuyInterfaceModule.mainFrame:IsShown() then
+		ItemsModule:CreateAuctionItemButtons(self.shown, BuyInterfaceModule.mainFrame.scrollTable)
+	elseif SellInterfaceModule.mainFrame:IsShown() then
+		ItemsModule:CreateAuctionItemButtons(self.shown, SellInterfaceModule.mainFrame.scrollTable)
+		if self.total > 0 then 
+			ItemsModule:UpdateSellItemPriceAfterSearch(1,  self.shown, self.total)
+		end
 	end
 	
 end
@@ -122,10 +125,8 @@ function ItemsModule:OnSellSelectedItem(parentFrame)
 		print("AuctionBuddy: Can't place auctions with an item price below 2 Coppers or without a valid stack size and quantity.")
 	end
 
-	if ItemsModule.currentItemPostedLink ~= nil then
-		PickupItem(ItemsModule.currentItemPostedLink) 
-		ItemsModule:RemoveInsertedItem(parentFrame)
-	end
+	PickupItem(ItemsModule.currentItemPostedLink) 
+	ItemsModule:RemoveInsertedItem(parentFrame)
 	
 end
 
@@ -177,11 +178,10 @@ function ItemsModule:UpdateSellItemPriceAfterSearch(numberList, shown, total)
 
 	local priceToSell = math.floor(buyoutPrice/itemQuantity)
 
-	if buyoutPrice == 0 and total > 1 and numberList < shown and SellInterfaceModule.mainFrame:IsShown() then
+	if buyoutPrice == 0 and total > 1 and numberList < shown then
 		numberList = numberList + 1
 		self:UpdateSellItemPriceAfterSearch(numberList, shown, total)
-
-	elseif SellInterfaceModule.mainFrame:IsShown() then
+	else
 		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, priceToSell)
 	end
 	
@@ -206,7 +206,6 @@ function ItemsModule:InsertSelectedItem(parentFrame)
 	local buttonCurrentText = parentFrame.itemToSellButton.text:GetText()
 
 	if infoType == "item" and buttonCurrentText ~= info2 then
-
 		parentFrame.itemToSellButton:SetScript("OnEnter", function(self)
 			GameTooltip:SetOwner(self, "ANCHOR_LEFT")
 			GameTooltip:SetHyperlink(info2)
@@ -333,27 +332,25 @@ function ItemsModule:RemoveInsertedItem(parentFrame)
 	DebugModule:Log(self, "RemoveInsertedItem", 2)
 	
 	infoType, info1, info2 = GetCursorInfo()
-	
-	if infoType == "item" then
-		parentFrame.itemToSellButton:SetScript("OnEnter", function(self)
-		end)
 
-		parentFrame.itemToSellButton.itemTexture:SetTexture(nil)
-		parentFrame.itemToSellButton.text:SetText("<-- [Insert Item]")
-		parentFrame.stackQuantity:SetText(1)
-		parentFrame.stackSize:SetText(1)
-		parentFrame.stackSize.maxStackValue:SetText("1")
-		parentFrame.stackQuantity.maxStackValue:SetText("1")
-		parentFrame.stackSize.maxStackBtn:Disable()
-		parentFrame.stackQuantity.maxStackBtn:Disable()
-		
-		self.currentItemPostedLink = nil
-		
-		ClickAuctionSellItemButton(false)
-		ClearCursor()
+	parentFrame.itemToSellButton:SetScript("OnEnter", function(self)
+	end)
 
-		parentFrame.createAuction:Disable()
-	end
+	parentFrame.itemToSellButton.itemTexture:SetTexture(nil)
+	parentFrame.itemToSellButton.text:SetText("<-- [Insert Item]")
+	parentFrame.stackQuantity:SetText(1)
+	parentFrame.stackSize:SetText(1)
+	parentFrame.stackSize.maxStackValue:SetText("1")
+	parentFrame.stackQuantity.maxStackValue:SetText("1")
+	parentFrame.stackSize.maxStackBtn:Disable()
+	parentFrame.stackQuantity.maxStackBtn:Disable()
+		
+	ItemsModule.currentItemPostedLink = nil
+		
+	ClickAuctionSellItemButton(false)
+	ClearCursor()
+
+	parentFrame.createAuction:Disable()
 
 end
 
