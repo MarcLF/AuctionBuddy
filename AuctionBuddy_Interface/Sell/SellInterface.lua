@@ -123,7 +123,7 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 	parentFrame.BuyFrameButton:SetScript("OnClick", function()
 		InterfaceFunctionsModule.switchingUI = true
 		parentFrame:Hide()
-		SellInterfaceModule:ResetData()
+		self:ResetData()
 		self:SendMessage("SHOW_AB_BUY_FRAME", parentFrame)
 	end)
 
@@ -132,8 +132,8 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 	parentFrame.nextPageButton:SetScript("OnClick", function()
 		if CanSendAuctionQuery() then
 			self:SendMessage("ON_CLICK_NEXT_PAGE", parentFrame)
+			AuctionBuddy:AuctionHouseSearch() 
 		end
-		AuctionBuddy:AuctionHouseSearch() 
 	end)
 	
 	parentFrame.prevPageButton = CreateFrame("Button", "AB_SellInterface_MainFrame_PrevPage_Button", parentFrame, "UIPanelButtonTemplate")
@@ -141,8 +141,8 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 	parentFrame.prevPageButton:SetScript("OnClick", function()
 		if CanSendAuctionQuery() then
 			self:SendMessage("ON_CLICK_PREV_PAGE", parentFrame)
+			AuctionBuddy:AuctionHouseSearch() 
 		end
-		AuctionBuddy:AuctionHouseSearch() 
 	end)
 	
 	parentFrame.instaBuyCheckBox = CreateFrame("CheckButton", "AB_SellInterface_MainFrame_InstaBuyCheck", parentFrame, "ChatConfigBaseCheckButtonTemplate")
@@ -533,14 +533,17 @@ end
 
 function SellInterfaceModule:OnShowInterface()
 
-	self.mainFrame:ClearAllPoints()
-	self.mainFrame:SetPoint(DatabaseModule.generalOptions.point, DatabaseModule.generalOptions.xPosOffset, DatabaseModule.generalOptions.yPosOffset)
-	self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale)
-	self.mainFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
-	self.mainFrame.totalBuyCost:SetText(self.mainFrame.totalBuyCost.value)
-	self.mainFrame.totalBidCost.value = GetCoinTextureString(0, 15)
-	self.mainFrame.totalBidCost:SetText(self.mainFrame.totalBuyCost.value)
-	self.mainFrame.scrollTable:ClearSelection()
+	SellInterfaceModule.mainFrame.nextPageButton:Disable()
+	SellInterfaceModule.mainFrame.prevPageButton:Disable()
+	SellInterfaceModule.mainFrame:ClearAllPoints()
+	SellInterfaceModule.mainFrame:SetPoint(DatabaseModule.generalOptions.point, DatabaseModule.generalOptions.xPosOffset, DatabaseModule.generalOptions.yPosOffset)
+	SellInterfaceModule.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale)
+	SellInterfaceModule.mainFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
+	SellInterfaceModule.mainFrame.totalBuyCost:SetText(self.mainFrame.totalBuyCost.value)
+	SellInterfaceModule.mainFrame.totalBidCost.value = GetCoinTextureString(0, 15)
+	SellInterfaceModule.mainFrame.totalBidCost:SetText(self.mainFrame.totalBuyCost.value)
+	SellInterfaceModule.mainFrame.alreadyBidText:Hide()
+	SellInterfaceModule.mainFrame.scrollTable:ClearSelection()
 	ContainerModule:ScanContainer()
 
 end
@@ -584,7 +587,6 @@ function SellInterfaceModule:ResetData()
 	self.mainFrame.scrollTable:SetData({}, true)
 	self.mainFrame.itemToSellButton.itemTexture:SetTexture(nil)
 	self.mainFrame.itemToSellButton.text:SetText("<-- [Insert Item]")
-	self.mainFrame.alreadyBidText:Hide()
 	self.mainFrame.stackSize.maxStackValue:SetText("1")
 	self.mainFrame.stackQuantity.maxStackValue:SetText("1")
 	self.mainFrame.stackSize.maxStackBtn:Disable()

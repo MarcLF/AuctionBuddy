@@ -84,7 +84,9 @@ function BuyInterfaceModule:CreateBuyInterface()
 		DatabaseModule.generalOptions.yPosOffset = yPos
 	end)
 	self.mainFrame:SetScript("OnShow", function() self:OnShowInterface() end)
-	self.mainFrame:SetScript("OnHide", function() InterfaceFunctionsModule:CloseAuctionHouseCustom() end)
+	self.mainFrame:SetScript("OnHide", function() 
+		InterfaceFunctionsModule:CloseAuctionHouseCustom() 
+	end)
 	self.mainFrame.CloseButton:SetScript("OnClick", function() CloseAuctionHouse() end)
 	tinsert(UISpecialFrames, "AB_BuyInterface_MainFrame")
 	
@@ -183,7 +185,7 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 	parentFrame.BuyFrameButton:SetScript("OnClick", function() 
 		InterfaceFunctionsModule.switchingUI = true
 		parentFrame:Hide()
-		BuyInterfaceModule:ResetData()
+		self:ResetData()
 		self:SendMessage("SHOW_AB_SELL_FRAME")
 	end)
 	
@@ -441,7 +443,9 @@ function BuyInterfaceModule:SetFrameParameters(frame, width, height, text, point
 end
 
 function BuyInterfaceModule:OnShowInterface()
-
+	
+	BuyInterfaceModule.mainFrame.nextPageButton:Disable()
+	BuyInterfaceModule.mainFrame.prevPageButton:Disable()
 	self.mainFrame:ClearAllPoints()
 	self.mainFrame:SetPoint(DatabaseModule.generalOptions.point, DatabaseModule.generalOptions.xPosOffset, DatabaseModule.generalOptions.yPosOffset)
 	self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale)
@@ -452,6 +456,7 @@ function BuyInterfaceModule:OnShowInterface()
 	self.mainFrame.totalBidCost.value = GetCoinTextureString(0, 15)
 	self.mainFrame.totalBidCost:SetText(self.mainFrame.totalBuyCost.value)
 	self.mainFrame.scrollTable:ClearSelection()
+	self.mainFrame.alreadyBidText:Hide()
 	ContainerModule:ScanContainer()
 
 end
@@ -466,6 +471,7 @@ end
 function BuyInterfaceModule:OnShowBuyFrame()
 	DebugModule:Log("BuyInterfaceModule", "OnShowBuyFrame", 3)
 
+	BuyInterfaceModule:SendMessage("DO_EMPTY_AH_SEARCH")
 	BuyInterfaceModule.mainFrame:Show()
 	BuyInterfaceModule:DisableBuyBidButtons()
 
@@ -489,12 +495,18 @@ end
 
 function BuyInterfaceModule:ResetData()
 
-	self.mainFrame.searchBar:SetText("")
-
 	if BuyInterfaceModule.mainFrame ~= nil then
 		BuyInterfaceModule.mainFrame.scrollTable:SetData({}, true)
 	end
-	
+
+	BuyInterfaceModule:ResetFilters()
+
+end
+
+function BuyInterfaceModule:ResetFilters()
+
+	self.mainFrame.searchBar:SetText("")
+
 	UIDropDownMenu_SetText(self.mainFrame.rarity, "Any") 
 	self.mainFrame.rarity.value = 0
 
@@ -505,8 +517,6 @@ function BuyInterfaceModule:ResetData()
 
 	self.mainFrame.minILvl:SetText("")
 	self.mainFrame.maxILvl:SetText("")
-
-	self.mainFrame.alreadyBidText:Hide()
 
 end
 

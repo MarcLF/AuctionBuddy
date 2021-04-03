@@ -106,7 +106,6 @@ function AuctionBuddy:AuctionFrameTab_OnClick(tab)
 	DebugModule:Log(self, "AuctionFrameTab_OnClick", 1)
 
 	if tab.buyTabButton then
-		self:SendMessage("UPDATE_NAVIGATION_PAGES", BuyInterfaceModule.mainFrame)
 		BuyInterfaceModule.mainFrame:Show()
 			
 		-- Disabling CloseAuctionHouse temporarily while we switch the current active tab
@@ -117,7 +116,6 @@ function AuctionBuddy:AuctionFrameTab_OnClick(tab)
 	end
 	
 	if tab.sellTabButton then
-		self:SendMessage("UPDATE_NAVIGATION_PAGES", SellInterfaceModule.mainFrame)
 		SellInterfaceModule.mainFrame:Show()
 		
 		-- Disabling CloseAuctionHouse temporarily while we switch the current active tab
@@ -132,20 +130,22 @@ end
 function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
 	DebugModule:Log(self, "AuctionHouseSearch", 0)
 
-	if textToSearch ~= nil and textToSearch ~= self.searchText then
+	if textToSearch ~= nil and textToSearch ~= AuctionBuddy.searchText then
 		NavigationModule.page = 0
 	end
 
 	if textToSearch ~= nil then
-		self.searchText = textToSearch
+		AuctionBuddy.searchText = textToSearch
 	end
 	
 	if CanSendAuctionQuery() then
 		ItemsModule.itemSelected = false
 		NavigationModule.searchActive = true
 
-		if self.searchText ~= "" then
-			DatabaseModule:InsertNewSearch(DatabaseModule.recentSearches, self.searchText)
+		local checkWhiteSpaces = string.gsub(AuctionBuddy.searchText, " ", "")
+
+		if string.len(AuctionBuddy.searchText) > 0 and string.len(checkWhiteSpaces) > 0 then
+			DatabaseModule:InsertNewSearch(DatabaseModule.recentSearches, AuctionBuddy.searchText)
 			DatabaseModule:InsertDataFromDatabase(BuyInterfaceModule.mainFrame.recentSearchesTable, DatabaseModule.recentSearches)
 		end
 		
@@ -166,11 +166,11 @@ function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
 
 		if self.isSortedBuyout == false then
 			SortAuctionItems("list", "buyout")
-			self.isSortedBuyout = true
+			AuctionBuddy.isSortedBuyout = true
 		end
 
 		QueryAuctionItems(	
-			self.searchText, 
+			AuctionBuddy.searchText, 
 			BuyInterfaceModule.mainFrame.minILvl:GetNumber(),
 			BuyInterfaceModule.mainFrame.maxILvl:GetNumber(), 
 			NavigationModule.page,
