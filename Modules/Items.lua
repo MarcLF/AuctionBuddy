@@ -113,16 +113,18 @@ end
 function ItemsModule:OnSellSelectedItem(parentFrame)
 	DebugModule:Log(self, "SellSelectedItem", 2)
 
+	local stackPriceBid =  MoneyInputFrame_GetCopper(parentFrame.itemPriceBid)
+
 	local itemPrice = MoneyInputFrame_GetCopper(parentFrame.itemPrice)
 	local stackPrice = MoneyInputFrame_GetCopper(parentFrame.stackPrice)
 	
 	local stackSize = parentFrame.stackSize:GetText()
 	local stackNumber = parentFrame.stackQuantity:GetText()
 	
-	if itemPrice > 2 and tonumber(stackSize) > 0 and tonumber(stackNumber) > 0 then
-		PostAuction(stackPrice - 1, stackPrice, parentFrame.auctionDuration.durationValue, stackSize, stackNumber)
+	if (tonumber(stackSize) > 0 and tonumber(stackNumber) > 0) then
+		PostAuction(stackPriceBid, stackPrice, parentFrame.auctionDuration.durationValue, stackSize, stackNumber)
 	else
-		print("AuctionBuddy: Can't place auctions with an item price below 2 Coppers or without a valid stack size and quantity.")
+		print("AuctionBuddy: Can't place auctions without a valid stack size and quantity.")
 	end
 
 	PickupItem(ItemsModule.currentItemPostedLink) 
@@ -176,13 +178,14 @@ function ItemsModule:UpdateSellItemPriceAfterSearch(numberList, shown, total)
 	local buyoutPrice = select(10, GetAuctionItemInfo("list", numberList))
 	local itemQuantity = select(3, GetAuctionItemInfo("list", numberList))
 
-	local priceToSell = math.floor(buyoutPrice/itemQuantity)
+	local priceToSell = math.floor(buyoutPrice/itemQuantity) - 1
 
 	if buyoutPrice == 0 and total > 1 and numberList < shown then
 		numberList = numberList + 1
 		self:UpdateSellItemPriceAfterSearch(numberList, shown, total)
 	else
 		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, priceToSell)
+		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPriceBid, priceToSell)
 	end
 	
 end

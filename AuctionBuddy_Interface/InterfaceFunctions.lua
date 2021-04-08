@@ -64,13 +64,13 @@ function InterfaceFunctionsModule:OnResultsTableItemSelected(parentFrame)
 
 end
 
-function InterfaceFunctionsModule:OnStackSizeTextChanged(parentFrame)
+function InterfaceFunctionsModule:OnStackSizeTextChanged(itemPriceFrame, stackPriceFrame, stackSizeFrame)
 	DebugModule:Log("InterfaceFunctionsModule", "OnStackSizeTextChanged", 2)
 
 	if DatabaseModule.sellOptions.stackPriceFixed == true then
-		InterfaceFunctionsModule:StackPriceUpdated(parentFrame)
+		InterfaceFunctionsModule:StackPriceUpdated(stackPriceFrame, stackSizeFrame, itemPriceFrame)
 	else
-		InterfaceFunctionsModule:ItemPriceUpdated(parentFrame)
+		InterfaceFunctionsModule:ItemPriceUpdated(itemPriceFrame, stackSizeFrame, stackPriceFrame) 
 	end
 
 end
@@ -100,37 +100,31 @@ function InterfaceFunctionsModule:UpdateDepositCost(parentFrame)
 
 end
 
-function InterfaceFunctionsModule:StackPriceUpdated(parentFrame)
+function InterfaceFunctionsModule:StackPriceUpdated(stackPriceFrame, stackSizeFrame, itemPriceFrame)
 	DebugModule:Log(self, "StackPriceUpdated", 2)
 
-	local stackPrice = MoneyInputFrame_GetCopper(parentFrame.stackPrice)
-	local stackSize = math.max(parentFrame.stackSize:GetNumber(), 1)
+	local stackPrice = MoneyInputFrame_GetCopper(stackPriceFrame)
+	local stackSize = math.max(stackSizeFrame:GetNumber(), 1)
 	
 	if stackSize ~= nil then
 		local newStackPrice = math.floor(stackPrice/stackSize)
 		
-		MoneyInputFrame_SetCopper(parentFrame.itemPrice, newStackPrice)
-		SellInterfaceModule.stackPriceValue = MoneyInputFrame_GetCopper(parentFrame.stackPrice)
+		MoneyInputFrame_SetCopper(itemPriceFrame, newStackPrice)
 	end
-	
-	self:UpdateDepositCost(parentFrame)
 
 end
 
-function InterfaceFunctionsModule:ItemPriceUpdated(parentFrame)
+function InterfaceFunctionsModule:ItemPriceUpdated(itemPriceFrame, stackSizeFrame, stackPriceFrame)
 	DebugModule:Log(self, "ItemPriceUpdated", 2)
 
-	local itemPrice = MoneyInputFrame_GetCopper(parentFrame.itemPrice)
-	local stackSize = math.max(parentFrame.stackSize:GetNumber(), 1)
+	local itemPrice = MoneyInputFrame_GetCopper(itemPriceFrame)
+	local stackSize = math.max(stackSizeFrame:GetNumber(), 1)
 	
 	if stackSize ~= nil then
 		local newItemPrice = math.floor(itemPrice*stackSize)
 	
-		MoneyInputFrame_SetCopper(parentFrame.stackPrice, newItemPrice)	
-		SellInterfaceModule.itemPriceValue = MoneyInputFrame_GetCopper(parentFrame.itemPrice)
+		MoneyInputFrame_SetCopper(stackPriceFrame, newItemPrice)	
 	end
-	
-	self:UpdateDepositCost(parentFrame)
 	
 end
 

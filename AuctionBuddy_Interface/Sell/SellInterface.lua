@@ -13,6 +13,9 @@ local ContainerModule = nil
 local DatabaseModule = nil
 local OptionsPanelModule = nil
 
+SellInterfaceModule.itemPriceBidValue = nil
+SellInterfaceModule.stackPriceBidValue = nil
+
 SellInterfaceModule.itemPriceValue = nil
 SellInterfaceModule.stackPriceValue = nil
 
@@ -29,6 +32,9 @@ function SellInterfaceModule:Enable()
 	if self.interfaceCreated == true then
 		return
 	end
+
+	SellInterfaceModule.itemPriceBidValue = 100
+	SellInterfaceModule.stackPriceBidValue = 100
 	
 	SellInterfaceModule.itemPriceValue = 100
 	SellInterfaceModule.stackPriceValue = 100
@@ -44,6 +50,7 @@ function SellInterfaceModule:Enable()
 	self:CreateSellInterfaceButtons(self.mainFrame)
 	self:CreateSellInterfaceOptions(self.mainFrame)
 	self:CreateSellTab(self.mainFrame)
+	self:CreateItemToSellEditBoxes(self.mainFrame)
 	self:CreateItemToSellParameters(self.mainFrame)
 	
 	ResultsTableModule:CreateResultsScrollFrameTable(self.mainFrame, 277, -135)
@@ -95,7 +102,7 @@ function SellInterfaceModule:CreateSellInterface()
 	self.mainFrame.title:SetText("AuctionBuddy SELL")
 	
 	self.mainFrame.itemFrame = CreateFrame("Frame", "AB_SellInterface_MainFrame_ItemFrame", self.mainFrame, "InsetFrameTemplate3")
-	SellInterfaceModule:SetFrameParameters(self.mainFrame.itemFrame, 285, 330, nil, "LEFT", 10, 66, "BACKGROUND")
+	SellInterfaceModule:SetFrameParameters(self.mainFrame.itemFrame, 285, 417, nil, "LEFT", 10, 46, "BACKGROUND")
 	
 	self.mainFrame.resultsTableFrame = CreateFrame("Frame", "AB_SellInterface_MainFrame_ResultsFrame", self.mainFrame, "InsetFrameTemplate3")
 	SellInterfaceModule:SetFrameParameters(self.mainFrame.resultsTableFrame, 668, 570, nil, "CENTER", 277, -30, "BACKGROUND")
@@ -163,7 +170,7 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 	parentFrame.instaBuyCheckBox.text:SetText("Double Click to buy an item")
 
 	parentFrame.itemToSellButton = CreateFrame("Button", "AB_SellInterface_MainFrame_ItemToSell_Button", parentFrame)
-	SellInterfaceModule:SetFrameParameters(parentFrame.itemToSellButton, 37, 37, nil, "TOPLEFT", 80, -140)
+	SellInterfaceModule:SetFrameParameters(parentFrame.itemToSellButton, 37, 37, nil, "TOPLEFT", 80, -115)
 	parentFrame.itemToSellButton:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square")	
 	parentFrame.itemToSellButton:SetScript("OnClick", function() 
 		self:ResetData()
@@ -237,7 +244,7 @@ function SellInterfaceModule:CreateSellInterfaceOptions(parentFrame)
 	parentFrame.alreadyBidText = parentFrame:CreateFontString("AB_SellInterface_MainFrame_AlreadyBid_Text", "OVERLAY")
 	parentFrame.alreadyBidText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
 	parentFrame.alreadyBidText:SetWidth(250)
-	parentFrame.alreadyBidText:SetPoint("BOTTOMLEFT", 35, 220)
+	parentFrame.alreadyBidText:SetPoint("BOTTOMLEFT", 35, 170)
 	parentFrame.alreadyBidText:SetJustifyH("LEFT")
 	parentFrame.alreadyBidText:SetText("You already have a bid on this item.")
 	parentFrame.alreadyBidText:Hide()
@@ -245,33 +252,33 @@ function SellInterfaceModule:CreateSellInterfaceOptions(parentFrame)
 	parentFrame.totalBidCost = parentFrame:CreateFontString("AB_SellInterface_MainFrame_TotalBidCost", "OVERLAY")
 	parentFrame.totalBidCost:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
 	parentFrame.totalBidCost:SetWidth(250)
-	parentFrame.totalBidCost:SetPoint("BOTTOMLEFT", 150, 192)
+	parentFrame.totalBidCost:SetPoint("BOTTOMLEFT", 150, 142)
 	parentFrame.totalBidCost:SetJustifyH("LEFT")
 	parentFrame.totalBidCost.value = GetCoinTextureString(0, 15)
 	parentFrame.totalBidCost:SetText(parentFrame.totalBidCost.value)
 
 	parentFrame.totalBidCost.text = parentFrame:CreateFontString("AB_SellInterface_MainFrame_TotalBidCost_Text", "OVERLAY", "GameFontNormal")
 	parentFrame.totalBidCost.text:SetWidth(250)
-	parentFrame.totalBidCost.text:SetPoint("BOTTOMLEFT", 35, 195)
+	parentFrame.totalBidCost.text:SetPoint("BOTTOMLEFT", 35, 145)
 	parentFrame.totalBidCost.text:SetJustifyH("LEFT")
 	parentFrame.totalBidCost.text:SetText("Total Bid Cost:")
 
 	parentFrame.totalBuyCost = parentFrame:CreateFontString("AB_SellInterface_MainFrame_TotalBuyCost", "OVERLAY")
 	parentFrame.totalBuyCost:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
 	parentFrame.totalBuyCost:SetWidth(250)
-	parentFrame.totalBuyCost:SetPoint("BOTTOMLEFT", 150, 167)
+	parentFrame.totalBuyCost:SetPoint("BOTTOMLEFT", 150, 117)
 	parentFrame.totalBuyCost:SetJustifyH("LEFT")
 	parentFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
 	parentFrame.totalBuyCost:SetText(parentFrame.totalBuyCost.value)
 
 	parentFrame.totalBuyCost.text = parentFrame:CreateFontString("AB_SellInterface_MainFrame_TotalBuyCost_Text", "OVERLAY", "GameFontNormal")
 	parentFrame.totalBuyCost.text:SetWidth(250)
-	parentFrame.totalBuyCost.text:SetPoint("BOTTOMLEFT", 35, 170)
+	parentFrame.totalBuyCost.text:SetPoint("BOTTOMLEFT", 35, 120)
 	parentFrame.totalBuyCost.text:SetJustifyH("LEFT")
 	parentFrame.totalBuyCost.text:SetText("Total Buyout Cost:")
 
 	parentFrame.buySelectedItem = CreateFrame("Button", "AB_SellInterface_MainFrame_BuySelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
-	SellInterfaceModule:SetFrameParameters(parentFrame.buySelectedItem, 125, 24, "Buy Selected Item", "LEFT", 160, -203)
+	SellInterfaceModule:SetFrameParameters(parentFrame.buySelectedItem, 125, 24, "Buy Selected Item", "LEFT", 160, -253)
 	parentFrame.buySelectedItem:SetScript("OnClick", function() 
 		self:SendMessage("ON_BUY_SELECTED_ITEM", parentFrame.scrollTable:GetSelection())
 		SellInterfaceModule:DisableBuyBidButtons()
@@ -280,7 +287,7 @@ function SellInterfaceModule:CreateSellInterfaceOptions(parentFrame)
 	parentFrame.buySelectedItem:Disable()
 	
 	parentFrame.bidSelectedItem = CreateFrame("Button", "AB_SellInterface_MainFrame_BidSelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
-	SellInterfaceModule:SetFrameParameters(parentFrame.bidSelectedItem, 125, 24, "Bid Selected Item", "LEFT", 20, -203)
+	SellInterfaceModule:SetFrameParameters(parentFrame.bidSelectedItem, 125, 24, "Bid Selected Item", "LEFT", 20, -253)
 	parentFrame.bidSelectedItem:SetScript("OnClick", function() 
 		self:SendMessage("ON_BID_SELECTED_ITEM", parentFrame.scrollTable:GetSelection())
 		self:DisableBuyBidButtons()
@@ -290,7 +297,7 @@ function SellInterfaceModule:CreateSellInterfaceOptions(parentFrame)
 	parentFrame.bidSelectedItem:Disable()
 
 	parentFrame.manageFavoriteLists = CreateFrame("Button", "AB_SellInterface_MainFrame_Options_Button", parentFrame, "UIPanelButtonTemplate")
-	SellInterfaceModule:SetFrameParameters(parentFrame.manageFavoriteLists, 100, 24, "Options", "LEFT", 100, -250)
+	SellInterfaceModule:SetFrameParameters(parentFrame.manageFavoriteLists, 100, 24, "Options", "LEFT", 100, -290)
 	parentFrame.manageFavoriteLists:SetScript("OnClick", function() 
 		parentFrame:Hide()
 		InterfaceOptionsFrame_OpenToCategory(OptionsPanelModule.sellParameters)
@@ -299,14 +306,54 @@ function SellInterfaceModule:CreateSellInterfaceOptions(parentFrame)
 
 end
 
-function SellInterfaceModule:CreateItemToSellParameters(parentFrame)
+function SellInterfaceModule:CreateItemToSellEditBoxes(parentFrame)
+
+	parentFrame.itemToSellBidText = parentFrame.itemFrame:CreateFontString("AB_SellInterface_MainFrame_ItemToSellBid_Text", "OVERLAY")
+	parentFrame.itemToSellBidText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
+	parentFrame.itemToSellBidText:SetPoint("LEFT", 105, 135)
+	parentFrame.itemToSellBidText:SetJustifyH("CENTER")
+	parentFrame.itemToSellBidText:SetText("- Auction Bid -")
+
+	parentFrame.itemPriceBid = CreateFrame("Frame", "AB_SellInterface_MainFrame_ItemToSell_ItemPriceBid", parentFrame, "MoneyInputFrameTemplate")
+	SellInterfaceModule:SetFrameParameters(parentFrame.itemPriceBid, nil, nil, nil, "CENTER", 100, -60, nil, parentFrame.itemToSellButton)
+	parentFrame.itemPriceBid:SetScript("OnShow", function() 
+		MoneyInputFrame_SetCopper(parentFrame.itemPriceBid, self.itemPriceBidValue) 
+		MoneyInputFrame_SetOnValueChangedFunc(parentFrame.itemPriceBid, function() 
+			InterfaceFunctionsModule:ItemPriceUpdated(parentFrame.itemPriceBid, parentFrame.stackSize, parentFrame.stackPriceBid)
+		end) 
+	end)
+	
+	parentFrame.itemPriceBid.text = parentFrame.itemPriceBid:CreateFontString("AB_SellInterface_MainFrame_ItemToSell_ItemPriceBid_Text", "OVERLAY", "GameFontNormal")
+	parentFrame.itemPriceBid.text:SetPoint("CENTER", -140, 0)
+	parentFrame.itemPriceBid.text:SetJustifyH("CENTER")
+	parentFrame.itemPriceBid.text:SetText("Item Price")
+	
+	parentFrame.stackPriceBid = CreateFrame("Frame", "AB_SellInterface_MainFrame_ItemToSell_StackPriceBid", parentFrame, "MoneyInputFrameTemplate")
+	SellInterfaceModule:SetFrameParameters(parentFrame.stackPriceBid, nil, nil, nil, "CENTER", 100, -85, nil, parentFrame.itemToSellButton)
+	parentFrame.stackPriceBid:SetScript("OnShow", function() 
+		MoneyInputFrame_SetCopper(parentFrame.stackPriceBid, self.stackPriceBidValue) 
+		MoneyInputFrame_SetOnValueChangedFunc(parentFrame.stackPriceBid, function() 
+			InterfaceFunctionsModule:StackPriceUpdated(parentFrame.stackPriceBid, parentFrame.stackSize, parentFrame.itemPriceBid)
+		end)
+	end)
+	
+	parentFrame.stackPriceBid.text = parentFrame.stackPriceBid:CreateFontString("AB_SellInterface_MainFrame_ItemToSell_StackPriceBid_Text", "OVERLAY", "GameFontNormal")
+	parentFrame.stackPriceBid.text:SetPoint("CENTER", -140, 0)
+	parentFrame.stackPriceBid.text:SetJustifyH("CENTER")
+	parentFrame.stackPriceBid.text:SetText("Stack Price")
+
+	parentFrame.itemToSellBidText = parentFrame.itemFrame:CreateFontString("AB_SellInterface_MainFrame_ItemToSellBid_Text", "OVERLAY")
+	parentFrame.itemToSellBidText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
+	parentFrame.itemToSellBidText:SetPoint("LEFT", 90, 60)
+	parentFrame.itemToSellBidText:SetJustifyH("CENTER")
+	parentFrame.itemToSellBidText:SetText("- Auction Buyout -")
 
 	parentFrame.itemPrice = CreateFrame("Frame", "AB_SellInterface_MainFrame_ItemToSell_ItemPrice", parentFrame, "MoneyInputFrameTemplate")
-	SellInterfaceModule:SetFrameParameters(parentFrame.itemPrice, nil, nil, nil, "CENTER", 100, -70, nil, parentFrame.itemToSellButton)
+	SellInterfaceModule:SetFrameParameters(parentFrame.itemPrice, nil, nil, nil, "CENTER", 100, -135, nil, parentFrame.itemToSellButton)
 	parentFrame.itemPrice:SetScript("OnShow", function() 
 		MoneyInputFrame_SetCopper(parentFrame.itemPrice, self.itemPriceValue) 
 		MoneyInputFrame_SetOnValueChangedFunc(parentFrame.itemPrice, function() 
-			InterfaceFunctionsModule:ItemPriceUpdated(parentFrame) 
+			InterfaceFunctionsModule:ItemPriceUpdated(parentFrame.itemPrice, parentFrame.stackSize, parentFrame.stackPrice)
 		end) 
 	end)
 	
@@ -316,11 +363,11 @@ function SellInterfaceModule:CreateItemToSellParameters(parentFrame)
 	parentFrame.itemPrice.text:SetText("Item Price")
 	
 	parentFrame.stackPrice = CreateFrame("Frame", "AB_SellInterface_MainFrame_ItemToSell_StackPrice", parentFrame, "MoneyInputFrameTemplate")
-	SellInterfaceModule:SetFrameParameters(parentFrame.stackPrice, nil, nil, nil, "CENTER", 100, -95, nil, parentFrame.itemToSellButton)
+	SellInterfaceModule:SetFrameParameters(parentFrame.stackPrice, nil, nil, nil, "CENTER", 100, -160, nil, parentFrame.itemToSellButton)
 	parentFrame.stackPrice:SetScript("OnShow", function() 
 		MoneyInputFrame_SetCopper(parentFrame.stackPrice, self.stackPriceValue) 
 		MoneyInputFrame_SetOnValueChangedFunc(parentFrame.stackPrice, function() 
-			InterfaceFunctionsModule:StackPriceUpdated(parentFrame) 
+			InterfaceFunctionsModule:StackPriceUpdated(parentFrame.stackPrice, parentFrame.stackSize, parentFrame.itemPrice)
 		end) 
 	end)
 	
@@ -330,13 +377,14 @@ function SellInterfaceModule:CreateItemToSellParameters(parentFrame)
 	parentFrame.stackPrice.text:SetText("Stack Price")
 
 	parentFrame.stackSize = CreateFrame("EditBox", "AB_SellInterface_MainFrame_ItemToSell_StackSize", parentFrame, "InputBoxTemplate")
-	SellInterfaceModule:SetFrameParameters(parentFrame.stackSize, 40, 40, nil, "CENTER", 50, -125, nil, parentFrame.itemToSellButton)
+	SellInterfaceModule:SetFrameParameters(parentFrame.stackSize, 40, 40, nil, "CENTER", 50, -200, nil, parentFrame.itemToSellButton)
 	parentFrame.stackSize:SetAutoFocus(false)
 	parentFrame.stackSize:SetJustifyH("CENTER")
 	parentFrame.stackSize:SetMaxBytes(6)
 	parentFrame.stackSize:SetText("1")
 	parentFrame.stackSize:SetScript("OnTextChanged", function()
-		self:SendMessage("ON_STACK_SIZE_TEXT_CHANGED", parentFrame)
+		self:SendMessage("ON_STACK_SIZE_TEXT_CHANGED", parentFrame.itemPrice, parentFrame.stackPrice, parentFrame.stackSize)
+		self:SendMessage("ON_STACK_SIZE_TEXT_CHANGED", parentFrame.itemPriceBid, parentFrame.stackPriceBid, parentFrame.stackSize)
 		self:SendMessage("UPDATE_MAX_STACK_VALUES", parentFrame)
 	end)
 	parentFrame.stackSize:SetScript("OnEscapePressed", function() parentFrame.stackSize:ClearFocus() end)
@@ -359,14 +407,14 @@ function SellInterfaceModule:CreateItemToSellParameters(parentFrame)
 	parentFrame.stackSize.maxStackValue:SetText("1")
 
 	parentFrame.stackSize.maxStackBtn = CreateFrame("Button", "AB_SellInterface_MainFrame_ItemToSell_MaxStackSize_Btn", parentFrame.stackSize, "UIPanelButtonTemplate")
-	SellInterfaceModule:SetFrameParameters(parentFrame.stackSize.maxStackBtn, 50, 24, "Max.", "CENTER", 160, -125, "HIGH", parentFrame.itemToSellButton)
+	SellInterfaceModule:SetFrameParameters(parentFrame.stackSize.maxStackBtn, 50, 24, "Max.", "CENTER", 110, 0, "HIGH", parentFrame.stackSize)
 	parentFrame.stackSize.maxStackBtn:SetScript("OnClick", function() 
 		self:SendMessage("ON_CLICK_MAX_STACK_SIZE", parentFrame)
 	end)
 	parentFrame.stackSize.maxStackBtn:Disable()
 	
 	parentFrame.stackQuantity = CreateFrame("EditBox", "AB_SellInterface_MainFrame_ItemToSell_StackQuantity", parentFrame, "InputBoxTemplate")
-	SellInterfaceModule:SetFrameParameters(parentFrame.stackQuantity, 40, 40, nil, "CENTER", 50, -150, nil, parentFrame.itemToSellButton)
+	SellInterfaceModule:SetFrameParameters(parentFrame.stackQuantity, 40, 40, nil, "CENTER", 50, -225, nil, parentFrame.itemToSellButton)
 	parentFrame.stackQuantity:SetAutoFocus(false)
 	parentFrame.stackQuantity:SetJustifyH("CENTER")
 	parentFrame.stackQuantity:SetMaxBytes(6)
@@ -397,14 +445,18 @@ function SellInterfaceModule:CreateItemToSellParameters(parentFrame)
 	parentFrame.stackQuantity.maxStackValue:SetText("1")
 
 	parentFrame.stackQuantity.maxStackBtn = CreateFrame("Button", "AB_SellInterface_MainFrame_ItemToSell_MaxStackQuantity_Btn", parentFrame.stackQuantity, "UIPanelButtonTemplate")
-	SellInterfaceModule:SetFrameParameters(parentFrame.stackQuantity.maxStackBtn, 50, 24, "Max.", "CENTER", 160, -150, "HIGH", parentFrame.itemToSellButton)
+	SellInterfaceModule:SetFrameParameters(parentFrame.stackQuantity.maxStackBtn, 50, 24, "Max.", "CENTER", 110, 0, "HIGH", parentFrame.stackQuantity)
 	parentFrame.stackQuantity.maxStackBtn:SetScript("OnClick", function() 
 		self:SendMessage("ON_CLICK_MAX_STACK_QUANTITY", parentFrame)
 	end)
 	parentFrame.stackQuantity.maxStackBtn:Disable()
-	
+
+end
+
+function SellInterfaceModule:CreateItemToSellParameters(parentFrame)
+
 	parentFrame.auctionDuration = CreateFrame("Frame", "AB_SellInterface_MainFrame_ItemToSell_AuctionDuration", parentFrame, "UIDropDownMenuTemplate")
-	parentFrame.auctionDuration:SetPoint("CENTER", parentFrame.itemToSellButton, "CENTER", 85, -220)
+	parentFrame.auctionDuration:SetPoint("CENTER", parentFrame.itemToSellButton, "CENTER", 95, -300)
 	parentFrame.auctionDuration.durationValue = 2
 	parentFrame.auctionDuration.durationText = "8 Hours"
 	UIDropDownMenu_SetWidth(parentFrame.auctionDuration, 100)
@@ -419,18 +471,18 @@ function SellInterfaceModule:CreateItemToSellParameters(parentFrame)
 	
 	parentFrame.auctionDepositText = parentFrame.itemFrame:CreateFontString("AB_SellInterface_MainFrame_AuctionDeposit_Text", "OVERLAY")
 	parentFrame.auctionDepositText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
-	parentFrame.auctionDepositText:SetPoint("LEFT", 60, -58)
+	parentFrame.auctionDepositText:SetPoint("LEFT", 90, -93)
 	parentFrame.auctionDepositText:SetJustifyH("CENTER")
 	parentFrame.auctionDepositText:SetText("Deposit:")
 	
 	parentFrame.auctionDepositCost = parentFrame.itemFrame:CreateFontString("AB_SellInterface_MainFrame_AuctionDeposit_Cost", "OVERLAY")
 	parentFrame.auctionDepositCost:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
-	parentFrame.auctionDepositCost:SetPoint("LEFT", 120, -58)
+	parentFrame.auctionDepositCost:SetPoint("LEFT", 150, -93)
 	parentFrame.auctionDepositCost.value = GetCoinTextureString(0, 15)
 	parentFrame.auctionDepositCost:SetText(parentFrame.auctionDepositCost.value)
 	
 	parentFrame.createAuction = CreateFrame("Button", "AB_SellInterface_MainFrame_ItemToSell_CreateAuction", parentFrame.itemFrame, "UIPanelButtonTemplate")
-	SellInterfaceModule:SetFrameParameters(parentFrame.createAuction, 160, 24, "Create Auction(s)", "CENTER", 60, -260, "HIGH", parentFrame.itemToSellButton)
+	SellInterfaceModule:SetFrameParameters(parentFrame.createAuction, 160, 24, "Create Auction(s)", "CENTER", 55, -340, "HIGH", parentFrame.itemToSellButton)
 	parentFrame.createAuction:SetScript("OnClick", function() 
 		self:SendMessage("ON_SELL_SELECTED_ITEM", parentFrame)
 		SellInterfaceModule:ResetData()
@@ -583,6 +635,9 @@ end
 
 function SellInterfaceModule:ResetData()
 	DebugModule:Log("SellInterfaceModule", "ResetData", 1)
+
+	self.itemPriceBidValue = 100
+	self.stackPriceBidValue = 100
 
 	self.itemPriceValue = 100
 	self.stackPriceValue = 100
