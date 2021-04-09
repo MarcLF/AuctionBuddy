@@ -113,7 +113,7 @@ end
 function ItemsModule:OnSellSelectedItem(parentFrame)
 	DebugModule:Log(self, "SellSelectedItem", 2)
 
-	local stackPriceBid =  MoneyInputFrame_GetCopper(parentFrame.itemPriceBid)
+	local stackPriceBid =  MoneyInputFrame_GetCopper(parentFrame.stackPriceBid)
 
 	local itemPrice = MoneyInputFrame_GetCopper(parentFrame.itemPrice)
 	local stackPrice = MoneyInputFrame_GetCopper(parentFrame.stackPrice)
