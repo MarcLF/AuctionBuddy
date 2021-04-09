@@ -117,7 +117,8 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 		
 		OnDoubleClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)
 			if button == "LeftButton" and DatabaseModule.buyOptions.doubleClickToBuy == true then
-				ItemsModule.BuySelectedItem(rowData, rowIndex, false)
+				self:SendMessage("ON_BUY_SELECTED_ITEM", parentFrame.scrollTable:GetSelection())
+					parentFrame.scrollTable:ClearSelection()
 			end
 			return true
 		end
