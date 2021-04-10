@@ -121,6 +121,8 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 	parentFrame.DefaultAHButton:SetScript("OnClick", function() 
 		InterfaceFunctionsModule.switchingUI = true
 		parentFrame:Hide()
+		self:ResetData()
+		self:SendMessage("REMOVE_INSERTED_ITEM", parentFrame)
 		AuctionFrame_Show()
 		InterfaceFunctionsModule.switchingUI = false
 	end)
@@ -131,6 +133,7 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 		InterfaceFunctionsModule.switchingUI = true
 		parentFrame:Hide()
 		self:ResetData()
+		self:SendMessage("REMOVE_INSERTED_ITEM", parentFrame)
 		self:SendMessage("SHOW_AB_BUY_FRAME", parentFrame)
 	end)
 

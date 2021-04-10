@@ -31,7 +31,7 @@ function ItemsModule:Enable()
 	self:RegisterMessage("UPDATE_MAX_STACK_VALUES", self.UpdateMaxStackValues)
 	self:RegisterMessage("ON_CLICK_MAX_STACK_SIZE", self.OnClickMaxStackSize)
 	self:RegisterMessage("ON_CLICK_MAX_STACK_QUANTITY", self.OnClickMaxStackQuantity)
-	self:RegisterMessage("SHOW_AB_BUY_FRAME", self.RemoveInsertedItem)
+	self:RegisterMessage("REMOVE_INSERTED_ITEM", self.RemoveInsertedItem)
 	
 end
 
