@@ -1,6 +1,6 @@
-## Interface: 11306
+## Interface: 11307
 ## Title: AuctionBuddy
-## Version: 2.0.0_beta
+## Version: 2.1.1
 ## Author: Erazhen
 ## Notes: Auction house addon
 ## SavedVariables: AB_GeneralOptions, AB_BuyOptions, AB_SellOptions, AB_RecentSearches, AB_FavoriteSearchesLists
