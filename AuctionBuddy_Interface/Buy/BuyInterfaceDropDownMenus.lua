@@ -111,7 +111,8 @@ local recipesTypeTable =
 	"Alchemy",
 	"First Aid",
 	"Enchanting",
-	"Fishing"
+	"Fishing",
+	"Jewelcrafting"
 }
 
 local rarityTable = 
