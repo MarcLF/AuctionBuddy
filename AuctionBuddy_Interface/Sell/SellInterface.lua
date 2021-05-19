@@ -389,6 +389,7 @@ function SellInterfaceModule:CreateItemToSellEditBoxes(parentFrame)
 		self:SendMessage("ON_STACK_SIZE_TEXT_CHANGED", parentFrame.itemPrice, parentFrame.stackPrice, parentFrame.stackSize)
 		self:SendMessage("ON_STACK_SIZE_TEXT_CHANGED", parentFrame.itemPriceBid, parentFrame.stackPriceBid, parentFrame.stackSize)
 		self:SendMessage("UPDATE_MAX_STACK_VALUES", parentFrame)
+		self:SendMessage("UPDATE_DEPOSIT_COST", parentFrame)
 	end)
 	parentFrame.stackSize:SetScript("OnEscapePressed", function() parentFrame.stackSize:ClearFocus() end)
 	
