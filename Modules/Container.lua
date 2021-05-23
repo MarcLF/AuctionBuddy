@@ -224,11 +224,15 @@ function ContainerModule:CreateSellContainerScrollFrameTable(parentFrame, xPos, 
 			format       = "icon",
 			events		 = {
 				OnEnter = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex)
-						ItemsModule:ShowToolTip(cellFrame, rowData.itemLink, true)
+						if rowData ~= nil then
+							ItemsModule:ShowToolTip(cellFrame, rowData.itemLink, true)
+						end
 						return false
 				end,
 				OnLeave = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex)
-						ItemsModule:ShowToolTip(cellFrame, rowData.itemLink, false)
+						if rowData ~= nil then
+							ItemsModule:ShowToolTip(cellFrame, rowData.itemLink, false)
+						end
 						return false
 				end
 			},

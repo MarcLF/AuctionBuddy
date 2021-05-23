@@ -23,6 +23,7 @@ function NavigationModule:Enable()
 	self:RegisterMessage("ON_CLICK_NEXT_PAGE", self.OnClickNextPage)
 	self:RegisterMessage("ON_CLICK_PREV_PAGE", self.OnClickPrevPage)
 	self:RegisterMessage("UPDATE_NAVIGATION_PAGES", self.OnUpdateNavigationPages)
+	self:RegisterMessage("POSTING_ITEM_TO_AH", self.ResetData)
 	
 	self.searchActive = false
 	self.page = 0
@@ -88,8 +89,8 @@ end
 
 function NavigationModule:ResetData()
 
-	self.shown = 0
-	self.total = 0
-	self.page = 0
+	NavigationModule.shown = 0
+	NavigationModule.total = 0
+	NavigationModule.page = 0
 
 end
