@@ -28,16 +28,17 @@ function SellInterfaceModule:Enable()
 	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 	self:RegisterMessage("RESULTSTABLE_ITEM_SELECTED", self.OnResultsTableItemSelected)	
 	self:RegisterMessage("SHOW_AB_SELL_FRAME", self.OnShowSellFrame)	
+	self:RegisterMessage("UPDATE_AVAILABLE_RESULTS_PAGES", self.OnUpdateAvailableResultsPages)	
 
 	if self.interfaceCreated == true then
 		return
 	end
 
-	SellInterfaceModule.itemPriceBidValue = 100
-	SellInterfaceModule.stackPriceBidValue = 100
+	SellInterfaceModule.itemPriceBidValue = 0
+	SellInterfaceModule.stackPriceBidValue = 0
 	
-	SellInterfaceModule.itemPriceValue = 100
-	SellInterfaceModule.stackPriceValue = 100
+	SellInterfaceModule.itemPriceValue = 0
+	SellInterfaceModule.stackPriceValue = 0
 	
 	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
 	InterfaceFunctionsModule = AuctionBuddy:GetModule("InterfaceFunctionsModule")
@@ -143,8 +144,38 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 		if CanSendAuctionQuery() then
 			self:SendMessage("ON_CLICK_NEXT_PAGE", parentFrame)
 			AuctionBuddy:AuctionHouseSearch() 
+		else
+			self:SendMessage("ERROR_CAN_NOT_SEND_AH_QUERY")
 		end
 	end)
+
+	parentFrame.pageInfoText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_PageInfo_Text", "OVERLAY")
+	parentFrame.pageInfoText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
+	parentFrame.pageInfoText:SetWidth(100)
+	parentFrame.pageInfoText:SetPoint("TOPRIGHT", -144, -37)
+	parentFrame.pageInfoText:SetJustifyH("LEFT")
+	parentFrame.pageInfoText:SetText("Page")
+
+	parentFrame.pageOfText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_PageOf_Text", "OVERLAY")
+	parentFrame.pageOfText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
+	parentFrame.pageOfText:SetWidth(100)
+	parentFrame.pageOfText:SetPoint("TOPRIGHT", -133, -62)
+	parentFrame.pageOfText:SetJustifyH("LEFT")
+	parentFrame.pageOfText:SetText("of")
+
+	parentFrame.currentPageText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_CurrentPage_Text", "OVERLAY")
+	parentFrame.currentPageText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
+	parentFrame.currentPageText:SetWidth(100)
+	parentFrame.currentPageText:SetPoint("TOPRIGHT", -150, -62)
+	parentFrame.currentPageText:SetJustifyH("LEFT")
+	parentFrame.currentPageText:SetText("0")
+
+	parentFrame.maxPagesText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_MaxPages_Text", "OVERLAY")
+	parentFrame.maxPagesText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
+	parentFrame.maxPagesText:SetWidth(100)
+	parentFrame.maxPagesText:SetPoint("TOPRIGHT", -112, -62)
+	parentFrame.maxPagesText:SetJustifyH("LEFT")
+	parentFrame.maxPagesText:SetText("0")
 	
 	parentFrame.prevPageButton = CreateFrame("Button", "AB_SellInterface_MainFrame_PrevPage_Button", parentFrame, "UIPanelButtonTemplate")
 	SellInterfaceModule:SetFrameParameters(parentFrame.prevPageButton, 80, 24, "Prev Page", "TOPRIGHT", -105, -60)
@@ -152,6 +183,8 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 		if CanSendAuctionQuery() then
 			self:SendMessage("ON_CLICK_PREV_PAGE", parentFrame)
 			AuctionBuddy:AuctionHouseSearch() 
+		else
+			self:SendMessage("ERROR_CAN_NOT_SEND_AH_QUERY")
 		end
 	end)
 	
@@ -217,7 +250,7 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 	parentFrame.currentPlayerGold.text:SetText("Player Gold:")
 
 	parentFrame.uiScaleSlider = CreateFrame("Slider", "AB_SellInterface_MainFrame_UISlider", parentFrame, "OptionsSliderTemplate")
-	parentFrame.uiScaleSlider:SetPoint("TOP", 250, -50)
+	parentFrame.uiScaleSlider:SetPoint("TOP", 210, -50)
 	parentFrame.uiScaleSlider:SetWidth(150)
 	parentFrame.uiScaleSlider:SetHeight(20)
 	parentFrame.uiScaleSlider:SetOrientation("HORIZONTAL")
@@ -229,12 +262,12 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 
 	parentFrame.uiScaleSlider.text = parentFrame:CreateFontString("AB_SellInterface_MainFrame_UISlider_Text", "OVERLAY", "GameFontNormal")
 	parentFrame.uiScaleSlider.text:SetWidth(250)
-	parentFrame.uiScaleSlider.text:SetPoint("TOP", 250, -35)
+	parentFrame.uiScaleSlider.text:SetPoint("TOP", 210, -35)
 	parentFrame.uiScaleSlider.text:SetJustifyH("CENTER")
 	parentFrame.uiScaleSlider.text:SetText("AB UI Scale")
 
 	parentFrame.uiScaleSliderApplyButton = CreateFrame("Button", "AB_SellInterface_MainFrame_UISlider_ApplyButton", parentFrame, "UIPanelButtonTemplate")
-	SellInterfaceModule:SetFrameParameters(parentFrame.uiScaleSliderApplyButton, 60, 24, "Apply", "TOP", 370, -50)
+	SellInterfaceModule:SetFrameParameters(parentFrame.uiScaleSliderApplyButton, 60, 24, "Apply", "TOP", 330, -48)
 	parentFrame.uiScaleSliderApplyButton:SetScript("OnClick", function() 
 		DatabaseModule.generalOptions.uiScale = parentFrame.uiScaleSlider:GetValue()
 		self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale) 
@@ -605,6 +638,8 @@ function SellInterfaceModule:OnShowInterface()
 	self.mainFrame.totalBidCost:SetText(self.mainFrame.totalBuyCost.value)
 	self.mainFrame.scrollTable:ClearSelection()
 	self.mainFrame.alreadyBidText:Hide()
+	self.mainFrame.currentPageText:SetText("0")
+	self.mainFrame.maxPagesText:SetText("0")
 	ContainerModule:ScanContainer()
 
 end
@@ -625,6 +660,14 @@ function SellInterfaceModule:OnShowSellFrame()
 
 end
 
+function SellInterfaceModule:OnUpdateAvailableResultsPages(currentPage, maxPages)
+	DebugModule:Log("SellInterfaceModule", "OnUpdateAvailableResultsPages", 3)
+
+	SellInterfaceModule.mainFrame.currentPageText:SetText(currentPage + 1)
+	SellInterfaceModule.mainFrame.maxPagesText:SetText(maxPages + 1)
+
+end
+
 function SellInterfaceModule:EnableBuyBidButtons()
 
 	SellInterfaceModule.mainFrame.buySelectedItem:Enable()
@@ -642,11 +685,11 @@ end
 function SellInterfaceModule:ResetData()
 	DebugModule:Log("SellInterfaceModule", "ResetData", 1)
 
-	self.itemPriceBidValue = 100
-	self.stackPriceBidValue = 100
+	self.itemPriceBidValue = 0
+	self.stackPriceBidValue = 0
 
-	self.itemPriceValue = 100
-	self.stackPriceValue = 100
+	self.itemPriceValue = 0
+	self.stackPriceValue = 0
 
 	self.mainFrame.itemToSellButton:SetScript("OnEnter", function(self)
 	end)

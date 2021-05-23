@@ -53,7 +53,7 @@ end
 function ContainerModule:AUCTION_OWNED_LIST_UPDATE()
 	DebugModule:Log(self, "AUCTION_OWNED_LIST_UPDATE", 2)
 
-	C_Timer.After(0.5, self.ScanContainer)
+	C_Timer.After(1.0, self.ScanContainer)
 
 end
 

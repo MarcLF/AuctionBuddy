@@ -42,7 +42,6 @@ function NavigationModule:OnClickNextPage(parentFrame)
 	DebugModule:Log(self, "OnClickNextPage", 2)
 
 	NavigationModule.page = NavigationModule.page + 1
-	parentFrame.prevPageButton:SetEnabled(true)
 
 end
 
@@ -51,8 +50,6 @@ function NavigationModule:OnClickPrevPage(parentFrame)
 
 	if NavigationModule.page > 0 then
 		NavigationModule.page = NavigationModule.page - 1
-	else
-		parentFrame.prevPageButton:SetEnabled(false)
 	end
 
 end
@@ -63,10 +60,12 @@ function NavigationModule:OnUpdateNavigationPages(parentFrame)
 	NavigationModule.shown, NavigationModule.total = GetNumAuctionItems("list")
 
 	if NavigationModule.total > 0 then
-		NavigationModule.maxResultsPages = NavigationModule.total / 50 - 1
+		NavigationModule.maxResultsPages = math.ceil(NavigationModule.total / 50 - 1)
 	else
 		NavigationModule.maxResultsPages = 0
 	end
+
+	NavigationModule:SendMessage("UPDATE_AVAILABLE_RESULTS_PAGES", NavigationModule.page, NavigationModule.maxResultsPages)
 	
 	if NavigationModule.searchActive then
 		if NavigationModule.page < NavigationModule.maxResultsPages then

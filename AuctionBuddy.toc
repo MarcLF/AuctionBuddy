@@ -20,6 +20,7 @@ Libs\StdUi\StdUi.xml
 AuctionBuddy.lua
 
 Modules\Debug.lua
+Modules\Error.lua
 Modules\Database.lua
 Modules\Items.lua
 Modules\Navigation.lua

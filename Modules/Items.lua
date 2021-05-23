@@ -51,15 +51,13 @@ end
 function ItemsModule:AUCTION_ITEM_LIST_UPDATE()
 	DebugModule:Log(self, "AUCTION_ITEM_LIST_UPDATE", 1)
 
-	self.shown, self.total = GetNumAuctionItems("list")
+	ItemsModule.shown, ItemsModule.total = GetNumAuctionItems("list")
 
 	if BuyInterfaceModule.mainFrame:IsShown() then
 		ItemsModule:CreateAuctionItemButtons(self.shown, BuyInterfaceModule.mainFrame.scrollTable)
 	elseif SellInterfaceModule.mainFrame:IsShown() then
 		ItemsModule:CreateAuctionItemButtons(self.shown, SellInterfaceModule.mainFrame.scrollTable)
-		if self.total > 0 then 
-			ItemsModule:UpdateSellItemPriceAfterSearch(1,  self.shown, self.total)
-		end
+		ItemsModule:UpdateSellItemPriceAfterSearch(1,  self.shown, self.total)
 	end
 	
 end
@@ -124,7 +122,7 @@ function ItemsModule:OnSellSelectedItem(parentFrame)
 	if (tonumber(stackSize) > 0 and tonumber(stackNumber) > 0) then
 		PostAuction(stackPriceBid, stackPrice, parentFrame.auctionDuration.durationValue, stackSize, stackNumber)
 	else
-		print("AuctionBuddy: Can't place auctions without a valid stack size and quantity.")
+		self:SendMessage("ERROR_INVALID_STACK_OR_SIZE_QUANTITY")
 	end
 
 	PickupItem(ItemsModule.currentItemPostedLink) 
@@ -174,6 +172,12 @@ end
 
 function ItemsModule:UpdateSellItemPriceAfterSearch(numberList, shown, total)
 	DebugModule:Log(self, "UpdateSellItemPriceAfterSearch", 2)
+
+	if total == 0 then
+		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, 0)
+		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPriceBid, 0)
+		do return end
+	end
 	
 	local buyoutPrice = select(10, GetAuctionItemInfo("list", numberList))
 	local itemQuantity = select(3, GetAuctionItemInfo("list", numberList))
@@ -364,7 +368,7 @@ function ItemsModule:AddCursorItem(frame)
 	if bindType ~= 1 then
 		ItemsModule:InsertSelectedItem(frame.mainFrame)
 	else
-		print("AuctionBuddy: Can't auction Soulbound items")
+		self:SendMessage("ERROR_CAN_NOT_AUCTION_SOULBOUND_ITEMS")
 	end
 
 end

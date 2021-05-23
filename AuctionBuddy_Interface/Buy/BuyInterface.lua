@@ -22,7 +22,8 @@ function BuyInterfaceModule:Enable()
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 	self:RegisterMessage("RESULTSTABLE_ITEM_SELECTED", self.OnResultsTableItemSelected)	
-	self:RegisterMessage("SHOW_AB_BUY_FRAME", self.OnShowBuyFrame)	
+	self:RegisterMessage("SHOW_AB_BUY_FRAME", self.OnShowBuyFrame)
+	self:RegisterMessage("UPDATE_AVAILABLE_RESULTS_PAGES", self.OnUpdateAvailableResultsPages)	
 
 	if self.interfaceCreated == true then
 		return
@@ -176,6 +177,7 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 	parentFrame.DefaultAHButton:SetScript("OnClick", function() 
 		InterfaceFunctionsModule.switchingUI = true
 		parentFrame:Hide()
+		self:ResetData()
 		AuctionFrame_Show() 
 		InterfaceFunctionsModule.switchingUI = false
 	end)
@@ -188,23 +190,55 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 		self:ResetData()
 		self:SendMessage("SHOW_AB_SELL_FRAME")
 	end)
+
+	parentFrame.pageInfoText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_PageInfo_Text", "OVERLAY")
+	parentFrame.pageInfoText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
+	parentFrame.pageInfoText:SetWidth(100)
+	parentFrame.pageInfoText:SetPoint("TOPRIGHT", -144, -37)
+	parentFrame.pageInfoText:SetJustifyH("LEFT")
+	parentFrame.pageInfoText:SetText("Page")
+
+	parentFrame.pageOfText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_PageOf_Text", "OVERLAY")
+	parentFrame.pageOfText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
+	parentFrame.pageOfText:SetWidth(100)
+	parentFrame.pageOfText:SetPoint("TOPRIGHT", -133, -62)
+	parentFrame.pageOfText:SetJustifyH("LEFT")
+	parentFrame.pageOfText:SetText("of")
+
+	parentFrame.currentPageText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_CurrentPage_Text", "OVERLAY")
+	parentFrame.currentPageText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
+	parentFrame.currentPageText:SetWidth(100)
+	parentFrame.currentPageText:SetPoint("TOPRIGHT", -150, -62)
+	parentFrame.currentPageText:SetJustifyH("LEFT")
+	parentFrame.currentPageText:SetText("0")
+
+	parentFrame.maxPagesText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_MaxPages_Text", "OVERLAY")
+	parentFrame.maxPagesText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
+	parentFrame.maxPagesText:SetWidth(100)
+	parentFrame.maxPagesText:SetPoint("TOPRIGHT", -112, -62)
+	parentFrame.maxPagesText:SetJustifyH("LEFT")
+	parentFrame.maxPagesText:SetText("0")
+
+	parentFrame.prevPageButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_PrevPage_Button", parentFrame, "UIPanelButtonTemplate")
+	BuyInterfaceModule:SetFrameParameters(parentFrame.prevPageButton, 80, 24, "Prev Page", "TOPRIGHT", -105, -60)
+	parentFrame.prevPageButton:SetScript("OnClick", function()
+		if CanSendAuctionQuery() then
+			self:SendMessage("ON_CLICK_PREV_PAGE", parentFrame)
+			AuctionBuddy:AuctionHouseSearch() 
+		else
+			self:SendMessage("ERROR_CAN_NOT_SEND_AH_QUERY")
+		end
+	end)
 	
 	parentFrame.nextPageButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_NextPage_Button", parentFrame, "UIPanelButtonTemplate")
 	BuyInterfaceModule:SetFrameParameters(parentFrame.nextPageButton, 80, 24, "Next Page", "TOPRIGHT", -25, -60)
 	parentFrame.nextPageButton:SetScript("OnClick", function()
 		if CanSendAuctionQuery() then
 			self:SendMessage("ON_CLICK_NEXT_PAGE", parentFrame)
+			AuctionBuddy:AuctionHouseSearch() 
+		else
+			self:SendMessage("ERROR_CAN_NOT_SEND_AH_QUERY")
 		end
-		AuctionBuddy:AuctionHouseSearch()
-	end)
-	
-	parentFrame.prevPageButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_PrevPage_Button", parentFrame, "UIPanelButtonTemplate")
-	BuyInterfaceModule:SetFrameParameters(parentFrame.prevPageButton, 80, 24, "Prev Page", "TOPRIGHT", -105, -60)
-	parentFrame.prevPageButton:SetScript("OnClick", function()
-		if CanSendAuctionQuery() then
-			self:SendMessage("ON_CLICK_PREV_PAGE", parentFrame)
-		end
-		AuctionBuddy:AuctionHouseSearch() 
 	end)
 	
 end
@@ -280,7 +314,7 @@ function BuyInterfaceModule:CreateBuyInterfaceBuyOptions(parentFrame)
 	parentFrame.currentPlayerGold.text:SetText("Player Gold:")
 
 	parentFrame.uiScaleSlider = CreateFrame("Slider", "AB_BuyInterface_MainFrame_UISlider", parentFrame, "OptionsSliderTemplate")
-	parentFrame.uiScaleSlider:SetPoint("TOP", 250, -50)
+	parentFrame.uiScaleSlider:SetPoint("TOP", 210, -50)
 	parentFrame.uiScaleSlider:SetWidth(150)
 	parentFrame.uiScaleSlider:SetHeight(20)
 	parentFrame.uiScaleSlider:SetOrientation("HORIZONTAL")
@@ -292,12 +326,12 @@ function BuyInterfaceModule:CreateBuyInterfaceBuyOptions(parentFrame)
 
 	parentFrame.uiScaleSlider.text = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_UISlider_Text", "OVERLAY", "GameFontNormal")
 	parentFrame.uiScaleSlider.text:SetWidth(250)
-	parentFrame.uiScaleSlider.text:SetPoint("TOP", 250, -35)
+	parentFrame.uiScaleSlider.text:SetPoint("TOP", 210, -35)
 	parentFrame.uiScaleSlider.text:SetJustifyH("CENTER")
 	parentFrame.uiScaleSlider.text:SetText("AB UI Scale")
 
 	parentFrame.uiScaleSliderApplyButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_UISlider_ApplyButton", parentFrame, "UIPanelButtonTemplate")
-	BuyInterfaceModule:SetFrameParameters(parentFrame.uiScaleSliderApplyButton, 60, 24, "Apply", "TOP", 370, -50)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.uiScaleSliderApplyButton, 60, 24, "Apply", "TOP", 330, -48)
 	parentFrame.uiScaleSliderApplyButton:SetScript("OnClick", function() 
 		DatabaseModule.generalOptions.uiScale = parentFrame.uiScaleSlider:GetValue()
 		self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale) 
@@ -308,36 +342,36 @@ end
 function BuyInterfaceModule:CreateSearchFilters(parentFrame)
 
 	parentFrame.iLvl = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_ItemLevel_Text", "OVERLAY", "GameFontNormal")
-	parentFrame.iLvl:SetPoint("TOPLEFT", 380, -35)
+	parentFrame.iLvl:SetPoint("TOPLEFT", 360, -35)
 	parentFrame.iLvl:SetJustifyH("CENTER")
 	parentFrame.iLvl:SetText("Level Range")
 
 	parentFrame.scoreSign = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_ItemLevel_ScoreSign", "OVERLAY", "GameFontNormal")
-	parentFrame.scoreSign:SetPoint("TOPLEFT", 410, -55)
+	parentFrame.scoreSign:SetPoint("TOPLEFT", 393, -60)
 	parentFrame.scoreSign:SetJustifyH("CENTER")
 	parentFrame.scoreSign:SetText("-")
 	
 	parentFrame.minILvl = CreateFrame("EditBox", "AB_BuyInterface_MainFrame_ItemLevel_MinItemLevel", parentFrame, "InputBoxTemplate")
-	BuyInterfaceModule:SetFrameParameters(parentFrame.minILvl, 30, 20, nil, "CENTER", -28, -20, nil, parentFrame.iLvl)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.minILvl, 30, 20, nil, "CENTER", -28, -25, nil, parentFrame.iLvl)
 	parentFrame.minILvl:SetAutoFocus(false)
 	parentFrame.minILvl:SetJustifyH("CENTER")
 	parentFrame.minILvl:SetScript("OnEscapePressed", function() parentFrame.minILvl:ClearFocus() end)
 	parentFrame.minILvl:SetScript("OnEnterPressed", function() parentFrame.minILvl:ClearFocus() end)
 
 	parentFrame.maxILvl = CreateFrame("EditBox", "AB_BuyInterface_MainFrame_ItemLevel_MaxItemLevel", parentFrame, "InputBoxTemplate")
-	BuyInterfaceModule:SetFrameParameters(parentFrame.maxILvl, 30, 20, nil, "CENTER", 27, -20, nil, parentFrame.iLvl)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.maxILvl, 30, 20, nil, "CENTER", 27, -25, nil, parentFrame.iLvl)
 	parentFrame.maxILvl:SetAutoFocus(false)
 	parentFrame.maxILvl:SetJustifyH("CENTER")
 	parentFrame.maxILvl:SetScript("OnEscapePressed", function() parentFrame.maxILvl:ClearFocus() end)
 	parentFrame.maxILvl:SetScript("OnEnterPressed", function() parentFrame.maxILvl:ClearFocus() end)
 
 	parentFrame.itemTypeText = parentFrame.maxILvl:CreateFontString("AB_BuyInterface_MainFrame_SlotType_Text", "OVERLAY", "GameFontNormal")
-	parentFrame.itemTypeText:SetPoint("CENTER", 99, 20)
+	parentFrame.itemTypeText:SetPoint("CENTER", 99, 25)
 	parentFrame.itemTypeText:SetJustifyH("CENTER")
 	parentFrame.itemTypeText:SetText("Item Type")
 
 	parentFrame.itemSubTypeText = parentFrame.maxILvl:CreateFontString("AB_BuyInterface_MainFrame_Rarity_Text", "OVERLAY", "GameFontNormal")
-	parentFrame.itemSubTypeText:SetPoint("CENTER", 249, 20)
+	parentFrame.itemSubTypeText:SetPoint("CENTER", 248, 25)
 	parentFrame.itemSubTypeText:SetJustifyH("CENTER")
 	parentFrame.itemSubTypeText:SetText("Rarity")
 
@@ -372,7 +406,7 @@ function BuyInterfaceModule:CreateBuyInterfaceSearchTablesOptions(parentFrame)
 			parentFrame.addFavoriteBar:SetText("")
 			parentFrame.addFavoriteBar:ClearFocus()
 		else
-			print("AuctionBuddy: Can't add an empty search.")
+			self:SendMessage("ERROR_CAN_NOT_ADD_EMPTY_SEARCH")
 		end
 	end)
 	
@@ -458,6 +492,8 @@ function BuyInterfaceModule:OnShowInterface()
 	self.mainFrame.totalBidCost:SetText(self.mainFrame.totalBuyCost.value)
 	self.mainFrame.scrollTable:ClearSelection()
 	self.mainFrame.alreadyBidText:Hide()
+	self.mainFrame.currentPageText:SetText("0")
+	self.mainFrame.maxPagesText:SetText("0")
 	ContainerModule:ScanContainer()
 
 end
@@ -477,6 +513,14 @@ function BuyInterfaceModule:OnShowBuyFrame()
 	BuyInterfaceModule:DisableBuyBidButtons()
 
 	InterfaceFunctionsModule.switchingUI = false
+
+end
+
+function BuyInterfaceModule:OnUpdateAvailableResultsPages(currentPage, maxPages)
+	DebugModule:Log("BuyInterfaceModule", "OnUpdateAvailableResultsPages", 3)
+
+	BuyInterfaceModule.mainFrame.currentPageText:SetText(currentPage + 1)
+	BuyInterfaceModule.mainFrame.maxPagesText:SetText(maxPages + 1)
 
 end
 

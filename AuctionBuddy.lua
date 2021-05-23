@@ -18,6 +18,7 @@ AuctionBuddy.isSortedBuyout = false
 local StdUi = LibStub("StdUi")
 
 local DebugModule = nil
+local ErrorModule = nil
 local DatabaseModule = nil
 local NavigationModule = nil
 local ItemsModule = nil
@@ -42,6 +43,7 @@ end
 function AuctionBuddy:VARIABLES_LOADED()
 
 	self:EnableModule("DebugModule")
+	self:EnableModule("ErrorModule")
 	self:EnableModule("DatabaseModule")
 	self:EnableModule("OptionsFunctionsModule")
 	self:EnableModule("OptionsPanelModule")
@@ -181,7 +183,7 @@ function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
 			filterData
 		)
 	else
-		print("AuctionBuddy: Can't send queries to the auction house right now, try again in few seconds.")
+		self:SendMessage("ERROR_CAN_NOT_SEND_AH_QUERY")
 	end
 	
 end
