@@ -112,21 +112,21 @@ function ItemsModule:OnSellSelectedItem(parentFrame)
 	DebugModule:Log("ItemsModule", "SellSelectedItem", 2)
 
 	local stackPriceBid =  MoneyInputFrame_GetCopper(parentFrame.stackPriceBid)
-
-	local itemPrice = MoneyInputFrame_GetCopper(parentFrame.itemPrice)
 	local stackPrice = MoneyInputFrame_GetCopper(parentFrame.stackPrice)
 	
-	local stackSize = parentFrame.stackSize:GetText()
-	local stackNumber = parentFrame.stackQuantity:GetText()
-
-	stackSize = string.len(stackSize) > 0 and stackSize or 0
-	stackNumber = string.len(stackNumber) > 0 and stackNumber or 0
+	local stackSize = parentFrame.stackSize:GetNumber()
+	local stackNumber = parentFrame.stackQuantity:GetNumber()
 
 	local checkPostingErrors = false
 
 	if tonumber(stackSize) < 1 and tonumber(stackNumber) < 1 then
 		checkPostingErrors = true
 		ItemsModule:SendMessage("AUCTIONBUDDY_ERROR", "InvalidStackOrSizeQuantity")
+	end
+	print(stackPrice)
+	if stackPrice < 1 then
+		checkPostingErrors = true
+		ItemsModule:SendMessage("AUCTIONBUDDY_ERROR", "InvalidAuctionPrice")
 	end
 
 	if checkPostingErrors == false then
@@ -191,14 +191,14 @@ function ItemsModule:UpdateSellItemPriceAfterSearch(numberList, shown, total)
 	local buyoutPrice = select(10, GetAuctionItemInfo("list", numberList))
 	local itemQuantity = select(3, GetAuctionItemInfo("list", numberList))
 
-	local priceToSell = math.floor(buyoutPrice/itemQuantity) - 1
+	local priceToSell = math.max(math.floor(buyoutPrice/itemQuantity) - 1, 0)
 
 	if buyoutPrice == 0 and total > 1 and numberList < shown then
 		numberList = numberList + 1
 		self:UpdateSellItemPriceAfterSearch(numberList, shown, total)
 	else
-		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, priceToSell)
 		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPriceBid, priceToSell)
+		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, priceToSell)
 	end
 	
 end
@@ -283,16 +283,8 @@ function ItemsModule:UpdateMaxStackValues(parentFrame)
 
 	local itemStackCount = select(8, GetItemInfo(itemLink)) or 1
 
-	local stackSizeValue = 1
-	local stackQuantityValue = 1
-
-	if parentFrame.stackSize:GetText() ~= "" and parentFrame.stackQuantity:GetText() ~= "0" then
-		stackSizeValue = tonumber(parentFrame.stackSize:GetText())
-	end
-
-	if parentFrame.stackQuantity:GetText() ~= "" and parentFrame.stackQuantity:GetText() ~= "0" then
-		stackQuantityValue = tonumber(parentFrame.stackQuantity:GetText())
-	end
+	local stackSizeValue = math.max(parentFrame.stackSize:GetNumber(), 1)
+	local stackQuantityValue = math.max(parentFrame.stackQuantity:GetNumber(), 1)
 
 	local maxStackSizeValue = math.max(math.floor(itemAmountInBag / stackQuantityValue), 1)
 	local maxStackQuantityValue = itemAmountInBag
