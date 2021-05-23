@@ -1,6 +1,6 @@
 ## Interface: 20501
 ## Title: AuctionBuddy
-## Version: 1.0.2
+## Version: 1.0.2a
 ## Author: Erazhen
 ## Notes: Auction house addon for The Burning Crusade Classic.
 ## SavedVariables: AB_GeneralOptions, AB_BuyOptions, AB_SellOptions, AB_RecentSearches, AB_FavoriteSearchesLists
