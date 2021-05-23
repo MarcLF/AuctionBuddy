@@ -123,8 +123,8 @@ function ItemsModule:OnSellSelectedItem(parentFrame)
 		checkPostingErrors = true
 		ItemsModule:SendMessage("AUCTIONBUDDY_ERROR", "InvalidStackOrSizeQuantity")
 	end
-	print(stackPrice)
-	if stackPrice < 1 then
+
+	if stackPriceBid < 1 or stackPrice < 1 then
 		checkPostingErrors = true
 		ItemsModule:SendMessage("AUCTIONBUDDY_ERROR", "InvalidAuctionPrice")
 	end

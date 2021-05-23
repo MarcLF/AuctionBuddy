@@ -11,7 +11,7 @@ local auctionBuddyErrors = {
 	InvalidStackOrSizeQuantity = "AuctionBuddy: Can't place auctions without a valid stack size and quantity.",
 	CannotSellSoulboundItems = "AuctionBuddy: Can't auction Soulbound items.",
 	TimeoutPostItem = "AuctionBuddy: Can't post new items at this moment, try again in few seconds.",
-	InvalidAuctionPrice = "AuctionBuddy: Can't post this item. Please insert a valid auction price."
+	InvalidAuctionPrice = "AuctionBuddy: Can't post this item. Please insert a valid auction price bid and buyout."
 }
 
 

@@ -685,6 +685,9 @@ end
 function SellInterfaceModule:ResetData()
 	DebugModule:Log("SellInterfaceModule", "ResetData", 1)
 
+	self.mainFrame.nextPageButton:Disable()
+	self.mainFrame.prevPageButton:Disable()
+
 	self.itemPriceBidValue = 0
 	self.stackPriceBidValue = 0
 
@@ -702,6 +705,9 @@ function SellInterfaceModule:ResetData()
 	self.mainFrame.stackQuantity.maxStackValue:SetText("1")
 	self.mainFrame.stackQuantity:SetText(1)
 	self.mainFrame.stackSize:SetText(1)
+
+	self.mainFrame.currentPageText:SetText("0")
+	self.mainFrame.maxPagesText:SetText("0")
 
 	self.mainFrame.stackSize.maxStackBtn:Disable()
 	self.mainFrame.stackQuantity.maxStackBtn:Disable()
