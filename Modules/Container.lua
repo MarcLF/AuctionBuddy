@@ -16,6 +16,8 @@ local containerNumOfSlots = nil
 ContainerModule.bagID = nil
 ContainerModule.bagSlot = nil
 ContainerModule.interfaceCreated = nil
+ContainerModule.isPostingItemToAH = false
+ContainerModule.isMultisellingItemsToAH = false
 
 function ContainerModule:Enable()
 
@@ -23,7 +25,11 @@ function ContainerModule:Enable()
 	DebugModule:Log(self, "Enable", 0)
 
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
-	self:RegisterEvent("AUCTION_OWNED_LIST_UPDATE")
+	self:RegisterEvent("BAG_UPDATE_DELAYED")
+	self:RegisterEvent("AUCTION_MULTISELL_START")
+	self:RegisterEvent("AUCTION_MULTISELL_UPDATE")
+	self:RegisterEvent("AUCTION_MULTISELL_FAILURE")
+	self:RegisterMessage("POSTING_ITEM_TO_AH", self.OnPostingItemToAH)
 
 	if self.interfaceCreated == true then
 		return
@@ -47,13 +53,70 @@ function ContainerModule:AUCTION_HOUSE_CLOSED()
 	DebugModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
 
 	self:UnregisterAllEvents()
+	ContainerModule.isPostingItemToAH = false
 	
 end
 
-function ContainerModule:AUCTION_OWNED_LIST_UPDATE()
-	DebugModule:Log(self, "AUCTION_OWNED_LIST_UPDATE", 2)
+function ContainerModule:BAG_UPDATE_DELAYED()
+	DebugModule:Log(self, "BAG_UPDATE_DELAYED", 0)
 
-	C_Timer.After(1.0, self.ScanContainer)
+	ContainerModule:ScanContainer()
+
+	ContainerModule.isPostingItemToAH = false
+
+end
+
+function ContainerModule:AUCTION_MULTISELL_START()
+	DebugModule:Log(self, "AUCTION_MULTISELL_START", 0)
+
+	ContainerModule.isMultisellingItemsToAH = true
+
+end
+
+function ContainerModule:AUCTION_MULTISELL_UPDATE(...)
+	DebugModule:Log(self, "AUCTION_MULTISELL_UPDATE", 0)
+
+	local createdCount = select(2, ...)
+	local totalToCreate = select(3, ...)
+
+	if (createdCount == totalToCreate) then 
+		ContainerModule.isMultisellingItemsToAH = false
+	end
+		
+
+end
+
+function ContainerModule:AUCTION_MULTISELL_FAILURE()
+	DebugModule:Log(self, "AUCTION_MULTISELL_FAILURE", 0)
+
+	ContainerModule.isMultisellingItemsToAH = false
+
+end
+
+function ContainerModule:OnPostingItemToAH()
+	DebugModule:Log(ContainerModule, "OnPostingItemToAH", 2)
+
+	ContainerModule.isPostingItemToAH = true
+
+end
+
+function ContainerModule:CanSelectContainerItem()
+
+	local canSelectContainerItem = true
+
+	if not CanSendAuctionQuery() then
+		canSelectContainerItem = false
+	elseif ContainerModule.isPostingItemToAH then
+		canSelectContainerItem = false
+	elseif ContainerModule.isMultisellingItemsToAH then
+		canSelectContainerItem = false
+	end
+
+	if not canSelectContainerItem then
+		ContainerModule:SendMessage("AUCTIONBUDDY_ERROR", "TimeoutPostItem")
+	end
+
+	return canSelectContainerItem
 
 end
 
@@ -61,6 +124,7 @@ function ContainerModule:ScanContainer()
 	DebugModule:Log("ContainerModule", "ScanContainer", 2)
 
 	local tableData = {}
+
 	for i = 0, 4, 1 do
 	
 		containerNumOfSlots = GetContainerNumSlots(i)
@@ -68,7 +132,7 @@ function ContainerModule:ScanContainer()
 		for j = 1, containerNumOfSlots, 1 do
 			local myTexture, itemCount, locked, itemQuality, readable, lootable, itemLinkContainer = GetContainerItemInfo(i, j)
 		
-			if myTexture ~= nil then
+			if myTexture ~= nil and not lootable then
 				if not C_Item.IsBound(ItemLocation:CreateFromBagAndSlot(i, j)) then
 					tinsert(tableData, 
 					{			
@@ -197,14 +261,16 @@ function ContainerModule:CreateSellContainerScrollFrameTable(parentFrame, xPos, 
 	parentFrame.scrollTableContainer:EnableSelection(true)
 	parentFrame.scrollTableContainer:RegisterEvents({
 		OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)
-			if button == "LeftButton" and ItemsModule.currentItemPostedLink ~= rowData.itemLink then
-				PickupContainerItem(rowData.bagID, rowData.slot)
-				ContainerModule.bagID = rowData.bagID
-				ContainerModule.bagSlot = rowData.slot
+			if ContainerModule:CanSelectContainerItem() then
+				if button == "LeftButton" and ItemsModule.currentItemPostedLink ~= rowData.itemLink then
+					PickupContainerItem(rowData.bagID, rowData.slot)
+					ContainerModule.bagID = rowData.bagID
+					ContainerModule.bagSlot = rowData.slot
 					
-				self:SendMessage("CONTAINER_ITEM_SELECTED", parentFrame, ContainerModule.bagID, ContainerModule.bagSlot)			
+					ContainerModule:SendMessage("CONTAINER_ITEM_SELECTED", parentFrame, ContainerModule.bagID, ContainerModule.bagSlot)			
 
-				parentFrame.scrollTableContainer:ClearSelection()
+					parentFrame.scrollTableContainer:ClearSelection()
+				end
 			end
 			return true
 		end

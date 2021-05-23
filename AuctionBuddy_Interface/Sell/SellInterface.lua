@@ -71,7 +71,7 @@ end
 
 function SellInterfaceModule:AUCTION_ITEM_LIST_UPDATE()
 	
-	self:SendMessage("UPDATE_NAVIGATION_PAGES", self.mainFrame)
+	SellInterfaceModule:SendMessage("UPDATE_NAVIGATION_PAGES", self.mainFrame)
 
 end
 
@@ -145,36 +145,36 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 			self:SendMessage("ON_CLICK_NEXT_PAGE", parentFrame)
 			AuctionBuddy:AuctionHouseSearch() 
 		else
-			self:SendMessage("ERROR_CAN_NOT_SEND_AH_QUERY")
+			self:SendMessage("AUCTIONBUDDY_ERROR", "CannotSendAHQuery")
 		end
 	end)
 
-	parentFrame.pageInfoText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_PageInfo_Text", "OVERLAY")
+	parentFrame.pageInfoText = parentFrame:CreateFontString("AB_SellInterface_MainFrame_PageInfo_Text", "OVERLAY")
 	parentFrame.pageInfoText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
 	parentFrame.pageInfoText:SetWidth(100)
 	parentFrame.pageInfoText:SetPoint("TOPRIGHT", -144, -37)
 	parentFrame.pageInfoText:SetJustifyH("LEFT")
 	parentFrame.pageInfoText:SetText("Page")
 
-	parentFrame.pageOfText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_PageOf_Text", "OVERLAY")
+	parentFrame.pageOfText = parentFrame:CreateFontString("AB_SellInterface_MainFrame_PageOf_Text", "OVERLAY")
 	parentFrame.pageOfText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
 	parentFrame.pageOfText:SetWidth(100)
 	parentFrame.pageOfText:SetPoint("TOPRIGHT", -133, -62)
 	parentFrame.pageOfText:SetJustifyH("LEFT")
 	parentFrame.pageOfText:SetText("of")
 
-	parentFrame.currentPageText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_CurrentPage_Text", "OVERLAY")
+	parentFrame.currentPageText = parentFrame:CreateFontString("AB_SellInterface_MainFrame_CurrentPage_Text", "OVERLAY")
 	parentFrame.currentPageText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
-	parentFrame.currentPageText:SetWidth(100)
-	parentFrame.currentPageText:SetPoint("TOPRIGHT", -150, -62)
-	parentFrame.currentPageText:SetJustifyH("LEFT")
+	parentFrame.currentPageText:SetWidth(80)
+	parentFrame.currentPageText:SetPoint("TOPRIGHT", -208, -62)
+	parentFrame.currentPageText:SetJustifyH("CENTER")
 	parentFrame.currentPageText:SetText("0")
 
-	parentFrame.maxPagesText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_MaxPages_Text", "OVERLAY")
+	parentFrame.maxPagesText = parentFrame:CreateFontString("AB_SellInterface_MainFrame_MaxPages_Text", "OVERLAY")
 	parentFrame.maxPagesText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
-	parentFrame.maxPagesText:SetWidth(100)
-	parentFrame.maxPagesText:SetPoint("TOPRIGHT", -112, -62)
-	parentFrame.maxPagesText:SetJustifyH("LEFT")
+	parentFrame.maxPagesText:SetWidth(80)
+	parentFrame.maxPagesText:SetPoint("TOPRIGHT", -162, -62)
+	parentFrame.maxPagesText:SetJustifyH("CENTER")
 	parentFrame.maxPagesText:SetText("0")
 	
 	parentFrame.prevPageButton = CreateFrame("Button", "AB_SellInterface_MainFrame_PrevPage_Button", parentFrame, "UIPanelButtonTemplate")

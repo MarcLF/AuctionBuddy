@@ -183,7 +183,7 @@ function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
 			filterData
 		)
 	else
-		self:SendMessage("ERROR_CAN_NOT_SEND_AH_QUERY")
+		AuctionBuddy:SendMessage("AUCTIONBUDDY_ERROR", "CannotSendAHQuery")
 	end
 	
 end

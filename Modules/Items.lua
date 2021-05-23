@@ -109,7 +109,7 @@ function ItemsModule:OnBuySelectedItem(selectedItemData)
 end
 
 function ItemsModule:OnSellSelectedItem(parentFrame)
-	DebugModule:Log(self, "SellSelectedItem", 2)
+	DebugModule:Log("ItemsModule", "SellSelectedItem", 2)
 
 	local stackPriceBid =  MoneyInputFrame_GetCopper(parentFrame.stackPriceBid)
 
@@ -118,11 +118,20 @@ function ItemsModule:OnSellSelectedItem(parentFrame)
 	
 	local stackSize = parentFrame.stackSize:GetText()
 	local stackNumber = parentFrame.stackQuantity:GetText()
-	
-	if (tonumber(stackSize) > 0 and tonumber(stackNumber) > 0) then
+
+	stackSize = string.len(stackSize) > 0 and stackSize or 0
+	stackNumber = string.len(stackNumber) > 0 and stackNumber or 0
+
+	local checkPostingErrors = false
+
+	if tonumber(stackSize) < 1 and tonumber(stackNumber) < 1 then
+		checkPostingErrors = true
+		ItemsModule:SendMessage("AUCTIONBUDDY_ERROR", "InvalidStackOrSizeQuantity")
+	end
+
+	if checkPostingErrors == false then
 		PostAuction(stackPriceBid, stackPrice, parentFrame.auctionDuration.durationValue, stackSize, stackNumber)
-	else
-		self:SendMessage("ERROR_INVALID_STACK_OR_SIZE_QUANTITY")
+		ItemsModule:SendMessage("POSTING_ITEM_TO_AH")	
 	end
 
 	PickupItem(ItemsModule.currentItemPostedLink) 
@@ -368,7 +377,7 @@ function ItemsModule:AddCursorItem(frame)
 	if bindType ~= 1 then
 		ItemsModule:InsertSelectedItem(frame.mainFrame)
 	else
-		self:SendMessage("ERROR_CAN_NOT_AUCTION_SOULBOUND_ITEMS")
+		ItemsModule:SendMessage("AUCTIONBUDDY_ERROR", "CannotSellSoulboundItems")
 	end
 
 end

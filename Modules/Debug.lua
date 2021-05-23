@@ -10,8 +10,9 @@ local DebugModule = AuctionBuddy:NewModule("DebugModule")
 -- 2 = HIGH
 -- 1 = MEDIUM
 -- 0 = LOW
+-- -1 = NONE
 
-DebugModule.verbose = 3
+DebugModule.verbose = 0
 
 function DebugModule:Log(...)
 
