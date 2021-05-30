@@ -20,8 +20,9 @@ local itemTypeTable =
 	"Projectile (All)",
 	"Quiver (All)",
 	"Recipe (All)",
-	"Reagent (All)",
-	"Miscellaneous (All)"
+	"Gems",
+	"Miscellaneous (All)",
+	"Quest Items"
 }
 
 -- Weapons Tables
@@ -64,21 +65,62 @@ local armorTypeTable =
 local armorSlotsTable =
 {
 	"Head",
-	"Neck",
 	"Shoulder",
-	"Shirt",
 	"Chest",
 	"Waist",
 	"Legs",
 	"Feet",
 	"Wrist",
 	"Hands",
+	"Back"
+}
+
+local armorMiscellaneousSlotsTable =
+{
+	"Head",
+	"Neck",
+	"Shirt",
 	"Finger",
 	"Trinket",
-	"Back",
 	"Held In Off-hand"
 }
 --
+
+local containersTypeTable = 
+{
+	"Bag",
+	"Soul Bag",
+	"Herb Bag",
+	"Enchanting Bag"
+}
+
+local consumableTypeTable = 
+{
+	"Food & Drink",
+	"Potion",
+	"Elixir",
+	"Flask",
+	"Bandage",
+	"Item Enhancement",
+	"Scroll",
+	"Other"
+}
+
+local tradeGoodsTypeTable = 
+{
+	"Elemental",
+	"Cloth",
+	"Leather",
+	"Metal & Stone",
+	"Meat",
+	"Enchanting",
+	"Jewelcrafting",
+	"Parts",
+	"Devices",
+	"Explosives",
+	"Materials",
+	"Other"
+}
 
 local projectileTable = 
 {
@@ -90,14 +132,6 @@ local quiverTable =
 {
 	"Quiver",
 	"Ammo Pouch"
-}
-
-local containersTypeTable = 
-{
-	"Bag",
-	"Soul Bag",
-	"Herb Bag",
-	"Enchanting Bag"
 }
 
 local recipesTypeTable =
@@ -113,6 +147,29 @@ local recipesTypeTable =
 	"Enchanting",
 	"Fishing",
 	"Jewelcrafting"
+}
+
+local gemsTypeTable =
+{
+	"Red",
+	"Blue",
+	"Yellow",
+	"Purple",
+	"Green",
+	"Orange",
+	"Meta",
+	"Simple",
+	"Prismatic"
+}
+
+local miscellaneousTypeTable =
+{
+	"Junk",
+	"Reagent",
+	"Pet",
+	"Holiday",
+	"Other",
+	"Mount"
 }
 
 local rarityTable = 
@@ -164,8 +221,7 @@ function BuyInterfaceDropDownMenusModule:CreateItemClassDropDownMenu(parentFrame
 				info.arg1 = key		
 				info.checked = BuyInterfaceModule.mainFrame.itemClasses.value == key
 
-				if key ~= 0 and itemTypeTable[key] ~= "Consumable (All)" and itemTypeTable[key] ~= "Trade Goods (All)" 
-				 and itemTypeTable[key] ~= "Reagent (All)"  and itemTypeTable[key] ~= "Miscellaneous (All)" then
+				if key ~= 0 and itemTypeTable[key] ~= "Quest Items" then
 					info.menuList, info.hasArrow = key, true
 				else
 					info.hasArrow = false
@@ -183,13 +239,16 @@ function BuyInterfaceDropDownMenusModule:CreateItemClassDropDownMenu(parentFrame
 				info.arg2 = InterfaceFunctionsModule:ReturnIndexGivenTableValue(UIDROPDOWNMENU_MENU_VALUE, itemTypeTable)
 				info.checked = BuyInterfaceModule.mainFrame.itemClasses.valueSubList == key
 
-					if nestedTable == armorTypeTable then
-					info.menuList, info.hasArrow = key, true
-				end
+					if nestedTable == armorTypeTable and nestedTable[key] ~= "Shields" 
+					and nestedTable[key] ~= "Librams" and nestedTable[key] ~= "Idols" 
+					and nestedTable[key] ~= "Totems" then
+						info.menuList, info.hasArrow = key, true
+					else
+						info.hasArrow = false
+					end
 
 				UIDropDownMenu_AddButton(info, level)
 			end
-
 		else
 			local _, parentOfNestedTableTable, nestedTable = BuyInterfaceDropDownMenusModule:GetNestedTableInfoFromMenuValue(UIDROPDOWNMENU_MENU_VALUE)
 
@@ -244,14 +303,12 @@ function BuyInterfaceDropDownMenusModule:SelectItemClassSubSubMenuType(arg1, arg
 
 end
 
-function BuyInterfaceDropDownMenusModule:GetNestedTableInfoFromMenuValue(menuValue, isSubList)
+function BuyInterfaceDropDownMenusModule:GetNestedTableInfoFromMenuValue(menuValue, level, isSubList)
 
 	local itemTypeValue, nestedTable, nestedOfNestedTable = nil
 
 	--TODO: Improve this code, i.e replace all these or = x for a loop
-	if menuValue == "Weapon (All)" or menuValue == "O.H. Axes" or menuValue == "T.H Axes" or menuValue == "Bows" or menuValue == "Guns" or menuValue == "O.H. Maces"
-	or menuValue ==	"T.H Maces" or menuValue ==	"Polearms"or menuValue == "O.H. Swords" or menuValue ==	"T.H Swords" or menuValue == "Staves" or menuValue == "Fist Weapons"
-	or (menuValue ==  "Miscellaneous" and isSubList) or menuValue == "Daggers" or menuValue == "Thrown" or menuValue ==	"Crossbows" or menuValue ==	"Wands" or menuValue ==	"Fishing Pole" then
+	if menuValue == "Weapon (All)" then
 		itemTypeValue = 1
 		nestedTable = weaponsTypeTable
 
@@ -260,8 +317,10 @@ function BuyInterfaceDropDownMenusModule:GetNestedTableInfoFromMenuValue(menuVal
 		itemTypeValue = 2
 		nestedTable = armorTypeTable
 		
-		if menuValue == "Miscellaneous" or menuValue == "Cloth" or menuValue == "Leather" or menuValue == "Mail" or menuValue == "Plate" then
+		if menuValue == "Cloth" or menuValue == "Leather" or menuValue == "Mail" or menuValue == "Plate" then
 			nestedOfNestedTable = armorSlotsTable
+		elseif menuValue == "Miscellaneous" then
+			nestedOfNestedTable = armorMiscellaneousSlotsTable
 		else
 			nestedOfNestedTable = {}
 		end	
@@ -273,12 +332,12 @@ function BuyInterfaceDropDownMenusModule:GetNestedTableInfoFromMenuValue(menuVal
 
 	elseif menuValue == "Consumable (All)" then
 		itemTypeValue = 4
-		nestedTable = {}
+		nestedTable = consumableTypeTable
 		nestedOfNestedTable = {}
 
 	elseif menuValue == "Trade Goods (All)" then
 		itemTypeValue = 5
-		nestedTable = {}
+		nestedTable = tradeGoodsTypeTable
 		nestedOfNestedTable = {}
 
 	elseif menuValue == "Projectile (All)" then
@@ -296,14 +355,14 @@ function BuyInterfaceDropDownMenusModule:GetNestedTableInfoFromMenuValue(menuVal
 		nestedTable = recipesTypeTable
 		nestedOfNestedTable = {}
 
-	elseif menuValue == "Reagent (All)" then
+	elseif menuValue == "Gems" then
 		itemTypeValue = 9
-		nestedTable = {}
+		nestedTable = gemsTypeTable
 		nestedOfNestedTable = {}
 
 	elseif menuValue == "Miscellaneous (All)" then
 		itemTypeValue = 10
-		nestedTable = {}
+		nestedTable = miscellaneousTypeTable
 		nestedOfNestedTable = {}
 	end
 
