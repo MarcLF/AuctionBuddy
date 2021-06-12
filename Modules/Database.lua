@@ -18,6 +18,7 @@ DatabaseModule.generalOptionsDefault =
 DatabaseModule.buyOptionsDefault = 
 {
 	doubleClickToBuy = false,
+	doubleClickToBid = false,
 	exactMatch = false,
 }
 
@@ -52,7 +53,7 @@ function DatabaseModule:Enable()
 
 	self.generalOptions = AB_GeneralOptions
 
-	if not AB_BuyOptions or AB_BuyOptions.exactMatch == nil or AB_BuyOptions.doubleClickToBuy == nil then 
+	if not AB_BuyOptions or AB_BuyOptions.exactMatch == nil or AB_BuyOptions.doubleClickToBuy == nil or AB_BuyOptions.doubleClickToBid == nil then 
 		AB_BuyOptions = self.buyOptionsDefault	
 	end
 

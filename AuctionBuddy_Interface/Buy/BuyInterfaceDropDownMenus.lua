@@ -373,7 +373,7 @@ end
 function BuyInterfaceDropDownMenusModule:CreateRarityDropDownMenu(parentFrame)
 
 	parentFrame.rarity = CreateFrame("Frame", "AB_BuyInterface_MainFrame_SlotType_DropDownMenu", parentFrame, "UIDropDownMenuTemplate")
-	parentFrame.rarity:SetPoint("CENTER", parentFrame.iLvl, "CENTER", 275, -27)
+	parentFrame.rarity:SetPoint("CENTER", parentFrame.iLvl, "CENTER", 271, -27)
 	parentFrame.rarity.value = 0
 	parentFrame.rarity.text = "Any"
 	UIDropDownMenu_SetWidth(parentFrame.rarity, 100)

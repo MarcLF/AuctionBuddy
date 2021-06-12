@@ -128,7 +128,7 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 		InterfaceFunctionsModule.switchingUI = false
 	end)
 	
-	parentFrame.BuyFrameButton = CreateFrame("Button", "AB_SellInterface_MainFrame_BuyFrame_Button", parentFrame, "UIPanelButtonTemplate")
+	parentFrame.BuyFrameButton = CreateFrame("Button", "AB_SellInterface_MainFrame_SellFrame_Button", parentFrame, "UIPanelButtonTemplate")
 	SellInterfaceModule:SetFrameParameters(parentFrame.BuyFrameButton, 80, 24, "Show Buy", "TOPRIGHT", -105, -30)
 	parentFrame.BuyFrameButton:SetScript("OnClick", function()
 		InterfaceFunctionsModule.switchingUI = true
@@ -188,10 +188,16 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 		end
 	end)
 	
+	parentFrame.doubleClickInfoText = parentFrame:CreateFontString("AB_SellInterface_MainFrame_InstaBuyCheck_Text", "OVERLAY", "GameFontNormal")
+	parentFrame.doubleClickInfoText:SetWidth(250)
+	parentFrame.doubleClickInfoText:SetPoint("TOPLEFT", 20, -55)
+	parentFrame.doubleClickInfoText:SetJustifyH("LEFT")
+	parentFrame.doubleClickInfoText:SetText("Double Click to:")
+
 	parentFrame.instaBuyCheckBox = CreateFrame("CheckButton", "AB_SellInterface_MainFrame_InstaBuyCheck", parentFrame, "ChatConfigBaseCheckButtonTemplate")
 	parentFrame.instaBuyCheckBox:SetWidth(24)
 	parentFrame.instaBuyCheckBox:SetHeight(24)
-	parentFrame.instaBuyCheckBox:SetPoint("TOPLEFT", 50, -65)
+	parentFrame.instaBuyCheckBox:SetPoint("TOPLEFT", 125, -35)
 	parentFrame.instaBuyCheckBox:SetScript("OnClick", function() 
 		DatabaseModule.buyOptions.doubleClickToBuy = not DatabaseModule.buyOptions.doubleClickToBuy 
 	end)
@@ -203,7 +209,24 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 	parentFrame.instaBuyCheckBox.text:SetWidth(250)
 	parentFrame.instaBuyCheckBox.text:SetPoint("CENTER", 140, 0)
 	parentFrame.instaBuyCheckBox.text:SetJustifyH("LEFT")
-	parentFrame.instaBuyCheckBox.text:SetText("Double Click to buy an item")
+	parentFrame.instaBuyCheckBox.text:SetText("Buy an item")
+
+	parentFrame.instaBidCheckBox = CreateFrame("CheckButton", "AB_SellInterface_MainFrame_InstaBidCheck", parentFrame, "ChatConfigBaseCheckButtonTemplate")
+	parentFrame.instaBidCheckBox:SetWidth(24)
+	parentFrame.instaBidCheckBox:SetHeight(24)
+	parentFrame.instaBidCheckBox:SetPoint("TOPLEFT", 125, -65)
+	parentFrame.instaBidCheckBox:SetScript("OnClick", function() 
+		DatabaseModule.buyOptions.doubleClickToBid = not DatabaseModule.buyOptions.doubleClickToBid 
+	end)
+	parentFrame.instaBidCheckBox:SetScript("OnShow", function() 	
+		parentFrame.instaBidCheckBox:SetChecked(DatabaseModule.buyOptions.doubleClickToBid)
+	end)
+
+	parentFrame.instaBidCheckBox.text = parentFrame.instaBidCheckBox:CreateFontString("AB_SellInterface_MainFrame_InstaBidCheck_Text", "OVERLAY", "GameFontNormal")
+	parentFrame.instaBidCheckBox.text:SetWidth(250)
+	parentFrame.instaBidCheckBox.text:SetPoint("CENTER", 140, 0)
+	parentFrame.instaBidCheckBox.text:SetJustifyH("LEFT")
+	parentFrame.instaBidCheckBox.text:SetText("Bid on an item")
 
 	parentFrame.itemToSellButton = CreateFrame("Button", "AB_SellInterface_MainFrame_ItemToSell_Button", parentFrame)
 	SellInterfaceModule:SetFrameParameters(parentFrame.itemToSellButton, 37, 37, nil, "TOPLEFT", 80, -115)
@@ -313,7 +336,7 @@ function SellInterfaceModule:CreateSellInterfaceOptions(parentFrame)
 	parentFrame.totalBuyCost.text:SetJustifyH("LEFT")
 	parentFrame.totalBuyCost.text:SetText("Total Buyout Cost:")
 
-	parentFrame.buySelectedItem = CreateFrame("Button", "AB_SellInterface_MainFrame_BuySelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
+	parentFrame.buySelectedItem = CreateFrame("Button", "AB_SellInterface_MainFrame_SellSelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
 	SellInterfaceModule:SetFrameParameters(parentFrame.buySelectedItem, 125, 24, "Buy Selected Item", "LEFT", 160, -253)
 	parentFrame.buySelectedItem:SetScript("OnClick", function() 
 		self:SendMessage("ON_BUY_SELECTED_ITEM", parentFrame.scrollTable:GetSelection())

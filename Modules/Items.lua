@@ -83,7 +83,7 @@ function ItemsModule:OnClickItemToSell(frameClicked)
 end
 
 function ItemsModule:OnBidSelectedItem(selectedItemData)
-	DebugModule:Log("ItemsModule", "OnBidSelectedItem", 1)
+	DebugModule:Log(self, "OnBidSelectedItem", 1)
 
 	local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemData))
 	local minIncrement = select(9, GetAuctionItemInfo("list", selectedItemData))
@@ -92,15 +92,11 @@ function ItemsModule:OnBidSelectedItem(selectedItemData)
 	local totalAmountToBid = max(bidAmount, minBid) + minIncrement
 
 	PlaceAuctionBid('list', selectedItemData, totalAmountToBid)
-	--Refresh ResultsTable by doing a nil AH search
-	if GetMoney() > totalAmountToBid then
-		AuctionBuddy:AuctionHouseSearch(nil)
-	end
 
 end
 
 function ItemsModule:OnBuySelectedItem(selectedItemData)
-	DebugModule:Log(self, "BuySelectedItem", 2)
+	DebugModule:Log(self, "BuySelectedItem", 1)
 	
 	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
 

@@ -105,7 +105,7 @@ function BuyInterfaceModule:CreateBuyInterface()
 	self.mainFrame.recentSearchesFrame = CreateFrame("Frame", "AB_BuyInterface_MainFrame_RecentSearchesFrame", self.mainFrame, "InsetFrameTemplate3")
 	BuyInterfaceModule:SetFrameParameters(self.mainFrame.recentSearchesFrame, 320, 170, nil, "CENTER", 400, 170, "BACKGROUND")
 	
-	self.mainFrame.favoriteSearchesFrame = CreateFrame("Frame", "AB_SellInterface_MainFrame_FavoriteSearchesFrame", self.mainFrame, "InsetFrameTemplate3")
+	self.mainFrame.favoriteSearchesFrame = CreateFrame("Frame", "AB_BuyInterface_MainFrame_FavoriteSearchesFrame", self.mainFrame, "InsetFrameTemplate3")
 	BuyInterfaceModule:SetFrameParameters(self.mainFrame.favoriteSearchesFrame, 320, 170, nil, "CENTER", 400, -100, "BACKGROUND")
 	
 	self:HideBuyInterface()
@@ -115,7 +115,7 @@ end
 function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 
 	parentFrame.searchBar = CreateFrame("EditBox", "AB_BuyInterface_MainFrame_SearchBar", parentFrame, "InputBoxTemplate")
-	BuyInterfaceModule:SetFrameParameters(parentFrame.searchBar, 200, 20, nil, "TOPLEFT", 25, -40)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.searchBar, 200, 20, nil, "TOPLEFT", 25, -35)
 	parentFrame.searchBar:SetAutoFocus(false)
 	parentFrame.searchBar:SetJustifyH("LEFT")
 	parentFrame.searchBar:SetScript("OnChar", function() 
@@ -134,31 +134,22 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 	parentFrame.searchBar:SetScript("OnEnterPressed", function() AuctionBuddy:AuctionHouseSearch(parentFrame.searchBar:GetText()) end)
 	
 	parentFrame.searchButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_Search_Button", parentFrame, "UIPanelButtonTemplate")
-	BuyInterfaceModule:SetFrameParameters(parentFrame.searchButton, 80, 24, "Search", "TOPLEFT", 235, -38)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.searchButton, 80, 24, "Search", "TOPLEFT", 235, -34)
 	parentFrame.searchButton:SetScript("OnClick", function() 
 		AuctionBuddy:AuctionHouseSearch(parentFrame.searchBar:GetText()) 
 		InterfaceFunctionsModule.autoCompleteTextPos = strlen(parentFrame.searchBar:GetText())
 	end)
 
-	parentFrame.exactMatch = CreateFrame("CheckButton", "AB_BuyInterface_MainFrame_ExactMatchCheck", parentFrame, "ChatConfigBaseCheckButtonTemplate")
-	parentFrame.exactMatch:SetWidth(24)
-	parentFrame.exactMatch:SetHeight(24)
-	parentFrame.exactMatch:SetPoint("TOPLEFT", 20, -65)
-	if DatabaseModule.buyOptions.exactMatch == true then
-		parentFrame.exactMatch:SetChecked(true)
-	end
-	parentFrame.exactMatch:SetScript("OnClick", function() DatabaseModule.buyOptions.exactMatch = not DatabaseModule.buyOptions.exactMatch end)
-
-	parentFrame.exactMatch.text = parentFrame.exactMatch:CreateFontString("AB_BuyInterface_MainFrame_ExactMatchCheck_Text", "OVERLAY", "GameFontNormal")
-	parentFrame.exactMatch.text:SetWidth(80)
-	parentFrame.exactMatch.text:SetPoint("CENTER", 50, 0)
-	parentFrame.exactMatch.text:SetJustifyH("LEFT")
-	parentFrame.exactMatch.text:SetText("Exact match")
+	parentFrame.doubleClickInfoText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_InstaBuyCheck_Text", "OVERLAY", "GameFontNormal")
+	parentFrame.doubleClickInfoText:SetWidth(250)
+	parentFrame.doubleClickInfoText:SetPoint("TOPLEFT", 12, -71)
+	parentFrame.doubleClickInfoText:SetJustifyH("LEFT")
+	parentFrame.doubleClickInfoText:SetText("Double Click to:")
 
 	parentFrame.instaBuyCheckBox = CreateFrame("CheckButton", "AB_BuyInterface_MainFrame_InstaBuyCheck", parentFrame, "ChatConfigBaseCheckButtonTemplate")
 	parentFrame.instaBuyCheckBox:SetWidth(24)
 	parentFrame.instaBuyCheckBox:SetHeight(24)
-	parentFrame.instaBuyCheckBox:SetPoint("TOPLEFT", 130, -65)
+	parentFrame.instaBuyCheckBox:SetPoint("TOPLEFT", 115, -53)
 	parentFrame.instaBuyCheckBox:SetScript("OnClick", function() 
 		DatabaseModule.buyOptions.doubleClickToBuy = not DatabaseModule.buyOptions.doubleClickToBuy 
 	end)
@@ -170,7 +161,39 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 	parentFrame.instaBuyCheckBox.text:SetWidth(250)
 	parentFrame.instaBuyCheckBox.text:SetPoint("CENTER", 140, 0)
 	parentFrame.instaBuyCheckBox.text:SetJustifyH("LEFT")
-	parentFrame.instaBuyCheckBox.text:SetText("Double Click to buy an item")
+	parentFrame.instaBuyCheckBox.text:SetText("Buy an item")
+
+	parentFrame.instaBidCheckBox = CreateFrame("CheckButton", "AB_BuyInterface_MainFrame_InstaBidCheck", parentFrame, "ChatConfigBaseCheckButtonTemplate")
+	parentFrame.instaBidCheckBox:SetWidth(24)
+	parentFrame.instaBidCheckBox:SetHeight(24)
+	parentFrame.instaBidCheckBox:SetPoint("TOPLEFT", 115, -72)
+	parentFrame.instaBidCheckBox:SetScript("OnClick", function() 
+		DatabaseModule.buyOptions.doubleClickToBid = not DatabaseModule.buyOptions.doubleClickToBid 
+	end)
+	parentFrame.instaBidCheckBox:SetScript("OnShow", function() 	
+		parentFrame.instaBidCheckBox:SetChecked(DatabaseModule.buyOptions.doubleClickToBid)
+	end)
+
+	parentFrame.instaBidCheckBox.text = parentFrame.instaBidCheckBox:CreateFontString("AB_BuyInterface_MainFrame_InstaBidCheck_Text", "OVERLAY", "GameFontNormal")
+	parentFrame.instaBidCheckBox.text:SetWidth(250)
+	parentFrame.instaBidCheckBox.text:SetPoint("CENTER", 140, 0)
+	parentFrame.instaBidCheckBox.text:SetJustifyH("LEFT")
+	parentFrame.instaBidCheckBox.text:SetText("Bid on an item")
+
+	parentFrame.exactMatch = CreateFrame("CheckButton", "AB_BuyInterface_MainFrame_ExactMatchCheck", parentFrame, "ChatConfigBaseCheckButtonTemplate")
+	parentFrame.exactMatch:SetWidth(24)
+	parentFrame.exactMatch:SetHeight(24)
+	parentFrame.exactMatch:SetPoint("TOPLEFT", 238, -65)
+	if DatabaseModule.buyOptions.exactMatch == true then
+		parentFrame.exactMatch:SetChecked(true)
+	end
+	parentFrame.exactMatch:SetScript("OnClick", function() DatabaseModule.buyOptions.exactMatch = not DatabaseModule.buyOptions.exactMatch end)
+
+	parentFrame.exactMatch.text = parentFrame.exactMatch:CreateFontString("AB_BuyInterface_MainFrame_ExactMatchCheck_Text", "OVERLAY", "GameFontNormal")
+	parentFrame.exactMatch.text:SetWidth(80)
+	parentFrame.exactMatch.text:SetPoint("CENTER", 52, 0)
+	parentFrame.exactMatch.text:SetJustifyH("LEFT")
+	parentFrame.exactMatch.text:SetText("Exact match")
 	
 	parentFrame.DefaultAHButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_DefaultAH_Button", parentFrame, "UIPanelButtonTemplate")
 	BuyInterfaceModule:SetFrameParameters(parentFrame.DefaultAHButton, 80, 24, "Default AH", "TOPRIGHT", -25, -30)
@@ -342,12 +365,12 @@ end
 function BuyInterfaceModule:CreateSearchFilters(parentFrame)
 
 	parentFrame.iLvl = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_ItemLevel_Text", "OVERLAY", "GameFontNormal")
-	parentFrame.iLvl:SetPoint("TOPLEFT", 360, -35)
+	parentFrame.iLvl:SetPoint("TOPLEFT", 362, -35)
 	parentFrame.iLvl:SetJustifyH("CENTER")
 	parentFrame.iLvl:SetText("Level Range")
 
 	parentFrame.scoreSign = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_ItemLevel_ScoreSign", "OVERLAY", "GameFontNormal")
-	parentFrame.scoreSign:SetPoint("TOPLEFT", 393, -60)
+	parentFrame.scoreSign:SetPoint("TOPLEFT", 395, -60)
 	parentFrame.scoreSign:SetJustifyH("CENTER")
 	parentFrame.scoreSign:SetText("-")
 	
@@ -371,7 +394,7 @@ function BuyInterfaceModule:CreateSearchFilters(parentFrame)
 	parentFrame.itemTypeText:SetText("Item Type")
 
 	parentFrame.itemSubTypeText = parentFrame.maxILvl:CreateFontString("AB_BuyInterface_MainFrame_Rarity_Text", "OVERLAY", "GameFontNormal")
-	parentFrame.itemSubTypeText:SetPoint("CENTER", 248, 25)
+	parentFrame.itemSubTypeText:SetPoint("CENTER", 244, 25)
 	parentFrame.itemSubTypeText:SetJustifyH("CENTER")
 	parentFrame.itemSubTypeText:SetText("Rarity")
 

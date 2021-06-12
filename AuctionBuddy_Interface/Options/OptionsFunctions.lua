@@ -44,6 +44,10 @@ function OptionsFunctionsModule:RemoveSelectedList(selectedListName, dropDownMen
 
 	local listSize = 0
 
+	if selectedListName == nil then
+		return
+	end
+
 	for key in pairs(DatabaseModule.favoriteSearchesLists) do
 		listSize = listSize + 1
 	end

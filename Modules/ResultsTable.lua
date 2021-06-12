@@ -107,7 +107,7 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 	parentFrame.scrollTable:EnableSelection(true)
 	parentFrame.scrollTable:RegisterEvents({
 		OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)	
-			if button == "LeftButton" then
+			if button == "LeftButton" or button == "RightButton" then
 				DebugModule:Log(self, "OnLeftClickResultsTable", 2)
 				parentFrame.scrollTable:SetSelection(rowIndex)
 				ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame)	
@@ -118,6 +118,9 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 		OnDoubleClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)
 			if button == "LeftButton" and DatabaseModule.buyOptions.doubleClickToBuy == true then
 				ResultsTableModule:SendMessage("ON_BUY_SELECTED_ITEM", parentFrame.scrollTable:GetSelection())
+				parentFrame.scrollTable:ClearSelection()
+			elseif button == "RightButton" and DatabaseModule.buyOptions.doubleClickToBid == true then
+				ResultsTableModule:SendMessage("ON_BID_SELECTED_ITEM", parentFrame.scrollTable:GetSelection())
 				parentFrame.scrollTable:ClearSelection()
 			end
 			return true
