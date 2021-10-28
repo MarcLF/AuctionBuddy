@@ -5,7 +5,7 @@ local StdUi = LibStub('StdUi')
 
 local SellInterfaceModule = AuctionBuddy:NewModule("SellInterfaceModule", "AceEvent-3.0")
 
-local DebugModule = nil
+local UtilsModule = nil
 local InterfaceFunctionsModule = nil
 local ResultsTableModule = nil
 local BuyInterfaceModule = nil
@@ -21,8 +21,8 @@ SellInterfaceModule.stackPriceValue = nil
 
 function SellInterfaceModule:Enable()
 
-	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable", 0)
+	UtilsModule = AuctionBuddy:GetModule("UtilsModule")
+	UtilsModule:Log(self, "Enable", 0)
 
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
@@ -668,14 +668,14 @@ function SellInterfaceModule:OnShowInterface()
 end
 
 function SellInterfaceModule:OnResultsTableItemSelected()
-	DebugModule:Log("Sell_OnResultsTableItemSelected", "OnResultsTableItemSelected", 3)
+	UtilsModule:Log("Sell_OnResultsTableItemSelected", "OnResultsTableItemSelected", 3)
 
 	SellInterfaceModule:EnableBuyBidButtons()
 
 end
 
 function SellInterfaceModule:OnShowSellFrame()
-	DebugModule:Log("SellInterfaceModule", "OnShowSellFrame", 3)
+	UtilsModule:Log("SellInterfaceModule", "OnShowSellFrame", 3)
 
 	SellInterfaceModule.mainFrame:Show()
 	SellInterfaceModule:DisableBuyBidButtons()
@@ -684,7 +684,7 @@ function SellInterfaceModule:OnShowSellFrame()
 end
 
 function SellInterfaceModule:OnUpdateAvailableResultsPages(currentPage, maxPages)
-	DebugModule:Log("SellInterfaceModule", "OnUpdateAvailableResultsPages", 3)
+	UtilsModule:Log("SellInterfaceModule", "OnUpdateAvailableResultsPages", 3)
 
 	SellInterfaceModule.mainFrame.currentPageText:SetText(currentPage + 1)
 	SellInterfaceModule.mainFrame.maxPagesText:SetText(maxPages + 1)
@@ -706,7 +706,7 @@ function SellInterfaceModule:DisableBuyBidButtons()
 end
 
 function SellInterfaceModule:ResetData()
-	DebugModule:Log("SellInterfaceModule", "ResetData", 1)
+	UtilsModule:Log("SellInterfaceModule", "ResetData", 1)
 
 	self.mainFrame.nextPageButton:Disable()
 	self.mainFrame.prevPageButton:Disable()

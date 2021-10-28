@@ -5,7 +5,7 @@ local StdUi = LibStub('StdUi')
 
 local ContainerModule = AuctionBuddy:NewModule("ContainerModule", "AceEvent-3.0")
 
-local DebugModule = nil
+local UtilsModule = nil
 local BuyInterfaceModule = nil
 local SellInterfaceModule = nil
 local ItemsModule = nil
@@ -21,8 +21,8 @@ ContainerModule.isMultisellingItemsToAH = false
 
 function ContainerModule:Enable()
 
-	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable", 0)
+	UtilsModule = AuctionBuddy:GetModule("UtilsModule")
+	UtilsModule:Log(self, "Enable", 0)
 
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 	self:RegisterEvent("BAG_UPDATE_DELAYED")
@@ -50,7 +50,7 @@ function ContainerModule:Enable()
 end
 
 function ContainerModule:AUCTION_HOUSE_CLOSED()
-	DebugModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
+	UtilsModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
 
 	self:UnregisterAllEvents()
 	ContainerModule.isPostingItemToAH = false
@@ -58,7 +58,7 @@ function ContainerModule:AUCTION_HOUSE_CLOSED()
 end
 
 function ContainerModule:BAG_UPDATE_DELAYED()
-	DebugModule:Log(self, "BAG_UPDATE_DELAYED", 0)
+	UtilsModule:Log(self, "BAG_UPDATE_DELAYED", 0)
 
 	ContainerModule:ScanContainer()
 
@@ -67,14 +67,14 @@ function ContainerModule:BAG_UPDATE_DELAYED()
 end
 
 function ContainerModule:AUCTION_MULTISELL_START()
-	DebugModule:Log(self, "AUCTION_MULTISELL_START", 0)
+	UtilsModule:Log(self, "AUCTION_MULTISELL_START", 0)
 
 	ContainerModule.isMultisellingItemsToAH = true
 
 end
 
 function ContainerModule:AUCTION_MULTISELL_UPDATE(...)
-	DebugModule:Log(self, "AUCTION_MULTISELL_UPDATE", 0)
+	UtilsModule:Log(self, "AUCTION_MULTISELL_UPDATE", 0)
 
 	local createdCount = select(2, ...)
 	local totalToCreate = select(3, ...)
@@ -87,14 +87,14 @@ function ContainerModule:AUCTION_MULTISELL_UPDATE(...)
 end
 
 function ContainerModule:AUCTION_MULTISELL_FAILURE()
-	DebugModule:Log(self, "AUCTION_MULTISELL_FAILURE", 0)
+	UtilsModule:Log(self, "AUCTION_MULTISELL_FAILURE", 0)
 
 	ContainerModule.isMultisellingItemsToAH = false
 
 end
 
 function ContainerModule:OnPostingItemToAH()
-	DebugModule:Log(ContainerModule, "OnPostingItemToAH", 2)
+	UtilsModule:Log(ContainerModule, "OnPostingItemToAH", 2)
 
 	ContainerModule.isPostingItemToAH = true
 
@@ -121,7 +121,7 @@ function ContainerModule:CanSelectContainerItem()
 end
 
 function ContainerModule:ScanContainer()
-	DebugModule:Log("ContainerModule", "ScanContainer", 2)
+	UtilsModule:Log("ContainerModule", "ScanContainer", 2)
 
 	local tableData = {}
 
@@ -137,7 +137,7 @@ function ContainerModule:ScanContainer()
 					tinsert(tableData, 
 					{			
 						texture = myTexture,
-						itemLink = itemLinkContainer,
+						itemLink = UtilsModule:RemoveCharacterFromString(itemLinkContainer, "%[", "%]"),
 						count = tonumber(itemCount),
 						quality = itemQuality,
 						bagID = i,
@@ -159,7 +159,7 @@ function ContainerModule:ScanContainer()
 end
 
 function ContainerModule:CreateBuyContainerScrollFrameTable(parentFrame, xPos, yPos)
-	DebugModule:Log(self, "CreateBuyContainerScrollFrameTable", 2)
+	UtilsModule:Log(self, "CreateBuyContainerScrollFrameTable", 2)
 	
 	local columnType = 
 	{
@@ -212,7 +212,7 @@ function ContainerModule:CreateBuyContainerScrollFrameTable(parentFrame, xPos, y
 end
 
 function ContainerModule:CreateSellContainerScrollFrameTable(parentFrame, xPos, yPos)
-	DebugModule:Log(self, "CreateSellContainerScrollFrameTable", 2)
+	UtilsModule:Log(self, "CreateSellContainerScrollFrameTable", 2)
 	
 	local columnType = 
 	{

@@ -9,7 +9,7 @@ InterfaceFunctionsModule.switchingUI = false
 InterfaceFunctionsModule.needToUpdateTotalCostText = false
 InterfaceFunctionsModule.autoCompleteTextPos = 1
 
-local DebugModule = nil
+local UtilsModule = nil
 local DatabaseModule = nil
 local BuyInterfaceModule = nil
 local SellInterfaceModule = nil
@@ -17,8 +17,8 @@ local ItemsModule = nil
 
 function InterfaceFunctionsModule:Enable()
 
-	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable", 0)
+	UtilsModule = AuctionBuddy:GetModule("UtilsModule")
+	UtilsModule:Log(self, "Enable", 0)
 
 	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
@@ -34,7 +34,7 @@ function InterfaceFunctionsModule:Enable()
 end
 
 function InterfaceFunctionsModule:AUCTION_HOUSE_CLOSED()
-	DebugModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
+	UtilsModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
 
 	self:UnregisterAllEvents()
 	self:UnregisterAllMessages()
@@ -42,7 +42,7 @@ function InterfaceFunctionsModule:AUCTION_HOUSE_CLOSED()
 end
 
 function InterfaceFunctionsModule:AUCTION_ITEM_LIST_UPDATE()
-	DebugModule:Log(self, "AUCTION_ITEM_LIST_UPDATE", 2)
+	UtilsModule:Log(self, "AUCTION_ITEM_LIST_UPDATE", 2)
 
 	C_Timer.After(0.5, function() 	
 		BuyInterfaceModule.mainFrame.currentPlayerGold.value = GetCoinTextureString(GetMoney(), 15)
@@ -58,14 +58,14 @@ function InterfaceFunctionsModule:AUCTION_ITEM_LIST_UPDATE()
 end
 
 function InterfaceFunctionsModule:OnResultsTableItemSelected(parentFrame)
-	DebugModule:Log("InterfaceFunctionsModule", "OnResultsTableItemSelected", 2)
+	UtilsModule:Log("InterfaceFunctionsModule", "OnResultsTableItemSelected", 2)
 
 	InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame)
 
 end
 
 function InterfaceFunctionsModule:OnStackSizeTextChanged(itemPriceFrame, stackPriceFrame, stackSizeFrame)
-	DebugModule:Log("InterfaceFunctionsModule", "OnStackSizeTextChanged", 2)
+	UtilsModule:Log("InterfaceFunctionsModule", "OnStackSizeTextChanged", 2)
 
 	if DatabaseModule.sellOptions.stackPriceFixed == true then
 		InterfaceFunctionsModule:StackPriceUpdated(stackPriceFrame, stackSizeFrame, itemPriceFrame)
@@ -76,7 +76,7 @@ function InterfaceFunctionsModule:OnStackSizeTextChanged(itemPriceFrame, stackPr
 end
 
 function InterfaceFunctionsModule:CloseAuctionHouseCustom()
-	DebugModule:Log(self, "CloseAuctionHouseCustom", 2)
+	UtilsModule:Log(self, "CloseAuctionHouseCustom", 2)
 
 	if self.switchingUI == false and SellInterfaceModule.interfaceCreated == true and BuyInterfaceModule.interfaceCreated == true then
 		CloseAuctionHouse()
@@ -85,7 +85,7 @@ function InterfaceFunctionsModule:CloseAuctionHouseCustom()
 end
 
 function InterfaceFunctionsModule:UpdateDepositCost(parentFrame)
-	DebugModule:Log(self, "UpdateDepositCost", 2)
+	UtilsModule:Log(self, "UpdateDepositCost", 2)
 	
 	local itemPrice = MoneyInputFrame_GetCopper(parentFrame.itemPrice)
 	local stackPrice = MoneyInputFrame_GetCopper(parentFrame.stackPrice)
@@ -101,7 +101,7 @@ function InterfaceFunctionsModule:UpdateDepositCost(parentFrame)
 end
 
 function InterfaceFunctionsModule:StackPriceUpdated(stackPriceFrame, stackSizeFrame, itemPriceFrame)
-	DebugModule:Log(self, "StackPriceUpdated", 2)
+	UtilsModule:Log(self, "StackPriceUpdated", 2)
 
 	local stackPrice = MoneyInputFrame_GetCopper(stackPriceFrame)
 	local stackSize = math.max(stackSizeFrame:GetNumber(), 1)
@@ -115,7 +115,7 @@ function InterfaceFunctionsModule:StackPriceUpdated(stackPriceFrame, stackSizeFr
 end
 
 function InterfaceFunctionsModule:ItemPriceUpdated(itemPriceFrame, stackSizeFrame, stackPriceFrame)
-	DebugModule:Log(self, "ItemPriceUpdated", 2)
+	UtilsModule:Log(self, "ItemPriceUpdated", 2)
 
 	local itemPrice = MoneyInputFrame_GetCopper(itemPriceFrame)
 	local stackSize = math.max(stackSizeFrame:GetNumber(), 1)
@@ -129,7 +129,7 @@ function InterfaceFunctionsModule:ItemPriceUpdated(itemPriceFrame, stackSizeFram
 end
 
 function InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame)
-	DebugModule:Log(self, "UpdateTotalBuyoutAndBidCostBuy", 2)
+	UtilsModule:Log(self, "UpdateTotalBuyoutAndBidCostBuy", 2)
 
 	local selectedItemData = parentFrame.scrollTable:GetSelection()
 
@@ -156,7 +156,7 @@ function InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame)
 end
 
 function InterfaceFunctionsModule:ReturnIndexGivenTableValue(tableValue, table)
-	DebugModule:Log(self, "ReturnIndexGivenTableValue", 2)
+	UtilsModule:Log(self, "ReturnIndexGivenTableValue", 2)
 
 	for key,value in pairs(table) do
 		if table[key] == tableValue then
@@ -167,7 +167,7 @@ function InterfaceFunctionsModule:ReturnIndexGivenTableValue(tableValue, table)
 end
 
 function InterfaceFunctionsModule:AutoCompleteText(frame, text)
-	DebugModule:Log(self, "AutoCompleteText", 3)
+	UtilsModule:Log(self, "AutoCompleteText", 3)
 
 	for key,value in pairs(DatabaseModule.recentSearches) do
 		for nestedKey, nestedValue in pairs(DatabaseModule.recentSearches[key]) do

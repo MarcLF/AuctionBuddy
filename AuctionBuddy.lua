@@ -17,7 +17,7 @@ AuctionBuddy.isSortedBuyout = false
 
 local StdUi = LibStub("StdUi")
 
-local DebugModule = nil
+local UtilsModule = nil
 local ErrorModule = nil
 local DatabaseModule = nil
 local NavigationModule = nil
@@ -42,7 +42,7 @@ end
 
 function AuctionBuddy:VARIABLES_LOADED()
 
-	self:EnableModule("DebugModule")
+	self:EnableModule("UtilsModule")
 	self:EnableModule("ErrorModule")
 	self:EnableModule("DatabaseModule")
 	self:EnableModule("OptionsFunctionsModule")
@@ -62,7 +62,7 @@ function AuctionBuddy:AUCTION_HOUSE_SHOW()
 	self:EnableModule("ContainerModule")
 	self:EnableModule("SearchesModule")
 	
-	DebugModule = self:GetModule("DebugModule")
+	UtilsModule = self:GetModule("UtilsModule")
 	DatabaseModule = self:GetModule("DatabaseModule")
 	NavigationModule = self:GetModule("NavigationModule")
 	ItemsModule = self:GetModule("ItemsModule")
@@ -81,14 +81,14 @@ function AuctionBuddy:AUCTION_HOUSE_SHOW()
 end
 
 function AuctionBuddy:AUCTION_HOUSE_CLOSED()
-	DebugModule:Log("AuctionBuddy", "AUCTION_HOUSE_CLOSED", 1)
+	UtilsModule:Log("AuctionBuddy", "AUCTION_HOUSE_CLOSED", 1)
 
 	self.searchText = ""
 	
 end
 
 function AuctionBuddy:TableCombine(keys, values)
-	DebugModule:Log(self, "TableCombine", 1)
+	UtilsModule:Log(self, "TableCombine", 1)
 
 	local result = {}
 	
@@ -105,7 +105,7 @@ local function NoResponse()
 end
 
 function AuctionBuddy:AuctionFrameTab_OnClick(tab)
-	DebugModule:Log(self, "AuctionFrameTab_OnClick", 1)
+	UtilsModule:Log(self, "AuctionFrameTab_OnClick", 1)
 
 	if tab.buyTabButton then
 		BuyInterfaceModule.mainFrame:Show()
@@ -130,7 +130,7 @@ function AuctionBuddy:AuctionFrameTab_OnClick(tab)
 end
 		
 function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
-	DebugModule:Log(self, "AuctionHouseSearch", 0)
+	UtilsModule:Log(self, "AuctionHouseSearch", 0)
 
 	if textToSearch ~= nil and textToSearch ~= AuctionBuddy.searchText then
 		NavigationModule.page = 0

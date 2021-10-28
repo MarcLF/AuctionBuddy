@@ -7,15 +7,15 @@ local ItemsModule = AuctionBuddy:NewModule("ItemsModule", "AceEvent-3.0")
 
 ItemsModule.currentItemPostedLink = nil
 
-local DebugModule = nil
+local UtilsModule = nil
 local InterfaceFunctionsModule = nil
 local BuyInterfaceModule = nil
 local SellInterfaceModule = nil
 
 function ItemsModule:Enable()
 
-	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable", 0)
+	UtilsModule = AuctionBuddy:GetModule("UtilsModule")
+	UtilsModule:Log(self, "Enable", 0)
 
 	InterfaceFunctionsModule = AuctionBuddy:GetModule("InterfaceFunctionsModule")
 	BuyInterfaceModule = AuctionBuddy:GetModule("BuyInterfaceModule")
@@ -36,7 +36,7 @@ function ItemsModule:Enable()
 end
 
 function ItemsModule:AUCTION_HOUSE_CLOSED()
-	DebugModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
+	UtilsModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
 
 	if ItemsModule.currentItemPostedLink ~= nil then
 		PickupItem(ItemsModule.currentItemPostedLink) 
@@ -49,7 +49,7 @@ function ItemsModule:AUCTION_HOUSE_CLOSED()
 end
 
 function ItemsModule:AUCTION_ITEM_LIST_UPDATE()
-	DebugModule:Log(self, "AUCTION_ITEM_LIST_UPDATE", 1)
+	UtilsModule:Log(self, "AUCTION_ITEM_LIST_UPDATE", 1)
 
 	ItemsModule.shown, ItemsModule.total = GetNumAuctionItems("list")
 
@@ -63,7 +63,7 @@ function ItemsModule:AUCTION_ITEM_LIST_UPDATE()
 end
 
 function ItemsModule:OnContainerItemSelected(parentFrame, bagID, bagSlot)
-	DebugModule:Log(self, "OnContainerItemSelected", 1)
+	UtilsModule:Log(self, "OnContainerItemSelected", 1)
 
 	ItemsModule:InsertSelectedItem(parentFrame)
 	ItemsModule:CalculateMaxStackValues(parentFrame, bagID, bagSlot)
@@ -71,7 +71,7 @@ function ItemsModule:OnContainerItemSelected(parentFrame, bagID, bagSlot)
 end
 
 function ItemsModule:OnClickItemToSell(frameClicked)
-	DebugModule:Log("ItemsModule", "OnClickItemToSell", 1)
+	UtilsModule:Log("ItemsModule", "OnClickItemToSell", 1)
 
 	if CursorHasItem() == false then
 		PickupItem(ItemsModule.currentItemPostedLink) 
@@ -83,7 +83,7 @@ function ItemsModule:OnClickItemToSell(frameClicked)
 end
 
 function ItemsModule:OnBidSelectedItem(selectedItemData)
-	DebugModule:Log(self, "OnBidSelectedItem", 1)
+	UtilsModule:Log(self, "OnBidSelectedItem", 1)
 
 	local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemData))
 	local minIncrement = select(9, GetAuctionItemInfo("list", selectedItemData))
@@ -96,7 +96,7 @@ function ItemsModule:OnBidSelectedItem(selectedItemData)
 end
 
 function ItemsModule:OnBuySelectedItem(selectedItemData)
-	DebugModule:Log(self, "BuySelectedItem", 1)
+	UtilsModule:Log(self, "BuySelectedItem", 1)
 	
 	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
 
@@ -105,7 +105,7 @@ function ItemsModule:OnBuySelectedItem(selectedItemData)
 end
 
 function ItemsModule:OnSellSelectedItem(parentFrame)
-	DebugModule:Log("ItemsModule", "SellSelectedItem", 2)
+	UtilsModule:Log("ItemsModule", "SellSelectedItem", 2)
 
 	local stackPriceBid =  MoneyInputFrame_GetCopper(parentFrame.stackPriceBid)
 	local stackPrice = MoneyInputFrame_GetCopper(parentFrame.stackPrice)
@@ -136,7 +136,7 @@ function ItemsModule:OnSellSelectedItem(parentFrame)
 end
 
 function ItemsModule:CreateAuctionItemButtons(itemsShown, scrollTable)
-	DebugModule:Log(self, "CreateAuctionItemButtons", 2)
+	UtilsModule:Log(self, "CreateAuctionItemButtons", 2)
 
 	local tableData = {}
 	
@@ -162,7 +162,6 @@ function ItemsModule:CreateAuctionItemButtons(itemsShown, scrollTable)
 			name = itemName,
 			owner = tostring(aucOwner),
 			count = aucCount,
-			quality = itemQuality,
 			itlvl = itemLevel,
 			bid = totalBidItem,
 			buy = buyOutPerItem,
@@ -176,7 +175,7 @@ function ItemsModule:CreateAuctionItemButtons(itemsShown, scrollTable)
 end
 
 function ItemsModule:UpdateSellItemPriceAfterSearch(numberList, shown, total)
-	DebugModule:Log(self, "UpdateSellItemPriceAfterSearch", 2)
+	UtilsModule:Log(self, "UpdateSellItemPriceAfterSearch", 2)
 
 	if total == 0 then
 		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, 0)
@@ -200,7 +199,7 @@ function ItemsModule:UpdateSellItemPriceAfterSearch(numberList, shown, total)
 end
 
 function ItemsModule:SearchSelectedContainerItem()
-	DebugModule:Log(self, "SearchSelectedContainerItem", 2)
+	UtilsModule:Log(self, "SearchSelectedContainerItem", 2)
 	
 	infoType, info1, info2 = GetCursorInfo()
 	local itemName = GetItemInfo(info2) 
@@ -210,7 +209,7 @@ function ItemsModule:SearchSelectedContainerItem()
 end
 
 function ItemsModule:InsertSelectedItem(parentFrame)
-	DebugModule:Log(self, "InsertSelectedItem", 2)
+	UtilsModule:Log(self, "InsertSelectedItem", 2)
 		
 	infoType, info1, info2 = GetCursorInfo()
 	
@@ -250,7 +249,7 @@ function ItemsModule:InsertSelectedItem(parentFrame)
 end
 
 function ItemsModule:CalculateMaxStackValues(parentFrame, bagID, bagSlot)
-	DebugModule:Log(self, "CalculateMaxStackValues", 0)
+	UtilsModule:Log(self, "CalculateMaxStackValues", 0)
 
 	local itemAmountInBag = 0
 	local itemLink = select(7, GetContainerItemInfo(bagID, bagSlot))
@@ -271,7 +270,7 @@ function ItemsModule:CalculateMaxStackValues(parentFrame, bagID, bagSlot)
 end
 
 function ItemsModule:UpdateMaxStackValues(parentFrame)
-	DebugModule:Log(self, "CalculateMaxStackValues", 0)
+	UtilsModule:Log(self, "CalculateMaxStackValues", 0)
 
 	local itemLink = parentFrame.itemToSellButton.text:GetText()
 	local itemAmountInBag = 0
@@ -294,14 +293,14 @@ function ItemsModule:UpdateMaxStackValues(parentFrame)
 end
 
 function ItemsModule:OnClickMaxStackSize(parentFrame)
-	DebugModule:Log(self, "OnClickMaxStackSize", 0)
+	UtilsModule:Log(self, "OnClickMaxStackSize", 0)
 
 	parentFrame.stackSize:SetText(parentFrame.stackSize.maxStackValue:GetText())
 
 end
 
 function ItemsModule:OnClickMaxStackQuantity(parentFrame)
-	DebugModule:Log(self, "OnClickMaxStackQuantity", 0)
+	UtilsModule:Log(self, "OnClickMaxStackQuantity", 0)
 
 	parentFrame.stackQuantity:SetText(parentFrame.stackQuantity.maxStackValue:GetText())
 
@@ -333,7 +332,7 @@ function ItemsModule:GetTotalItemAmountInBag(parentFrame, itemLink)
 end
 
 function ItemsModule:RemoveInsertedItem()
-	DebugModule:Log(self, "RemoveInsertedItem", 2)
+	UtilsModule:Log(self, "RemoveInsertedItem", 2)
 	
 	infoType, info1, info2 = GetCursorInfo()
 
@@ -345,7 +344,7 @@ function ItemsModule:RemoveInsertedItem()
 end
 
 function ItemsModule:ShowToolTip(frame, link, show)
-	DebugModule:Log(self, "ShowToolTip", 3)
+	UtilsModule:Log(self, "ShowToolTip", 3)
 
 	if show == true then
 		GameTooltip:SetOwner(frame)
@@ -358,7 +357,7 @@ function ItemsModule:ShowToolTip(frame, link, show)
 end
 
 function ItemsModule:AddCursorItem(frame)
-	DebugModule:Log(self, "AddCursorItem", 2)
+	UtilsModule:Log(self, "AddCursorItem", 2)
 
 	local infoType, info1, info2 = GetCursorInfo()
 	local bindType = select(14, GetItemInfo(info2))

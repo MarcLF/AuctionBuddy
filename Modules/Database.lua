@@ -5,7 +5,7 @@ local StdUi = LibStub('StdUi')
 
 local DatabaseModule = AuctionBuddy:NewModule("DatabaseModule")
 
-local DebugModule = nil
+local UtilsModule = nil
 
 DatabaseModule.generalOptionsDefault = 
 {
@@ -44,8 +44,8 @@ DatabaseModule.favoriteSearchesListsDefault =
 
 function DatabaseModule:Enable()
 
-	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable", 0)
+	UtilsModule = AuctionBuddy:GetModule("UtilsModule")
+	UtilsModule:Log(self, "Enable", 0)
 
 	if not AB_GeneralOptions or not AB_GeneralOptions.xPosOffset or not AB_GeneralOptions.yPosOffset  or not AB_GeneralOptions.point then 
 		AB_GeneralOptions = self.generalOptionsDefault	
@@ -80,7 +80,7 @@ function DatabaseModule:Enable()
 end
 
 function DatabaseModule:ResetDatabase(databaseToReset, dropDownToRefresh)
-	DebugModule:Log(self, "ResetDatabase", 1)
+	UtilsModule:Log(self, "ResetDatabase", 1)
 
 	if databaseToReset == "AB_RecentSearches" then
 		AB_RecentSearches = {}
@@ -119,7 +119,7 @@ function DatabaseModule:ResetDatabase(databaseToReset, dropDownToRefresh)
 end
 
 function DatabaseModule:InsertNewSearch(databaseTable, nameToInsert)
-	DebugModule:Log(self, "InsertNewSearch", 1)
+	UtilsModule:Log(self, "InsertNewSearch", 1)
 
 	for key, value in pairs(databaseTable) do
 		for nestedKey, nestedValue in pairs(value) do
@@ -137,7 +137,7 @@ function DatabaseModule:InsertNewSearch(databaseTable, nameToInsert)
 end
 
 function DatabaseModule:InsertDataFromDatabase(scrollTable, databaseTable)
-	DebugModule:Log(self, "InsertDataFromDatabase", 1)
+	UtilsModule:Log(self, "InsertDataFromDatabase", 1)
 
 	scrollTable:SetData(databaseTable, true)
 

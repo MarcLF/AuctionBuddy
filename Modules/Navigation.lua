@@ -9,12 +9,12 @@ NavigationModule.searchActive = nil
 NavigationModule.page = nil
 NavigationModule.maxResultsPages = nil
 
-local DebugModule = nil
+local UtilsModule = nil
 
 function NavigationModule:Enable()
 
-	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable", 0)
+	UtilsModule = AuctionBuddy:GetModule("UtilsModule")
+	UtilsModule:Log(self, "Enable", 0)
 	
 	BuyInterfaceModule = AuctionBuddy:GetModule("BuyInterfaceModule")
 	SellInterfaceModule = AuctionBuddy:GetModule("SellInterfaceModule")
@@ -32,7 +32,7 @@ function NavigationModule:Enable()
 end
 
 function NavigationModule:AUCTION_HOUSE_CLOSED()
-	DebugModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
+	UtilsModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
 
 	self:UnregisterAllMessages()
 	self:UnregisterAllEvents()
@@ -40,14 +40,14 @@ function NavigationModule:AUCTION_HOUSE_CLOSED()
 end
 
 function NavigationModule:OnClickNextPage(parentFrame)
-	DebugModule:Log(self, "OnClickNextPage", 2)
+	UtilsModule:Log(self, "OnClickNextPage", 2)
 
 	NavigationModule.page = NavigationModule.page + 1
 
 end
 
 function NavigationModule:OnClickPrevPage(parentFrame)
-	DebugModule:Log(self, "OnClickPrevPage", 2)
+	UtilsModule:Log(self, "OnClickPrevPage", 2)
 
 	if NavigationModule.page > 0 then
 		NavigationModule.page = NavigationModule.page - 1
@@ -56,7 +56,7 @@ function NavigationModule:OnClickPrevPage(parentFrame)
 end
 
 function NavigationModule:OnUpdateNavigationPages(parentFrame)
-	DebugModule:Log(self, "OnUpdateNavigationPages", 2)
+	UtilsModule:Log(self, "OnUpdateNavigationPages", 2)
 
 	NavigationModule.shown, NavigationModule.total = GetNumAuctionItems("list")
 

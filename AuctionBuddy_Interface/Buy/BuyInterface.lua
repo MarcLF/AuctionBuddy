@@ -5,7 +5,7 @@ local StdUi = LibStub('StdUi')
 
 local BuyInterfaceModule = AuctionBuddy:NewModule("BuyInterfaceModule", "AceEvent-3.0")
 
-local DebugModule = nil
+local UtilsModule = nil
 local InterfaceFunctionsModule = nil
 local ResultsTableModule = nil
 local SellInterfaceModule = nil
@@ -16,8 +16,8 @@ local OptionsPanelModule = nil
 
 function BuyInterfaceModule:Enable()
 
-	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable", 0)
+	UtilsModule = AuctionBuddy:GetModule("UtilsModule")
+	UtilsModule:Log(self, "Enable", 0)
 
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
@@ -522,14 +522,14 @@ function BuyInterfaceModule:OnShowInterface()
 end
 
 function BuyInterfaceModule:OnResultsTableItemSelected()
-	DebugModule:Log("Buy_OnResultsTableItemSelected", "OnResultsTableItemSelected", 3)
+	UtilsModule:Log("Buy_OnResultsTableItemSelected", "OnResultsTableItemSelected", 3)
 
 	BuyInterfaceModule:EnableBuyBidButtons()
 
 end
 
 function BuyInterfaceModule:OnShowBuyFrame()
-	DebugModule:Log("BuyInterfaceModule", "OnShowBuyFrame", 3)
+	UtilsModule:Log("BuyInterfaceModule", "OnShowBuyFrame", 3)
 
 	BuyInterfaceModule:SendMessage("DO_EMPTY_AH_SEARCH")
 	BuyInterfaceModule.mainFrame:Show()
@@ -540,7 +540,7 @@ function BuyInterfaceModule:OnShowBuyFrame()
 end
 
 function BuyInterfaceModule:OnUpdateAvailableResultsPages(currentPage, maxPages)
-	DebugModule:Log("BuyInterfaceModule", "OnUpdateAvailableResultsPages", 3)
+	UtilsModule:Log("BuyInterfaceModule", "OnUpdateAvailableResultsPages", 3)
 
 	BuyInterfaceModule.mainFrame.currentPageText:SetText(currentPage + 1)
 	BuyInterfaceModule.mainFrame.maxPagesText:SetText(maxPages + 1)

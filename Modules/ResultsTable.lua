@@ -5,14 +5,14 @@ local StdUi = LibStub('StdUi')
 
 local ResultsTableModule = AuctionBuddy:NewModule("ResultsTableModule", "AceEvent-3.0")
 
-local DebugModule = nil
+local UtilsModule = nil
 local ItemsModule = nil
 local DatabaseModule = nil
 
 function ResultsTableModule:Enable()
 
-	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable", 0)
+	UtilsModule = AuctionBuddy:GetModule("UtilsModule")
+	UtilsModule:Log(self, "Enable", 0)
 
 	ItemsModule = AuctionBuddy:GetModule("ItemsModule")
 	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
@@ -20,7 +20,7 @@ function ResultsTableModule:Enable()
 end
 
 function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPos)
-	DebugModule:Log(self, "CreateResultsScrollFrameTable", 2)
+	UtilsModule:Log(self, "CreateResultsScrollFrameTable", 2)
 	
 	if parentFrame.scrollTableCreated then
 		return
@@ -46,9 +46,9 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 		},
 		{
 			name         = "Name",
-			width        = 80,
+			width        = 110,
 			align        = "LEFT",
-			index        = "itemLink",
+			index        = "name",
 			format       = "string",
 		},
 		{
@@ -57,13 +57,6 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 			align        = "LEFT",
 			index        = "owner",
 			format       = "string",
-		},
-		{
-			name         = "Quantity",
-			width        = 60,
-			align        = "CENTER",
-			index        = "count",
-			format       = "number",
 		},
 		{
 			name         = "Quality",
@@ -81,21 +74,21 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 		},
 		{
 			name         = "Bid / Total",
-			width        = 80,
+			width        = 90,
 			align        = "RIGHT",
 			index        = "bid",
 			format       = "money",
 		},
 		{
 			name         = "Buy / Item",
-			width        = 80,
+			width        = 90,
 			align        = "RIGHT",
 			index        = "buy",
 			format       = "money",
 		},
 			{
 			name         = 'Total Price',
-			width        = 80,
+			width        = 90,
 			align        = 'RIGHT',
 			index        = 'totalPrice',
 			format       = 'money',
@@ -108,7 +101,7 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 	parentFrame.scrollTable:RegisterEvents({
 		OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)	
 			if button == "LeftButton" or button == "RightButton" then
-				DebugModule:Log(self, "OnLeftClickResultsTable", 2)
+				UtilsModule:Log(self, "OnLeftClickResultsTable", 2)
 				parentFrame.scrollTable:SetSelection(rowIndex)
 				ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame)	
 			end

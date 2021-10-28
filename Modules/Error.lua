@@ -17,8 +17,8 @@ local auctionBuddyErrors = {
 
 function ErrorModule:Enable()
 
-	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable", 0)
+	UtilsModule = AuctionBuddy:GetModule("UtilsModule")
+	UtilsModule:Log(self, "Enable", 0)
 
 	self:RegisterMessage("AUCTIONBUDDY_ERROR", self.ProcessAuctionBuddyError)
 	

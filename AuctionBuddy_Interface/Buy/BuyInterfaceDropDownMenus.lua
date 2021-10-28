@@ -5,7 +5,7 @@ local StdUi = LibStub('StdUi')
 
 local BuyInterfaceDropDownMenusModule = AuctionBuddy:NewModule("BuyInterfaceDropDownMenusModule", "AceEvent-3.0")
 
-local DebugModule = nil
+local UtilsModule = nil
 local InterfaceFunctionsModule = nil
 local BuyInterfaceModule = nil
 
@@ -183,8 +183,8 @@ local rarityTable =
 
 function BuyInterfaceDropDownMenusModule:Enable()
 
-	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable", 0)
+	UtilsModule = AuctionBuddy:GetModule("UtilsModule")
+	UtilsModule:Log(self, "Enable", 0)
 
 	InterfaceFunctionsModule = AuctionBuddy:GetModule("InterfaceFunctionsModule")
 	BuyInterfaceModule = AuctionBuddy:GetModule("BuyInterfaceModule")
