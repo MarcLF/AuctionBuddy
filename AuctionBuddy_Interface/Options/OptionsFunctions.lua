@@ -1,8 +1,6 @@
 -- 
 local AuctionBuddy = unpack(select(2, ...))
 
-local StdUi = LibStub('StdUi')
-
 local OptionsFunctionsModule = AuctionBuddy:NewModule("OptionsFunctionsModule", "AceEvent-3.0")
 
 local UtilsModule = nil

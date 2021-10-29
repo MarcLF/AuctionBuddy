@@ -1,8 +1,6 @@
 -- 
 local AuctionBuddy = unpack(select(2, ...))
 
-local StdUi = LibStub('StdUi')
-
 local BuyInterfaceDropDownMenusModule = AuctionBuddy:NewModule("BuyInterfaceDropDownMenusModule", "AceEvent-3.0")
 
 local UtilsModule = nil

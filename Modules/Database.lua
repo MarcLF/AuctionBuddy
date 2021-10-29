@@ -1,8 +1,6 @@
 --
 local AuctionBuddy = unpack(select(2, ...))
 
-local StdUi = LibStub('StdUi')
-
 local DatabaseModule = AuctionBuddy:NewModule("DatabaseModule")
 
 local UtilsModule = nil

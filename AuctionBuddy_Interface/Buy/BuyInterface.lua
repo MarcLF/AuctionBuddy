@@ -1,8 +1,6 @@
 -- 
 local AuctionBuddy = unpack(select(2, ...))
 
-local StdUi = LibStub('StdUi')
-
 local BuyInterfaceModule = AuctionBuddy:NewModule("BuyInterfaceModule", "AceEvent-3.0")
 
 local UtilsModule = nil
@@ -20,10 +18,8 @@ function BuyInterfaceModule:Enable()
 	UtilsModule:Log(self, "Enable", 0)
 
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
-	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 	self:RegisterMessage("RESULTSTABLE_ITEM_SELECTED", self.OnResultsTableItemSelected)	
 	self:RegisterMessage("SHOW_AB_BUY_FRAME", self.OnShowBuyFrame)
-	self:RegisterMessage("UPDATE_AVAILABLE_RESULTS_PAGES", self.OnUpdateAvailableResultsPages)	
 
 	if self.interfaceCreated == true then
 		return
@@ -62,7 +58,8 @@ function BuyInterfaceModule:AUCTION_HOUSE_CLOSED()
 end
 
 function BuyInterfaceModule:AUCTION_ITEM_LIST_UPDATE()
-	
+	UtilsModule:Log("BuyInterfaceModule", "AUCTION_ITEM_LIST_UPDATE", 0)
+
 	BuyInterfaceModule:SendMessage("UPDATE_NAVIGATION_PAGES", self.mainFrame)
 
 end
@@ -84,7 +81,7 @@ function BuyInterfaceModule:CreateBuyInterface()
 		DatabaseModule.generalOptions.xPosOffset = xPos
 		DatabaseModule.generalOptions.yPosOffset = yPos
 	end)
-	self.mainFrame:SetScript("OnShow", function() self:OnShowInterface() end)
+	self.mainFrame:SetScript("OnShow", function() self:OnShowBuyFrame() end)
 	self.mainFrame:SetScript("OnHide", function() 
 		InterfaceFunctionsModule:CloseAuctionHouseCustom() 
 	end)
@@ -499,28 +496,6 @@ function BuyInterfaceModule:SetFrameParameters(frame, width, height, text, point
 	
 end
 
-function BuyInterfaceModule:OnShowInterface()
-	
-	self.mainFrame.nextPageButton:Disable()
-	self.mainFrame.prevPageButton:Disable()
-
-	self.mainFrame:ClearAllPoints()
-	self.mainFrame:SetPoint(DatabaseModule.generalOptions.point, DatabaseModule.generalOptions.xPosOffset, DatabaseModule.generalOptions.yPosOffset)
-	self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale)
-	self.mainFrame.currentPlayerGold.value = GetCoinTextureString(GetMoney(), 15)
-	self.mainFrame.currentPlayerGold:SetText(self.mainFrame.currentPlayerGold.value)
-	self.mainFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
-	self.mainFrame.totalBuyCost:SetText(self.mainFrame.totalBuyCost.value)
-	self.mainFrame.totalBidCost.value = GetCoinTextureString(0, 15)
-	self.mainFrame.totalBidCost:SetText(self.mainFrame.totalBuyCost.value)
-	self.mainFrame.scrollTable:ClearSelection()
-	self.mainFrame.alreadyBidText:Hide()
-	self.mainFrame.currentPageText:SetText("0")
-	self.mainFrame.maxPagesText:SetText("0")
-	ContainerModule:ScanContainer()
-
-end
-
 function BuyInterfaceModule:OnResultsTableItemSelected()
 	UtilsModule:Log("Buy_OnResultsTableItemSelected", "OnResultsTableItemSelected", 3)
 
@@ -531,9 +506,29 @@ end
 function BuyInterfaceModule:OnShowBuyFrame()
 	UtilsModule:Log("BuyInterfaceModule", "OnShowBuyFrame", 3)
 
+	BuyInterfaceModule:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
+	BuyInterfaceModule:RegisterMessage("UPDATE_AVAILABLE_RESULTS_PAGES", BuyInterfaceModule.OnUpdateAvailableResultsPages)	
+
 	BuyInterfaceModule:SendMessage("DO_EMPTY_AH_SEARCH")
 	BuyInterfaceModule.mainFrame:Show()
 	BuyInterfaceModule:DisableBuyBidButtons()
+
+	BuyInterfaceModule.mainFrame.nextPageButton:Disable()
+	BuyInterfaceModule.mainFrame.prevPageButton:Disable()
+
+	BuyInterfaceModule.mainFrame:ClearAllPoints()
+	BuyInterfaceModule.mainFrame:SetPoint(DatabaseModule.generalOptions.point, DatabaseModule.generalOptions.xPosOffset, DatabaseModule.generalOptions.yPosOffset)
+	BuyInterfaceModule.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale)
+	BuyInterfaceModule.mainFrame.currentPlayerGold.value = GetCoinTextureString(GetMoney(), 15)
+	BuyInterfaceModule.mainFrame.currentPlayerGold:SetText(BuyInterfaceModule.mainFrame.currentPlayerGold.value)
+	BuyInterfaceModule.mainFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
+	BuyInterfaceModule.mainFrame.totalBuyCost:SetText(BuyInterfaceModule.mainFrame.totalBuyCost.value)
+	BuyInterfaceModule.mainFrame.totalBidCost.value = GetCoinTextureString(0, 15)
+	BuyInterfaceModule.mainFrame.totalBidCost:SetText(BuyInterfaceModule.mainFrame.totalBuyCost.value)
+	BuyInterfaceModule.mainFrame.scrollTable:ClearSelection()
+	BuyInterfaceModule.mainFrame.alreadyBidText:Hide()
+	BuyInterfaceModule.mainFrame.currentPageText:SetText("0")
+	BuyInterfaceModule.mainFrame.maxPagesText:SetText("0")
 
 	InterfaceFunctionsModule.switchingUI = false
 
@@ -589,6 +584,9 @@ function BuyInterfaceModule:ResetFilters()
 end
 
 function BuyInterfaceModule:HideBuyInterface()
+
+	BuyInterfaceModule:UnregisterEvent("AUCTION_ITEM_LIST_UPDATE")
+	BuyInterfaceModule:UnregisterMessage("UPDATE_AVAILABLE_RESULTS_PAGES", BuyInterfaceModule.OnUpdateAvailableResultsPages)	
 
 	if BuyInterfaceModule.mainFrame ~= nil then
 		BuyInterfaceModule.mainFrame:Hide()

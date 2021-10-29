@@ -1,8 +1,6 @@
 --
 local AuctionBuddy = unpack(select(2, ...))
 
-local StdUi = LibStub('StdUi')
-
 local UtilsModule = AuctionBuddy:NewModule("UtilsModule")
 
 -- Log Verbose Levels
@@ -12,7 +10,7 @@ local UtilsModule = AuctionBuddy:NewModule("UtilsModule")
 -- 0 = LOW
 -- -1 = NONE
 
-UtilsModule.verbose = 0
+UtilsModule.verbose = 3
 
 function UtilsModule:Log(...)
 

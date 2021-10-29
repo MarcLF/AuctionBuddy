@@ -1,8 +1,6 @@
 --
 local AuctionBuddy = unpack(select(2, ...))
 
-local StdUi = LibStub('StdUi')
-
 local ErrorModule = AuctionBuddy:NewModule("ErrorModule", "AceEvent-3.0")
 
 local auctionBuddyErrors = {

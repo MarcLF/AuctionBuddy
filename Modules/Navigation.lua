@@ -1,8 +1,6 @@
 --
 local AuctionBuddy = unpack(select(2, ...))
 
-local StdUi = LibStub('StdUi')
-
 local NavigationModule = AuctionBuddy:NewModule("NavigationModule", "AceEvent-3.0")
 
 NavigationModule.searchActive = nil
@@ -60,11 +58,7 @@ function NavigationModule:OnUpdateNavigationPages(parentFrame)
 
 	NavigationModule.shown, NavigationModule.total = GetNumAuctionItems("list")
 
-	if NavigationModule.total > 0 then
-		NavigationModule.maxResultsPages = math.ceil(NavigationModule.total / 50 - 1)
-	else
-		NavigationModule.maxResultsPages = 0
-	end
+	NavigationModule.maxResultsPages = math.ceil(math.max(NavigationModule.total, 1) / math.max(NavigationModule.shown, 1) - 1)
 
 	NavigationModule:SendMessage("UPDATE_AVAILABLE_RESULTS_PAGES", NavigationModule.page, NavigationModule.maxResultsPages)
 	

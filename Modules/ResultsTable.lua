@@ -59,10 +59,10 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 			format       = "string",
 		},
 		{
-			name         = "Quality",
+			name         = "Quantity",
 			width        = 60,
 			align        = "CENTER",
-			index        = "quality",
+			index        = "count",
 			format       = "string",
 		},
 		{

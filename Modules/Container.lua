@@ -29,6 +29,8 @@ function ContainerModule:Enable()
 	self:RegisterEvent("AUCTION_MULTISELL_START")
 	self:RegisterEvent("AUCTION_MULTISELL_UPDATE")
 	self:RegisterEvent("AUCTION_MULTISELL_FAILURE")
+	self:RegisterMessage("SHOW_AB_BUY_FRAME", self.ScanContainer)
+	self:RegisterMessage("SHOW_AB_SELL_FRAME", self.ScanContainer)
 	self:RegisterMessage("POSTING_ITEM_TO_AH", self.OnPostingItemToAH)
 
 	if self.interfaceCreated == true then

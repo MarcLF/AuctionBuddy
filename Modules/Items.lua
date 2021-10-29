@@ -1,8 +1,6 @@
 --
 local AuctionBuddy = unpack(select(2, ...))
 
-local StdUi = LibStub('StdUi')
-
 local ItemsModule = AuctionBuddy:NewModule("ItemsModule", "AceEvent-3.0")
 
 ItemsModule.currentItemPostedLink = nil
