@@ -256,7 +256,7 @@ function ItemsModule:CalculateMaxStackValues(parentFrame, bagID, bagSlot)
 
 	itemAmountInBag = ItemsModule:GetTotalItemAmountInBag(parentFrame, itemLink)
 
-	local maxStackSizeValue = math.min(itemAmountInBag, itemStackCount)
+	local maxStackSizeValue = math.max(math.min(itemAmountInBag, itemStackCount), 1)
 	local maxStackNumberValue = math.max(math.floor(itemAmountInBag / tonumber(parentFrame.stackSize:GetText())), 1)
 
 	parentFrame.stackSize.maxStackValue:SetText(tostring(maxStackSizeValue))
