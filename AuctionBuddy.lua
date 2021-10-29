@@ -62,6 +62,8 @@ function AuctionBuddy:AUCTION_HOUSE_SHOW()
 	self:EnableModule("ContainerModule")
 	self:EnableModule("SearchesModule")
 	
+	self:RegisterMessage("ON_AUCTION_HOUSE_SEARCH", self.AuctionHouseSearch)
+
 	UtilsModule = self:GetModule("UtilsModule")
 	DatabaseModule = self:GetModule("DatabaseModule")
 	NavigationModule = self:GetModule("NavigationModule")
@@ -82,6 +84,8 @@ end
 
 function AuctionBuddy:AUCTION_HOUSE_CLOSED()
 	UtilsModule:Log("AuctionBuddy", "AUCTION_HOUSE_CLOSED", 1)
+
+	self:UnregisterMessage("ON_AUCTION_HOUSE_SEARCH")
 
 	self.searchText = ""
 	

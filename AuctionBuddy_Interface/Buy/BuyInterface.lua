@@ -128,12 +128,14 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 		end
 	end)
 	parentFrame.searchBar:SetScript("OnEscapePressed", function() parentFrame.searchBar:ClearFocus() end)
-	parentFrame.searchBar:SetScript("OnEnterPressed", function() AuctionBuddy:AuctionHouseSearch(parentFrame.searchBar:GetText()) end)
+	parentFrame.searchBar:SetScript("OnEnterPressed", function()
+		self:SendMessage("ON_AUCTION_HOUSE_SEARCH", parentFrame.searchBar:GetText())
+	end)
 	
 	parentFrame.searchButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_Search_Button", parentFrame, "UIPanelButtonTemplate")
 	BuyInterfaceModule:SetFrameParameters(parentFrame.searchButton, 80, 24, "Search", "TOPLEFT", 235, -34)
 	parentFrame.searchButton:SetScript("OnClick", function() 
-		AuctionBuddy:AuctionHouseSearch(parentFrame.searchBar:GetText()) 
+		self:SendMessage("ON_AUCTION_HOUSE_SEARCH", parentFrame.searchBar:GetText())
 		InterfaceFunctionsModule.autoCompleteTextPos = strlen(parentFrame.searchBar:GetText())
 	end)
 
@@ -244,7 +246,7 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 	parentFrame.prevPageButton:SetScript("OnClick", function()
 		if CanSendAuctionQuery() then
 			self:SendMessage("ON_CLICK_PREV_PAGE", parentFrame)
-			AuctionBuddy:AuctionHouseSearch() 
+			self:SendMessage("ON_AUCTION_HOUSE_SEARCH")
 		else
 			self:SendMessage("AUCTIONBUDDY_ERROR", "CannotSendAHQuery")
 		end
@@ -255,7 +257,7 @@ function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
 	parentFrame.nextPageButton:SetScript("OnClick", function()
 		if CanSendAuctionQuery() then
 			self:SendMessage("ON_CLICK_NEXT_PAGE", parentFrame)
-			AuctionBuddy:AuctionHouseSearch() 
+			self:SendMessage("ON_AUCTION_HOUSE_SEARCH")
 		else
 			self:SendMessage("AUCTIONBUDDY_ERROR", "CannotSendAHQuery")
 		end
@@ -586,7 +588,7 @@ end
 function BuyInterfaceModule:HideBuyInterface()
 
 	BuyInterfaceModule:UnregisterEvent("AUCTION_ITEM_LIST_UPDATE")
-	BuyInterfaceModule:UnregisterMessage("UPDATE_AVAILABLE_RESULTS_PAGES", BuyInterfaceModule.OnUpdateAvailableResultsPages)	
+	BuyInterfaceModule:UnregisterMessage("UPDATE_AVAILABLE_RESULTS_PAGES")	
 
 	if BuyInterfaceModule.mainFrame ~= nil then
 		BuyInterfaceModule.mainFrame:Hide()

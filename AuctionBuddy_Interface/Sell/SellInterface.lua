@@ -140,7 +140,7 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 	parentFrame.nextPageButton:SetScript("OnClick", function()
 		if CanSendAuctionQuery() then
 			self:SendMessage("ON_CLICK_NEXT_PAGE", parentFrame)
-			AuctionBuddy:AuctionHouseSearch() 
+			self:SendMessage("ON_AUCTION_HOUSE_SEARCH")
 		else
 			self:SendMessage("AUCTIONBUDDY_ERROR", "CannotSendAHQuery")
 		end
@@ -179,7 +179,7 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 	parentFrame.prevPageButton:SetScript("OnClick", function()
 		if CanSendAuctionQuery() then
 			self:SendMessage("ON_CLICK_PREV_PAGE", parentFrame)
-			AuctionBuddy:AuctionHouseSearch() 
+			self:SendMessage("ON_AUCTION_HOUSE_SEARCH")
 		else
 			self:SendMessage("ERROR_CAN_NOT_SEND_AH_QUERY")
 		end
@@ -747,7 +747,7 @@ function SellInterfaceModule:HideSellInterface()
 	UtilsModule:Log("SellInterfaceModule", "HideSellInterface", 2)
 
 	SellInterfaceModule:UnregisterEvent("AUCTION_ITEM_LIST_UPDATE")
-	SellInterfaceModule:UnregisterMessage("UPDATE_AVAILABLE_RESULTS_PAGES", SellInterfaceModule.OnUpdateAvailableResultsPages)	
+	SellInterfaceModule:UnregisterMessage("UPDATE_AVAILABLE_RESULTS_PAGES")	
 
 	if SellInterfaceModule.mainFrame ~= nil then
 		SellInterfaceModule.mainFrame:Hide()

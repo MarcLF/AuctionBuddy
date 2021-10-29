@@ -73,7 +73,7 @@ function SearchesModule:CreateRecentSearchesScrollFrameTable(parentFrame, xPos, 
 	parentFrame.recentSearchesTable:RegisterEvents({
 		OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)	
 			if button == "LeftButton" then
-					AuctionBuddy:AuctionHouseSearch(rowData.searchName)	
+				self:SendMessage("ON_AUCTION_HOUSE_SEARCH", rowData.searchName)
 			end
 			return true
 		end,
@@ -100,7 +100,7 @@ function SearchesModule:CreateFavoriteSearchesScrollFrameTable(parentFrame, xPos
 	parentFrame.favoriteSearchesTable:RegisterEvents({
 		OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)	
 			if button == "LeftButton" then
-					AuctionBuddy:AuctionHouseSearch(rowData.searchName)	
+				self:SendMessage("ON_AUCTION_HOUSE_SEARCH", rowData.searchName)
 			end
 			return true
 		end,

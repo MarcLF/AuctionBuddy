@@ -202,7 +202,7 @@ function ItemsModule:SearchSelectedContainerItem()
 	infoType, info1, info2 = GetCursorInfo()
 	local itemName = GetItemInfo(info2) 
 	ClearCursor()
-	AuctionBuddy:AuctionHouseSearch(itemName)
+	self:SendMessage("ON_AUCTION_HOUSE_SEARCH", itemName)
 	
 end
 
@@ -233,7 +233,7 @@ function ItemsModule:InsertSelectedItem(parentFrame)
 		parentFrame.stackSize:SetText(1)
 		
 		local itemName = GetItemInfo(info2) 
-		AuctionBuddy:AuctionHouseSearch(itemName, true)		
+		ItemsModule:SendMessage("ON_AUCTION_HOUSE_SEARCH", itemName, true)
 					
 		ClickAuctionSellItemButton()
 		
