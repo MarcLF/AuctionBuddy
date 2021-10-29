@@ -59,7 +59,7 @@ function OptionsPanelModule:CreateOptionsPanel()
 	self.ABInfoFrame.text:SetWidth(500)
 	self.ABInfoFrame.text:SetPoint("TOPLEFT", 15, -12)
 	self.ABInfoFrame.text:SetJustifyH("LEFT")
-	self.ABInfoFrame.text:SetText("A user guide is coming in a future update. In the meanwhile, if you have any questions, please submit them in the comment section of the AuctionBuddy addon webpage.\n\nThank you.")
+	self.ABInfoFrame.text:SetText("AuctionBuddy is a small fast auction house addon using Blizzard artstyle.\nIt is intended to be an improvement from the vanilla auction house.\nIt's main features are:\n\nFast Search:\nAuctionBuddy scans the items from your bags and puts them on a list inside the User Interface so you can search any by just left clicking on them.\n\nSearch History:\nPrevious searches are stored into an easily accessible list.\n\nFavorite Lists System:\nSimilar to the previous category, you will be able to save (and then remove) specific searches, either by introducing manually the name of them or by right-clicking any item from your bag items list.\nAlso you will be able to create delete and rename multiple favorite lists.\n\nSmart Sell:\nA related list to the one from Fast Search be shown in the Sell window, where you will be able to sell any item from your bags by left clicking on that list.\nIt will as well set the price per item equal to the lowest posted in that moment.\n\nOther Actions:\nAll windows are draggable.\nDouble left click to insta buy.\nMultiple search filters.\nUI Scaling.\nAuto-complete input search text.\n\n\nFor more information or to submit any feedback, please visit the link down below. Thank you!\n\nhttps://www.curseforge.com/wow/addons/auctionbuddy")
 
 	InterfaceOptions_AddCategory(self.panel)
 
