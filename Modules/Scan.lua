@@ -40,7 +40,7 @@ function ScanModule:Enable()
 	self:RegisterMessage("ON_SCAN_NEXT_AH_PAGE", self.AuctionHouseSearch)
 	self:RegisterMessage("SCAN_SELECTED_ITEM_AH_PAGE", self.AuctionHouseSearch)
 
-	self:RegisterMessage("REMOVE_SELECTED__RESULTS_ROW", self.RemoveSelectedResultsRow)
+	self:RegisterMessage("REMOVE_SELECTED_RESULTS_ROW", self.RemoveSelectedResultsRow)
 
 	self:RegisterMessage("ON_CLICK_NEXT_PAGE", self.OnClickNextPage)
 	self:RegisterMessage("ON_CLICK_PREV_PAGE", self.OnClickPrevPage)
@@ -184,6 +184,11 @@ function ScanModule:InsertResultsPage()
 	UtilsModule:Log("ScanModule", "InsertResultsPage", 0)
 
 	hasCurrentPageBeenAdded = false
+
+	if not ScanModule.shownPerBlizzardPage then
+		return
+	end
+
 	for i = 1, math.min(maxScanSizePerPage, ScanModule.shownPerBlizzardPage) do
 		if i + (ScanModule.page - 1) * ScanModule.shownPerBlizzardPage > maxScanSizePerPage then
 			print("breaking")
