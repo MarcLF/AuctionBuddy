@@ -65,13 +65,6 @@ function SellInterfaceModule:AUCTION_HOUSE_CLOSED()
 
 end
 
-function SellInterfaceModule:AUCTION_ITEM_LIST_UPDATE()
-	UtilsModule:Log("SellInterfaceModule", "AUCTION_ITEM_LIST_UPDATE", 0)
-	
-	SellInterfaceModule:SendMessage("UPDATE_NAVIGATION_PAGES", self.mainFrame)
-
-end
-
 function SellInterfaceModule:CreateSellInterface()
 	
 	self.mainFrame = CreateFrame("Frame", "AB_SellInterface_MainFrame", UIParent, "BasicFrameTemplate")
@@ -656,7 +649,6 @@ end
 function SellInterfaceModule:OnShowSellFrame()
 	UtilsModule:Log("SellInterfaceModule", "OnShowSellFrame", 3)
 
-	SellInterfaceModule:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 	SellInterfaceModule:RegisterMessage("UPDATE_AVAILABLE_RESULTS_PAGES", SellInterfaceModule.OnUpdateAvailableResultsPages)	
 
 	SellInterfaceModule.mainFrame:Show()
@@ -746,7 +738,6 @@ end
 function SellInterfaceModule:HideSellInterface()
 	UtilsModule:Log("SellInterfaceModule", "HideSellInterface", 2)
 
-	SellInterfaceModule:UnregisterEvent("AUCTION_ITEM_LIST_UPDATE")
 	SellInterfaceModule:UnregisterMessage("UPDATE_AVAILABLE_RESULTS_PAGES")	
 
 	if SellInterfaceModule.mainFrame ~= nil then

@@ -21,6 +21,7 @@ function ItemsModule:Enable()
 
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
+
 	self:RegisterMessage("CONTAINER_ITEM_SELECTED", self.OnContainerItemSelected)
 	self:RegisterMessage("ON_CLICK_ITEM_TO_SELL", self.OnClickItemToSell)
 	self:RegisterMessage("ON_BID_SELECTED_ITEM", self.OnBidSelectedItem)
@@ -49,13 +50,8 @@ end
 function ItemsModule:AUCTION_ITEM_LIST_UPDATE()
 	UtilsModule:Log(self, "AUCTION_ITEM_LIST_UPDATE", 1)
 
-	ItemsModule.shown, ItemsModule.total = GetNumAuctionItems("list")
-
-	if BuyInterfaceModule.mainFrame:IsShown() then
-		ItemsModule:CreateAuctionItemButtons(self.shown, BuyInterfaceModule.mainFrame.scrollTable)
-	elseif SellInterfaceModule.mainFrame:IsShown() then
+	if SellInterfaceModule.mainFrame:IsShown() then
 		ItemsModule:CreateAuctionItemButtons(self.shown, SellInterfaceModule.mainFrame.scrollTable)
-		ItemsModule:UpdateSellItemPriceAfterSearch(1,  self.shown, self.total)
 	end
 	
 end
@@ -96,6 +92,12 @@ end
 function ItemsModule:OnBuySelectedItem(selectedItemData)
 	UtilsModule:Log(self, "BuySelectedItem", 1)
 	
+	print("Select Item original: ", selectedItemData)
+	local intervalModifier =  50 * math.floor((selectedItemData - 1) / 50)
+	print("Interval: ", intervalModifier)
+	selectedItemData = selectedItemData - intervalModifier
+	print("Select Item post conversion: ", selectedItemData)
+
 	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
 
 	PlaceAuctionBid('list', selectedItemData, buyoutPrice)
@@ -130,45 +132,6 @@ function ItemsModule:OnSellSelectedItem(parentFrame)
 
 	PickupItem(ItemsModule.currentItemPostedLink) 
 	ItemsModule:RemoveInsertedItem(parentFrame)
-	
-end
-
-function ItemsModule:CreateAuctionItemButtons(itemsShown, scrollTable)
-	UtilsModule:Log(self, "CreateAuctionItemButtons", 2)
-
-	local tableData = {}
-	
-	for i = 1, itemsShown do
-		local itemName, myTexture, aucCount, itemQuality, canUse, itemLevel, levelColHeader, minBid,
-		minIncrement, buyoutPrice, bidAmount, highBidder, bidderFullName, aucOwner,
-		ownerFullName, saleStatus, itemId, hasAllInfo = GetAuctionItemInfo("list", i);
-		
-		local buyOutPerItem = buyoutPrice/aucCount
-		local totalBidItem
-
-		if bidAmount > 0 then
-			totalBidItem = bidAmount
-		else
-			totalBidItem = minBid
-		end
-
-		-- This data is compared to each index of columnType array from the CreateResultsScrollFrameTable function inside ResultsTable.lua
-		tinsert(tableData, 
-		{
-			texture = myTexture,
-			itemLink = tostring(GetAuctionItemLink("list", i)),
-			name = itemName,
-			owner = tostring(aucOwner),
-			count = aucCount,
-			itlvl = itemLevel,
-			bid = totalBidItem,
-			buy = buyOutPerItem,
-			totalPrice = buyoutPrice
-		})
-	end
-	
-	scrollTable:Show()
-	scrollTable:SetData(tableData, true)
 	
 end
 

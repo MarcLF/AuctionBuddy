@@ -8,6 +8,9 @@ local ResultsTableModule = AuctionBuddy:NewModule("ResultsTableModule", "AceEven
 local UtilsModule = nil
 local ItemsModule = nil
 local DatabaseModule = nil
+local ScanModule = nil
+
+local containedInPageNumber = nil
 
 function ResultsTableModule:Enable()
 
@@ -16,6 +19,7 @@ function ResultsTableModule:Enable()
 
 	ItemsModule = AuctionBuddy:GetModule("ItemsModule")
 	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
+	ScanModule = AuctionBuddy:GetModule("ScanModule")
 
 end
 
@@ -29,7 +33,7 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 	local columnType = {
 		{
 			name         = "Icon",
-			width        = 48,
+			width        = 36,
 			align        = "LEFT",
 			index        = "texture",
 			format       = "icon",
@@ -46,7 +50,7 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 		},
 		{
 			name         = "Name",
-			width        = 110,
+			width        = 150,
 			align        = "LEFT",
 			index        = "name",
 			format       = "string",
@@ -59,15 +63,15 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 			format       = "string",
 		},
 		{
-			name         = "Quantity",
-			width        = 60,
-			align        = "CENTER",
+			name         = "Size",
+			width        = 50,
+			align        = "LEFT",
 			index        = "count",
 			format       = "string",
 		},
 		{
-			name         = "Level",
-			width        = 50,
+			name         = " Lvl",
+			width        = 45,
 			align        = "CENTER",
 			index        = "itlvl",
 			format       = "string",
@@ -87,7 +91,7 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 			format       = "money",
 		},
 			{
-			name         = 'Total Price',
+			name         = "Buy / Total",
 			width        = 90,
 			align        = 'RIGHT',
 			index        = 'totalPrice',
@@ -95,15 +99,41 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 		},
 	}
 	
-	parentFrame.scrollTable = StdUi:ScrollTable(parentFrame, columnType, 16, 32)
+	parentFrame.scrollTable = StdUi:ScrollTable(parentFrame, columnType, 18, 28)
 	StdUi:GlueTop(parentFrame.scrollTable, parentFrame, xPos,yPos, 0, 0)
 	parentFrame.scrollTable:EnableSelection(true)
 	parentFrame.scrollTable:RegisterEvents({
 		OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)	
 			if button == "LeftButton" or button == "RightButton" then
-				UtilsModule:Log(self, "OnLeftClickResultsTable", 2)
+				UtilsModule:Log(self, "OnClickResultsTable", 2)
 				parentFrame.scrollTable:SetSelection(rowIndex)
-				ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame)	
+
+				local prevContainedInPageNumber = containedInPageNumber or ScanModule.page
+				containedInPageNumber = math.floor((parentFrame.scrollTable:GetSelection() - 1) / 50)
+				print("prev page: ", prevContainedInPageNumber)
+				print("current page: ", containedInPageNumber)
+
+				local buyoutPrice = nil
+				local bidPrice = nil
+				local stackSize = nil
+
+				for key, value in pairs(rowData) do
+					if key == "totalPrice" then
+						buyoutPrice = value
+					elseif key == "bid" then
+						bidPrice = value
+					elseif key == "count" then
+						stackSize = value
+					end
+				end
+
+				if prevContainedInPageNumber ~= containedInPageNumber then
+					ResultsTableModule:SendMessage("SCAN_SELECTED_ITEM_AH_PAGE", nil, nil, containedInPageNumber)
+				end
+
+				C_Timer.After(0.2, function() 	
+					ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame, buyoutPrice, bidPrice, stackSize)
+				end)
 			end
 			return true
 		end,

@@ -23,7 +23,7 @@ Modules\Utils.lua
 Modules\Error.lua
 Modules\Database.lua
 Modules\Items.lua
-Modules\Navigation.lua
+Modules\Scan.lua
 Modules\Container.lua
 Modules\ResultsTable.lua
 Modules\Searches.lua

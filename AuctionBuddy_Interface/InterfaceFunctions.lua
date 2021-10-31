@@ -47,18 +47,18 @@ function InterfaceFunctionsModule:AUCTION_ITEM_LIST_UPDATE()
 		BuyInterfaceModule.mainFrame.currentPlayerGold:SetText(BuyInterfaceModule.mainFrame.currentPlayerGold.value)
 	end)
 
-	local valueGoldFormat = GetCoinTextureString(0, 15)
-	BuyInterfaceModule.mainFrame.totalBidCost:SetText(valueGoldFormat)
-	BuyInterfaceModule.mainFrame.totalBuyCost:SetText(valueGoldFormat)
-	SellInterfaceModule.mainFrame.totalBidCost:SetText(valueGoldFormat)
-	SellInterfaceModule.mainFrame.totalBuyCost:SetText(valueGoldFormat)
+	--local valueGoldFormat = GetCoinTextureString(0, 15)
+	--BuyInterfaceModule.mainFrame.totalBidCost:SetText(valueGoldFormat)
+	--BuyInterfaceModule.mainFrame.totalBuyCost:SetText(valueGoldFormat)
+	--SellInterfaceModule.mainFrame.totalBidCost:SetText(valueGoldFormat)
+	--SellInterfaceModule.mainFrame.totalBuyCost:SetText(valueGoldFormat)
 	
 end
 
-function InterfaceFunctionsModule:OnResultsTableItemSelected(parentFrame)
-	UtilsModule:Log("InterfaceFunctionsModule", "OnResultsTableItemSelected", 2)
+function InterfaceFunctionsModule:OnResultsTableItemSelected(parentFrame, buyoutPrice, bidPrice, stackSize)
+	UtilsModule:Log("InterfaceFunctionsModule", "OnResultsTableItemSelected", 0)
 
-	InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame)
+	InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame, buyoutPrice, bidPrice, stackSize)
 
 end
 
@@ -126,16 +126,31 @@ function InterfaceFunctionsModule:ItemPriceUpdated(itemPriceFrame, stackSizeFram
 	
 end
 
-function InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame)
-	UtilsModule:Log(self, "UpdateTotalBuyoutAndBidCostBuy", 2)
+function InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame, buttonBuyoutPrice, buttonBidPrice, buttonStackSize)
+	UtilsModule:Log(self, "UpdateTotalBuyoutAndBidCostBuy", 0)
 
 	local selectedItemData = parentFrame.scrollTable:GetSelection()
-
+	print("Select Item original: ", selectedItemData)
+	local intervalModifier =  50 * math.floor((selectedItemData - 1) / 50)
+	print("Interval: ", intervalModifier)
+	selectedItemData = selectedItemData - intervalModifier
+	print("Select Item post conversion: ", selectedItemData)
+	local stackSize = select(3, GetAuctionItemInfo("list", selectedItemData))
 	local minBid = select(8, GetAuctionItemInfo("list", selectedItemData))
 	local minBidIncrement = select(9, GetAuctionItemInfo("list", selectedItemData))
 	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
 	local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemData))
 	local highBidder = select(12, GetAuctionItemInfo("list", selectedItemData))
+
+	print(buyoutPrice, " ", buttonBuyoutPrice)
+	print(minBid, " ", buttonBidPrice)
+	print(stackSize, " ", buttonStackSize)
+	-- Checking if the selected button auction has been sold
+	if buyoutPrice ~= buttonBuyoutPrice or minBid ~= buttonBidPrice or stackSize ~= buttonStackSize then
+		UtilsModule:Log(self, "RemovingSelectedRow", 0)
+		InterfaceFunctionsModule:SendMessage("REMOVE_SELECTED_RESULTS_ROW", parentFrame.scrollTable:GetSelection())
+		return
+	end
 
 	local totalAmountToBid = max(minBid, bidAmount) + minBidIncrement
 

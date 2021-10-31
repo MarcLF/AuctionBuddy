@@ -12,15 +12,10 @@ _G[addonName] = AuctionBuddy
 
 AuctionBuddy.auctionTabs = {}
 
-AuctionBuddy.searchText = nil
-AuctionBuddy.isSortedBuyout = false
-
-local StdUi = LibStub("StdUi")
-
 local UtilsModule = nil
 local ErrorModule = nil
 local DatabaseModule = nil
-local NavigationModule = nil
+local ScanModule = nil
 local ItemsModule = nil
 local ResultsTableModule = nil
 local InterfaceFunctionsModule = nil
@@ -58,15 +53,13 @@ function AuctionBuddy:AUCTION_HOUSE_SHOW()
 	self:EnableModule("BuyInterfaceModule")
 	self:EnableModule("BuyInterfaceDropDownMenusModule")
 	self:EnableModule("SellInterfaceModule")
-	self:EnableModule("NavigationModule")
+	self:EnableModule("ScanModule")
 	self:EnableModule("ContainerModule")
 	self:EnableModule("SearchesModule")
 	
-	self:RegisterMessage("ON_AUCTION_HOUSE_SEARCH", self.AuctionHouseSearch)
-
 	UtilsModule = self:GetModule("UtilsModule")
 	DatabaseModule = self:GetModule("DatabaseModule")
-	NavigationModule = self:GetModule("NavigationModule")
+	ScanModule = self:GetModule("ScanModule")
 	ItemsModule = self:GetModule("ItemsModule")
 	ResultsTableModule = self:GetModule("ResultsTableModule")
 	InterfaceFunctionsModule = self:GetModule("InterfaceFunctionsModule")
@@ -84,10 +77,6 @@ end
 
 function AuctionBuddy:AUCTION_HOUSE_CLOSED()
 	UtilsModule:Log("AuctionBuddy", "AUCTION_HOUSE_CLOSED", 1)
-
-	self:UnregisterMessage("ON_AUCTION_HOUSE_SEARCH")
-
-	self.searchText = ""
 	
 end
 
@@ -129,65 +118,6 @@ function AuctionBuddy:AuctionFrameTab_OnClick(tab)
 		CloseAuctionHouse = NoResponse
 		AuctionFrame_Hide()
 		CloseAuctionHouse = CloseAuctionHouseFunctional
-	end
-	
-end
-		
-function AuctionBuddy:AuctionHouseSearch(textToSearch, exactMatch)
-	UtilsModule:Log(self, "AuctionHouseSearch", 0)
-
-	if textToSearch ~= nil and textToSearch ~= AuctionBuddy.searchText then
-		NavigationModule.page = 0
-	end
-
-	if textToSearch ~= nil then
-		AuctionBuddy.searchText = textToSearch
-	end
-	
-	if CanSendAuctionQuery() then
-		ItemsModule.itemSelected = false
-		NavigationModule.searchActive = true
-
-		local checkWhiteSpaces = string.gsub(AuctionBuddy.searchText, " ", "")
-
-		if string.len(AuctionBuddy.searchText) > 0 and string.len(checkWhiteSpaces) > 0 then
-			DatabaseModule:InsertNewSearch(DatabaseModule.recentSearches, AuctionBuddy.searchText)
-			DatabaseModule:InsertDataFromDatabase(BuyInterfaceModule.mainFrame.recentSearchesTable, DatabaseModule.recentSearches)
-		end
-		
-		local filterData = nil
-		local itemType = BuyInterfaceModule.mainFrame.itemClasses.value
-		local itemSubType = BuyInterfaceModule.mainFrame.itemClasses.valueSubList
-		local itemSubSubType = BuyInterfaceModule.mainFrame.itemClasses.valueSubSubList
-
-		if itemType ~= nil and itemSubType ~= nil and itemSubSubType ~= nil then
-			filterData = AuctionCategories[itemType].subCategories[itemSubType].subCategories[itemSubSubType].filters
-		elseif itemType ~= nil and itemSubType ~= nil then
-			filterData = AuctionCategories[itemType].subCategories[itemSubType].filters
-		elseif itemType ~= 0 then
-			filterData = AuctionCategories[itemType].filters
-		else
-			filterData = 0
-        end
-
-		if self.isSortedBuyout == false then
-			SortAuctionItems("list", "buyout")
-			AuctionBuddy.isSortedBuyout = true
-		end
-
-		QueryAuctionItems(	
-			AuctionBuddy.searchText, 
-			BuyInterfaceModule.mainFrame.minILvl:GetNumber(),
-			BuyInterfaceModule.mainFrame.maxILvl:GetNumber(), 
-			NavigationModule.page,
-			false,
-			BuyInterfaceModule.mainFrame.rarity.value,
-			false,
-			DatabaseModule.buyOptions.exactMatch or exactMatch,
-			filterData
-		)
-	else
-		AuctionBuddy:SendMessage("AUCTIONBUDDY_ERROR", "CannotSendAHQuery")
 	end
 	
 end

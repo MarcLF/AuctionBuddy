@@ -68,7 +68,7 @@ function SearchesModule:CreateRecentSearchesScrollFrameTable(parentFrame, xPos, 
 	}
 	
 	parentFrame.recentSearchesTable = StdUi:ScrollTable(parentFrame, columnType, 8, 16)
-	StdUi:GlueTop(parentFrame.recentSearchesTable, parentFrame, xPos,yPos, 0, 0)
+	StdUi:GlueTop(parentFrame.recentSearchesTable, parentFrame, xPos, yPos, 0, 0)
 	parentFrame.recentSearchesTable:EnableSelection(true)
 	parentFrame.recentSearchesTable:RegisterEvents({
 		OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)	

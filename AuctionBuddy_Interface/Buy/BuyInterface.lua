@@ -40,7 +40,7 @@ function BuyInterfaceModule:Enable()
 	self:CreateBuyInterfaceSearchTablesOptions(self.mainFrame)
 	self:CreateSearchFilters(self.mainFrame)
 	
-	ResultsTableModule:CreateResultsScrollFrameTable(self.mainFrame, -280, -135)
+	ResultsTableModule:CreateResultsScrollFrameTable(self.mainFrame, -278, -135)
 
 	self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale)
 	
@@ -54,13 +54,6 @@ function BuyInterfaceModule:AUCTION_HOUSE_CLOSED()
 	self:ResetData()
 	self:UnregisterAllEvents()
 	self:UnregisterAllMessages()
-
-end
-
-function BuyInterfaceModule:AUCTION_ITEM_LIST_UPDATE()
-	UtilsModule:Log("BuyInterfaceModule", "AUCTION_ITEM_LIST_UPDATE", 0)
-
-	BuyInterfaceModule:SendMessage("UPDATE_NAVIGATION_PAGES", self.mainFrame)
 
 end
 
@@ -508,7 +501,6 @@ end
 function BuyInterfaceModule:OnShowBuyFrame()
 	UtilsModule:Log("BuyInterfaceModule", "OnShowBuyFrame", 3)
 
-	BuyInterfaceModule:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 	BuyInterfaceModule:RegisterMessage("UPDATE_AVAILABLE_RESULTS_PAGES", BuyInterfaceModule.OnUpdateAvailableResultsPages)	
 
 	BuyInterfaceModule:SendMessage("DO_EMPTY_AH_SEARCH")
@@ -587,7 +579,6 @@ end
 
 function BuyInterfaceModule:HideBuyInterface()
 
-	BuyInterfaceModule:UnregisterEvent("AUCTION_ITEM_LIST_UPDATE")
 	BuyInterfaceModule:UnregisterMessage("UPDATE_AVAILABLE_RESULTS_PAGES")	
 
 	if BuyInterfaceModule.mainFrame ~= nil then
