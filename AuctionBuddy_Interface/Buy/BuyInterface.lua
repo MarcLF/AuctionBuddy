@@ -21,7 +21,9 @@ function BuyInterfaceModule:Enable()
 	self:RegisterMessage("RESULTSTABLE_ITEM_SELECTED", self.OnResultsTableItemSelected)	
 	self:RegisterMessage("SHOW_AB_BUY_FRAME", self.OnShowBuyFrame)
 	self:RegisterMessage("ON_AH_SCAN_RUNNING", self.OnAHScanRunning)
-
+	self:RegisterMessage("SCAN_SELECTED_ITEM_AH_PAGE", self.DisableBuyBidButtons)
+	self:RegisterMessage("REMOVE_SELECTED_RESULTS_ROW", self.DisableBuyBidButtons)
+	
 	if self.interfaceCreated == true then
 		return
 	end
@@ -484,6 +486,8 @@ end
 
 function BuyInterfaceModule:OnAHScanRunning(isAHScanRunning)
 	UtilsModule:Log("BuyInterfaceModule", "OnAHScanRunning", 3)
+
+	BuyInterfaceModule:DisableBuyBidButtons()
 
 	if isAHScanRunning then
 		BuyInterfaceModule.mainFrame.scrollTable.scanRunningText:Show()
