@@ -20,7 +20,6 @@ function ItemsModule:Enable()
 	SellInterfaceModule = AuctionBuddy:GetModule("SellInterfaceModule")
 
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
-	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 
 	self:RegisterMessage("CONTAINER_ITEM_SELECTED", self.OnContainerItemSelected)
 	self:RegisterMessage("ON_CLICK_ITEM_TO_SELL", self.OnClickItemToSell)
@@ -31,6 +30,7 @@ function ItemsModule:Enable()
 	self:RegisterMessage("ON_CLICK_MAX_STACK_SIZE", self.OnClickMaxStackSize)
 	self:RegisterMessage("ON_CLICK_MAX_STACK_QUANTITY", self.OnClickMaxStackQuantity)
 	self:RegisterMessage("REMOVE_INSERTED_ITEM", self.RemoveInsertedItem)
+	self:RegisterMessage("UPDATE_SELL_ITEM_PRICE", self.UpdateSellItemPriceAfterSearch)
 	
 end
 
@@ -44,15 +44,6 @@ function ItemsModule:AUCTION_HOUSE_CLOSED()
 
 	self:UnregisterAllEvents()
 	self:UnregisterAllMessages()
-	
-end
-
-function ItemsModule:AUCTION_ITEM_LIST_UPDATE()
-	UtilsModule:Log(self, "AUCTION_ITEM_LIST_UPDATE", 1)
-
-	if SellInterfaceModule.mainFrame:IsShown() then
-		ItemsModule:CreateAuctionItemButtons(self.shown, SellInterfaceModule.mainFrame.scrollTable)
-	end
 	
 end
 
@@ -135,27 +126,45 @@ function ItemsModule:OnSellSelectedItem(parentFrame)
 	
 end
 
-function ItemsModule:UpdateSellItemPriceAfterSearch(numberList, shown, total)
+function ItemsModule:UpdateSellItemPriceAfterSearch(resultsTable)
 	UtilsModule:Log(self, "UpdateSellItemPriceAfterSearch", 2)
 
-	if total == 0 then
+	if shown == 0 then
 		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, 0)
 		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPriceBid, 0)
-		do return end
+		return
 	end
-	
-	local buyoutPrice = select(10, GetAuctionItemInfo("list", numberList))
-	local itemQuantity = select(3, GetAuctionItemInfo("list", numberList))
 
-	local priceToSell = math.max(math.floor(buyoutPrice/itemQuantity) - 1, 0)
+	local buyoutPrice = 0
+	local prevBuyoutPrice = 0
 
-	if buyoutPrice == 0 and total > 1 and numberList < shown then
-		numberList = numberList + 1
-		self:UpdateSellItemPriceAfterSearch(numberList, shown, total)
-	else
-		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPriceBid, priceToSell)
-		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, priceToSell)
+	local bidPrice = 0
+	local prevBidPrice = 0
+
+	for key, value in pairs(resultsTable) do
+		for nestedKey, nestedValue in pairs(value) do
+			if nestedKey == "buy" and nestedValue > 0 then
+				prevBuyoutPrice = nestedValue
+			elseif nestedKey == "bid" and nestedValue > 0 then
+				prevBidPrice = nestedValue
+			end
+
+			if prevBuyoutPrice <= buyoutPrice or buyoutPrice == 0 then
+				buyoutPrice = prevBuyoutPrice
+			end
+
+			if prevBidPrice <= bidPrice or bidPrice == 0 then
+				bidPrice = prevBidPrice
+			end
+		end
 	end
+
+	if bidPrice > buyoutPrice then
+		bidPrice = buyoutPrice
+	end
+
+	MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPriceBid, bidPrice)
+	MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, buyoutPrice)
 	
 end
 

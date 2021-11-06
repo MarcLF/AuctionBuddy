@@ -25,6 +25,7 @@ function SellInterfaceModule:Enable()
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 	self:RegisterMessage("RESULTSTABLE_ITEM_SELECTED", self.OnResultsTableItemSelected)	
 	self:RegisterMessage("SHOW_AB_SELL_FRAME", self.OnShowSellFrame)	
+	self:RegisterMessage("ON_AH_SCAN_RUNNING", self.OnAHScanRunning)
 
 	if self.interfaceCreated == true then
 		return
@@ -51,6 +52,14 @@ function SellInterfaceModule:Enable()
 	self:CreateItemToSellParameters(self.mainFrame)
 	
 	ResultsTableModule:CreateResultsScrollFrameTable(self.mainFrame, 277, -135)
+
+	self.mainFrame.scrollTable.scanRunningText = self.mainFrame.scrollTable:CreateFontString("AB_BuyInterface_MainFrame_ScanRunning_Text", "OVERLAY")
+	self.mainFrame.scrollTable.scanRunningText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
+	self.mainFrame.scrollTable.scanRunningText:SetWidth(100)
+	self.mainFrame.scrollTable.scanRunningText:SetPoint("CENTER", 0, 0)
+	self.mainFrame.scrollTable.scanRunningText:SetJustifyH("LEFT")
+	self.mainFrame.scrollTable.scanRunningText:SetText("Scanning...")
+	self.mainFrame.scrollTable.scanRunningText:Hide()
 	
 	self.interfaceCreated = true
 	
@@ -613,8 +622,20 @@ function SellInterfaceModule:OnShowSellFrame()
 	SellInterfaceModule.mainFrame.totalBidCost:SetText(SellInterfaceModule.mainFrame.totalBuyCost.value)
 	SellInterfaceModule.mainFrame.scrollTable:ClearSelection()
 	SellInterfaceModule.mainFrame.alreadyBidText:Hide()
+	SellInterfaceModule.mainFrame.scrollTable.scanRunningText:Hide()
 
 	InterfaceFunctionsModule.switchingUI = false
+
+end
+
+function SellInterfaceModule:OnAHScanRunning(isAHScanRunning)
+	UtilsModule:Log("SellInterfaceModule", "OnAHScanRunning", 3)
+
+	if isAHScanRunning then
+		SellInterfaceModule.mainFrame.scrollTable.scanRunningText:Show()
+	else
+		SellInterfaceModule.mainFrame.scrollTable.scanRunningText:Hide()
+	end
 
 end
 

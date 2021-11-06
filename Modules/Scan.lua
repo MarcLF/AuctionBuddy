@@ -6,7 +6,9 @@ local ScanModule = AuctionBuddy:NewModule("ScanModule", "AceEvent-3.0")
 ScanModule.searchActive = nil
 ScanModule.page = nil
 ScanModule.searchText = nil
-ScanModule.isSortedBuyout = false
+
+ScanModule.shownPerBlizzardPage = 0
+ScanModule.total = 0
 
 local UtilsModule = nil
 local DatabaseModule = nil
@@ -253,6 +255,7 @@ function ScanModule:SendResultsTable()
 		scrollTable = BuyInterfaceModule.mainFrame.scrollTable
 	elseif SellInterfaceModule.mainFrame:IsShown() then
 		scrollTable = SellInterfaceModule.mainFrame.scrollTable
+		ScanModule:SendMessage("UPDATE_SELL_ITEM_PRICE", resultsTableData)
 	end
 	
 	ScanModule:SendMessage("ON_AH_SCAN_RUNNING", false)
@@ -268,7 +271,7 @@ end
 
 function ScanModule:ResetData()
 
-	ScanModule.shown = 0
+	ScanModule.shownPerBlizzardPage = 0
 	ScanModule.total = 0
 	ScanModule.page = 0
 

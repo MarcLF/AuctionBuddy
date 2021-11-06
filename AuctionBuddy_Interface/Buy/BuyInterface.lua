@@ -43,7 +43,7 @@ function BuyInterfaceModule:Enable()
 	
 	ResultsTableModule:CreateResultsScrollFrameTable(self.mainFrame, -278, -135)
 
-	self.mainFrame.scrollTable.scanRunningText = self.mainFrame.scrollTable:CreateFontString("AB_BuyInterface_MainFrame_ScanRunning_Text", "TOOLTIP")
+	self.mainFrame.scrollTable.scanRunningText = self.mainFrame.scrollTable:CreateFontString("AB_BuyInterface_MainFrame_ScanRunning_Text", "OVERLAY")
 	self.mainFrame.scrollTable.scanRunningText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
 	self.mainFrame.scrollTable.scanRunningText:SetWidth(100)
 	self.mainFrame.scrollTable.scanRunningText:SetPoint("CENTER", 0, 0)
