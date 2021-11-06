@@ -93,14 +93,18 @@ end
 function ScanModule:AuctionHouseSearchStart(textToSearch, exactMatch, pageToSearch)
 	UtilsModule:Log(self, "AuctionHouseSearchStart", 0)
 
-	resultsTableData = {}
-	ScanModule:SendResultsTable()
-	ScanModule.page = 0
+	if CanSendAuctionQuery() then
+		resultsTableData = {}
+		ScanModule:SendResultsTable()
+		ScanModule.page = 0
 
-	ScanModule:SendMessage("ON_AH_SCAN_RUNNING", true)
+		ScanModule:SendMessage("ON_AH_SCAN_RUNNING", true)
 
-	ScanModule:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
-	ScanModule:AuctionHouseSearch(textToSearch, exactMatch, pageToSearch)
+		ScanModule:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
+		ScanModule:AuctionHouseSearch(textToSearch, exactMatch, pageToSearch)
+	else
+		AuctionBuddy:SendMessage("AUCTIONBUDDY_ERROR", "CannotSendAHQuery")
+	end
 
 end
 
@@ -115,48 +119,44 @@ function ScanModule:AuctionHouseSearch(textToSearch, exactMatch, pageToSearch)
 		AuctionBuddy.searchText = textToSearch
 	end
 	
-	if CanSendAuctionQuery() then
-		ScanModule.searchActive = true
+	ScanModule.searchActive = true
 
-		local checkWhiteSpaces = string.gsub(AuctionBuddy.searchText, " ", "")
+	local checkWhiteSpaces = string.gsub(AuctionBuddy.searchText, " ", "")
 
-		if string.len(AuctionBuddy.searchText) > 0 and string.len(checkWhiteSpaces) > 0 then
-			DatabaseModule:InsertNewSearch(DatabaseModule.recentSearches, AuctionBuddy.searchText)
-			DatabaseModule:InsertDataFromDatabase(BuyInterfaceModule.mainFrame.recentSearchesTable, DatabaseModule.recentSearches)
-		end
-		
-		local filterData = nil
-		local itemType = BuyInterfaceModule.mainFrame.itemClasses.value
-		local itemSubType = BuyInterfaceModule.mainFrame.itemClasses.valueSubList
-		local itemSubSubType = BuyInterfaceModule.mainFrame.itemClasses.valueSubSubList
-
-		if itemType ~= nil and itemSubType ~= nil and itemSubSubType ~= nil then
-			filterData = AuctionCategories[itemType].subCategories[itemSubType].subCategories[itemSubSubType].filters
-		elseif itemType ~= nil and itemSubType ~= nil then
-			filterData = AuctionCategories[itemType].subCategories[itemSubType].filters
-		elseif itemType ~= 0 then
-			filterData = AuctionCategories[itemType].filters
-		else
-			filterData = 0
-        end
-
-		local currentPageToSearch = pageToSearch or ScanModule.page
-		print("Searching Page: ", currentPageToSearch)
-
-		QueryAuctionItems(	
-			AuctionBuddy.searchText, 
-			BuyInterfaceModule.mainFrame.minILvl:GetNumber(),
-			BuyInterfaceModule.mainFrame.maxILvl:GetNumber(), 
-			currentPageToSearch,
-			false,
-			BuyInterfaceModule.mainFrame.rarity.value,
-			false,
-			DatabaseModule.buyOptions.exactMatch or exactMatch,
-			filterData
-		)
-	else
-		AuctionBuddy:SendMessage("AUCTIONBUDDY_ERROR", "CannotSendAHQuery")
+	if string.len(AuctionBuddy.searchText) > 0 and string.len(checkWhiteSpaces) > 0 then
+		DatabaseModule:InsertNewSearch(DatabaseModule.recentSearches, AuctionBuddy.searchText)
+		DatabaseModule:InsertDataFromDatabase(BuyInterfaceModule.mainFrame.recentSearchesTable, DatabaseModule.recentSearches)
 	end
+		
+	local filterData = nil
+	local itemType = BuyInterfaceModule.mainFrame.itemClasses.value
+	local itemSubType = BuyInterfaceModule.mainFrame.itemClasses.valueSubList
+	local itemSubSubType = BuyInterfaceModule.mainFrame.itemClasses.valueSubSubList
+
+	if itemType ~= nil and itemSubType ~= nil and itemSubSubType ~= nil then
+		filterData = AuctionCategories[itemType].subCategories[itemSubType].subCategories[itemSubSubType].filters
+	elseif itemType ~= nil and itemSubType ~= nil then
+		filterData = AuctionCategories[itemType].subCategories[itemSubType].filters
+	elseif itemType ~= 0 then
+		filterData = AuctionCategories[itemType].filters
+	else
+		filterData = 0
+    end
+
+	local currentPageToSearch = pageToSearch or ScanModule.page
+	print("Searching Page: ", currentPageToSearch)
+
+	QueryAuctionItems(	
+		AuctionBuddy.searchText, 
+		BuyInterfaceModule.mainFrame.minILvl:GetNumber(),
+		BuyInterfaceModule.mainFrame.maxILvl:GetNumber(), 
+		currentPageToSearch,
+		false,
+		BuyInterfaceModule.mainFrame.rarity.value,
+		false,
+		DatabaseModule.buyOptions.exactMatch or exactMatch,
+		filterData
+	)
 	
 end
 
