@@ -135,7 +135,8 @@ function ContainerModule:ScanContainer()
 					tinsert(tableData, 
 					{			
 						texture = myTexture,
-						itemLink = UtilsModule:RemoveCharacterFromString(itemLinkContainer, "%[", "%]"),
+						itemName = UtilsModule:RemoveCharacterFromString(itemLinkContainer, "%[", "%]"),
+						itemLink = itemLinkContainer,
 						count = tonumber(itemCount),
 						quality = itemQuality,
 						bagID = i,
@@ -182,7 +183,7 @@ function ContainerModule:CreateBuyContainerScrollFrameTable(parentFrame, xPos, y
 			name         = "Name",
 			width        = 80,
 			align        = "LEFT",
-			index        = "itemLink",
+			index        = "itemName",
 			format       = "string",
 		}
 	}
@@ -239,7 +240,7 @@ function ContainerModule:CreateSellContainerScrollFrameTable(parentFrame, xPos, 
 			name         = "Name",
 			width        = 75,
 			align        = "LEFT",
-			index        = "itemLink",
+			index        = "itemName",
 			format       = "string",
 		},
 		{
