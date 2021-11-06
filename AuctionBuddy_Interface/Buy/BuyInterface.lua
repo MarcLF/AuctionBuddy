@@ -215,56 +215,6 @@ function BuyInterfaceModule:CreateBuyInterfaceGeneral(parentFrame)
 		self:SendMessage("SHOW_AB_SELL_FRAME")
 	end)
 
-	parentFrame.pageInfoText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_PageInfo_Text", "OVERLAY")
-	parentFrame.pageInfoText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
-	parentFrame.pageInfoText:SetWidth(100)
-	parentFrame.pageInfoText:SetPoint("TOPRIGHT", -144, -37)
-	parentFrame.pageInfoText:SetJustifyH("LEFT")
-	parentFrame.pageInfoText:SetText("Page")
-
-	parentFrame.pageOfText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_PageOf_Text", "OVERLAY")
-	parentFrame.pageOfText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
-	parentFrame.pageOfText:SetWidth(80)
-	parentFrame.pageOfText:SetPoint("TOPRIGHT", -153, -62)
-	parentFrame.pageOfText:SetJustifyH("LEFT")
-	parentFrame.pageOfText:SetText("of")
-
-	parentFrame.currentPageText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_CurrentPage_Text", "OVERLAY")
-	parentFrame.currentPageText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
-	parentFrame.currentPageText:SetWidth(80)
-	parentFrame.currentPageText:SetPoint("TOPRIGHT", -208, -62)
-	parentFrame.currentPageText:SetJustifyH("CENTER")
-	parentFrame.currentPageText:SetText("0")
-
-	parentFrame.maxPagesText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_MaxPages_Text", "OVERLAY")
-	parentFrame.maxPagesText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
-	parentFrame.maxPagesText:SetWidth(80)
-	parentFrame.maxPagesText:SetPoint("TOPRIGHT", -162, -62)
-	parentFrame.maxPagesText:SetJustifyH("CENTER")
-	parentFrame.maxPagesText:SetText("0")
-
-	parentFrame.prevPageButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_PrevPage_Button", parentFrame, "UIPanelButtonTemplate")
-	BuyInterfaceModule:SetFrameParameters(parentFrame.prevPageButton, 80, 24, "Prev Page", "TOPRIGHT", -105, -60)
-	parentFrame.prevPageButton:SetScript("OnClick", function()
-		if CanSendAuctionQuery() then
-			self:SendMessage("ON_CLICK_PREV_PAGE", parentFrame)
-			self:SendMessage("ON_AUCTION_HOUSE_SEARCH")
-		else
-			self:SendMessage("AUCTIONBUDDY_ERROR", "CannotSendAHQuery")
-		end
-	end)
-	
-	parentFrame.nextPageButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_NextPage_Button", parentFrame, "UIPanelButtonTemplate")
-	BuyInterfaceModule:SetFrameParameters(parentFrame.nextPageButton, 80, 24, "Next Page", "TOPRIGHT", -25, -60)
-	parentFrame.nextPageButton:SetScript("OnClick", function()
-		if CanSendAuctionQuery() then
-			self:SendMessage("ON_CLICK_NEXT_PAGE", parentFrame)
-			self:SendMessage("ON_AUCTION_HOUSE_SEARCH")
-		else
-			self:SendMessage("AUCTIONBUDDY_ERROR", "CannotSendAHQuery")
-		end
-	end)
-	
 end
 
 function BuyInterfaceModule:CreateBuyInterfaceBuyOptions(parentFrame)
@@ -511,14 +461,9 @@ end
 function BuyInterfaceModule:OnShowBuyFrame()
 	UtilsModule:Log("BuyInterfaceModule", "OnShowBuyFrame", 3)
 
-	BuyInterfaceModule:RegisterMessage("UPDATE_AVAILABLE_RESULTS_PAGES", BuyInterfaceModule.OnUpdateAvailableResultsPages)	
-
 	BuyInterfaceModule:SendMessage("DO_EMPTY_AH_SEARCH")
 	BuyInterfaceModule.mainFrame:Show()
 	BuyInterfaceModule:DisableBuyBidButtons()
-
-	BuyInterfaceModule.mainFrame.nextPageButton:Disable()
-	BuyInterfaceModule.mainFrame.prevPageButton:Disable()
 
 	BuyInterfaceModule.mainFrame:ClearAllPoints()
 	BuyInterfaceModule.mainFrame:SetPoint(DatabaseModule.generalOptions.point, DatabaseModule.generalOptions.xPosOffset, DatabaseModule.generalOptions.yPosOffset)
@@ -531,8 +476,6 @@ function BuyInterfaceModule:OnShowBuyFrame()
 	BuyInterfaceModule.mainFrame.totalBidCost:SetText(BuyInterfaceModule.mainFrame.totalBuyCost.value)
 	BuyInterfaceModule.mainFrame.scrollTable:ClearSelection()
 	BuyInterfaceModule.mainFrame.alreadyBidText:Hide()
-	BuyInterfaceModule.mainFrame.currentPageText:SetText("0")
-	BuyInterfaceModule.mainFrame.maxPagesText:SetText("0")
 
 	InterfaceFunctionsModule.switchingUI = false
 
@@ -546,14 +489,6 @@ function BuyInterfaceModule:OnAHScanRunning(isAHScanRunning)
 	else
 		BuyInterfaceModule.mainFrame.scanRunningText:Hide()
 	end
-
-end
-
-function BuyInterfaceModule:OnUpdateAvailableResultsPages(currentPage, maxPages)
-	UtilsModule:Log("BuyInterfaceModule", "OnUpdateAvailableResultsPages", 3)
-
-	BuyInterfaceModule.mainFrame.currentPageText:SetText(currentPage + 1)
-	BuyInterfaceModule.mainFrame.maxPagesText:SetText(maxPages + 1)
 
 end
 
@@ -599,8 +534,6 @@ function BuyInterfaceModule:ResetFilters()
 end
 
 function BuyInterfaceModule:HideBuyInterface()
-
-	BuyInterfaceModule:UnregisterMessage("UPDATE_AVAILABLE_RESULTS_PAGES")	
 
 	if BuyInterfaceModule.mainFrame ~= nil then
 		BuyInterfaceModule.mainFrame:Hide()

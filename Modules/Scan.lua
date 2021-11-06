@@ -5,7 +5,6 @@ local ScanModule = AuctionBuddy:NewModule("ScanModule", "AceEvent-3.0")
 
 ScanModule.searchActive = nil
 ScanModule.page = nil
-ScanModule.maxResultsPages = nil
 ScanModule.searchText = nil
 ScanModule.isSortedBuyout = false
 
@@ -41,9 +40,6 @@ function ScanModule:Enable()
 	self:RegisterMessage("SCAN_SELECTED_ITEM_AH_PAGE", self.AuctionHouseSearch)
 
 	self:RegisterMessage("REMOVE_SELECTED_RESULTS_ROW", self.RemoveSelectedResultsRow)
-
-	self:RegisterMessage("ON_CLICK_NEXT_PAGE", self.OnClickNextPage)
-	self:RegisterMessage("ON_CLICK_PREV_PAGE", self.OnClickPrevPage)
 	self:RegisterMessage("POSTING_ITEM_TO_AH", self.ResetData)
 	
 	ScanResultsCoroutine = coroutine.create(ScanModule.ScanResults)
@@ -57,10 +53,8 @@ function ScanModule:Enable()
 		end
 	end)
 
-
 	self.searchActive = false
 	self.page = 0
-	self.maxResultsPages = 0
 
 end
 
@@ -70,7 +64,6 @@ function ScanModule:AUCTION_ITEM_LIST_UPDATE()
 	if not isScanningRunning then
 		ScanModule.shownPerBlizzardPage, ScanModule.total = GetNumAuctionItems("list")
 		maxScanSizePerPage = ScanModule.total;
-		print("SHOWN:::::::::", ScanModule.shownPerBlizzardPage)
 		isScanningRunning = true
 	end
 
@@ -265,50 +258,6 @@ function ScanModule:SendResultsTable()
 	isScanningRunning = false
 
 	ScanModule:UnregisterEvent("AUCTION_ITEM_LIST_UPDATE")
-
-end
-
-function ScanModule:OnUpdateNavigationPages(parentFrame)
-	UtilsModule:Log(self, "OnUpdateNavigationPages", 2)
-
-	ScanModule.maxResultsPages = math.ceil(math.max(ScanModule.total, 1) / math.max(maxScanSizePerPage, 1) - 1)
-
-	ScanModule:SendMessage("UPDATE_AVAILABLE_RESULTS_PAGES", ScanModule.page, ScanModule.maxResultsPages)
-	
-	if ScanModule.searchActive then
-		if ScanModule.page < ScanModule.maxResultsPages then
-			parentFrame.nextPageButton:SetEnabled(true)
-		else
-			parentFrame.nextPageButton:SetEnabled(false)
-		end
-		
-		if ScanModule.page > 0 then
-			parentFrame.prevPageButton:SetEnabled(true)
-		else
-			parentFrame.prevPageButton:SetEnabled(false)
-		end
-	else	
-		parentFrame.nextPageButton:SetEnabled(false)
-		parentFrame.prevPageButton:SetEnabled(false)	
-	end
-
-	ScanModule.searchActive = false
-	
-end
-
-function ScanModule:OnClickNextPage(parentFrame)
-	UtilsModule:Log(self, "OnClickNextPage", 2)
-
-	ScanModule.page = ScanModule.page + 1
-
-end
-
-function ScanModule:OnClickPrevPage(parentFrame)
-	UtilsModule:Log(self, "OnClickPrevPage", 2)
-
-	if ScanModule.page > 0 then
-		ScanModule.page = ScanModule.page - 1
-	end
 
 end
 
