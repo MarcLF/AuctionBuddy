@@ -49,7 +49,7 @@ function StdUi:Dialog(title, message, dialogId)
 	else
 		window = self:Window(nil, self.config.dialog.width, self.config.dialog.height, title);
 		window:SetPoint('CENTER');
-		window:SetFrameStrata('DIALOG');
+		window:SetFrameStrata('BACKGROUND');
 	end
 
 	if window.messageLabel then

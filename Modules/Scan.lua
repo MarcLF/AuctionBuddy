@@ -66,18 +66,19 @@ end
 
 function ScanModule:AUCTION_ITEM_LIST_UPDATE()
 	UtilsModule:Log(self, "AUCTION_ITEM_LIST_UPDATE", 1)
-
-	scanFrame:Show()
 	
 	if not isScanningRunning then
 		ScanModule.shownPerBlizzardPage, ScanModule.total = GetNumAuctionItems("list")
-		resultsTableData = {}
+		maxScanSizePerPage = ScanModule.total;
+		print("SHOWN:::::::::", ScanModule.shownPerBlizzardPage)
 		isScanningRunning = true
 	end
 
 	if isScanningRunning then
 		ScanModule:InsertResultsPage()
 	end
+
+	scanFrame:Show()
 		
 end
 
@@ -96,6 +97,12 @@ end
 
 function ScanModule:AuctionHouseSearchStart(textToSearch, exactMatch, pageToSearch)
 	UtilsModule:Log(self, "AuctionHouseSearchStart", 0)
+
+	resultsTableData = {}
+	ScanModule:SendResultsTable()
+	ScanModule.page = 0
+
+	ScanModule:SendMessage("ON_AH_SCAN_RUNNING", true)
 
 	ScanModule:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 	ScanModule:AuctionHouseSearch(textToSearch, exactMatch, pageToSearch)
@@ -184,7 +191,7 @@ function ScanModule:InsertResultsPage()
 	UtilsModule:Log("ScanModule", "InsertResultsPage", 0)
 
 	hasCurrentPageBeenAdded = false
-
+	print(ScanModule.shownPerBlizzardPage)
 	if not ScanModule.shownPerBlizzardPage then
 		return
 	end
@@ -250,6 +257,7 @@ function ScanModule:SendResultsTable()
 		scrollTable = SellInterfaceModule.mainFrame.scrollTable
 	end
 	
+	ScanModule:SendMessage("ON_AH_SCAN_RUNNING", false)
 	scrollTable:Show()
 	scrollTable:SetData(resultsTableData, true)
 

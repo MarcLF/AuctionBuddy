@@ -20,6 +20,7 @@ function BuyInterfaceModule:Enable()
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 	self:RegisterMessage("RESULTSTABLE_ITEM_SELECTED", self.OnResultsTableItemSelected)	
 	self:RegisterMessage("SHOW_AB_BUY_FRAME", self.OnShowBuyFrame)
+	self:RegisterMessage("ON_AH_SCAN_RUNNING", self.OnAHScanRunning)
 
 	if self.interfaceCreated == true then
 		return
@@ -35,12 +36,20 @@ function BuyInterfaceModule:Enable()
 	
 	self:CreateBuyInterface()	
 	self:CreateBuyTab(self.mainFrame)
-	self:CreateBuyInterfaceButtons(self.mainFrame)
+	self:CreateBuyInterfaceGeneral(self.mainFrame)
 	self:CreateBuyInterfaceBuyOptions(self.mainFrame)
 	self:CreateBuyInterfaceSearchTablesOptions(self.mainFrame)
 	self:CreateSearchFilters(self.mainFrame)
 	
 	ResultsTableModule:CreateResultsScrollFrameTable(self.mainFrame, -278, -135)
+
+	self.mainFrame.scanRunningText = self.mainFrame:CreateFontString("AB_BuyInterface_MainFrame_ScanRunning_Text", "TOOLTIP")
+	self.mainFrame.scanRunningText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
+	self.mainFrame.scanRunningText:SetWidth(100)
+	self.mainFrame.scanRunningText:SetPoint("CENTER", -250, -25)
+	self.mainFrame.scanRunningText:SetJustifyH("LEFT")
+	self.mainFrame.scanRunningText:SetText("Scanning...")
+	self.mainFrame.scanRunningText:Hide()
 
 	self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale)
 	
@@ -102,7 +111,7 @@ function BuyInterfaceModule:CreateBuyInterface()
 	
 end
 
-function BuyInterfaceModule:CreateBuyInterfaceButtons(parentFrame)
+function BuyInterfaceModule:CreateBuyInterfaceGeneral(parentFrame)
 
 	parentFrame.searchBar = CreateFrame("EditBox", "AB_BuyInterface_MainFrame_SearchBar", parentFrame, "InputBoxTemplate")
 	BuyInterfaceModule:SetFrameParameters(parentFrame.searchBar, 200, 20, nil, "TOPLEFT", 25, -35)
@@ -423,6 +432,7 @@ function BuyInterfaceModule:CreateBuyInterfaceSearchTablesOptions(parentFrame)
 		else
 			self:SendMessage("AUCTIONBUDDY_ERROR", "CannotAddEmptySearch")
 		end
+		parentFrame.addFavoriteBar:ClearFocus()
 	end)
 	
 	parentFrame.addFavorite = CreateFrame("Button", "AB_BuyInterface_MainFrame_AddFavorite_Button", parentFrame, "UIPanelButtonTemplate")
@@ -525,6 +535,17 @@ function BuyInterfaceModule:OnShowBuyFrame()
 	BuyInterfaceModule.mainFrame.maxPagesText:SetText("0")
 
 	InterfaceFunctionsModule.switchingUI = false
+
+end
+
+function BuyInterfaceModule:OnAHScanRunning(isAHScanRunning)
+	UtilsModule:Log("BuyInterfaceModule", "OnAHScanRunning", 3)
+
+	if isAHScanRunning then
+		BuyInterfaceModule.mainFrame.scanRunningText:Show()
+	else
+		BuyInterfaceModule.mainFrame.scanRunningText:Hide()
+	end
 
 end
 

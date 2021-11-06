@@ -100,7 +100,7 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 	}
 	
 	parentFrame.scrollTable = StdUi:ScrollTable(parentFrame, columnType, 18, 28)
-	StdUi:GlueTop(parentFrame.scrollTable, parentFrame, xPos,yPos, 0, 0)
+	StdUi:GlueTop(parentFrame.scrollTable, parentFrame, xPos, yPos, 0, 0)
 	parentFrame.scrollTable:EnableSelection(true)
 	parentFrame.scrollTable:RegisterEvents({
 		OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)	
