@@ -43,13 +43,13 @@ function BuyInterfaceModule:Enable()
 	
 	ResultsTableModule:CreateResultsScrollFrameTable(self.mainFrame, -278, -135)
 
-	self.mainFrame.scanRunningText = self.mainFrame:CreateFontString("AB_BuyInterface_MainFrame_ScanRunning_Text", "TOOLTIP")
-	self.mainFrame.scanRunningText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
-	self.mainFrame.scanRunningText:SetWidth(100)
-	self.mainFrame.scanRunningText:SetPoint("CENTER", -250, -25)
-	self.mainFrame.scanRunningText:SetJustifyH("LEFT")
-	self.mainFrame.scanRunningText:SetText("Scanning...")
-	self.mainFrame.scanRunningText:Hide()
+	self.mainFrame.scrollTable.scanRunningText = self.mainFrame.scrollTable:CreateFontString("AB_BuyInterface_MainFrame_ScanRunning_Text", "TOOLTIP")
+	self.mainFrame.scrollTable.scanRunningText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
+	self.mainFrame.scrollTable.scanRunningText:SetWidth(100)
+	self.mainFrame.scrollTable.scanRunningText:SetPoint("CENTER", 0, 0)
+	self.mainFrame.scrollTable.scanRunningText:SetJustifyH("LEFT")
+	self.mainFrame.scrollTable.scanRunningText:SetText("Scanning...")
+	self.mainFrame.scrollTable.scanRunningText:Hide()
 
 	self.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale)
 	
@@ -132,6 +132,7 @@ function BuyInterfaceModule:CreateBuyInterfaceGeneral(parentFrame)
 	parentFrame.searchBar:SetScript("OnEscapePressed", function() parentFrame.searchBar:ClearFocus() end)
 	parentFrame.searchBar:SetScript("OnEnterPressed", function()
 		self:SendMessage("ON_AUCTION_HOUSE_SEARCH", parentFrame.searchBar:GetText())
+		parentFrame.searchBar:ClearFocus()
 	end)
 	
 	parentFrame.searchButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_Search_Button", parentFrame, "UIPanelButtonTemplate")
@@ -197,7 +198,7 @@ function BuyInterfaceModule:CreateBuyInterfaceGeneral(parentFrame)
 	parentFrame.exactMatch.text:SetText("Exact match")
 	
 	parentFrame.DefaultAHButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_DefaultAH_Button", parentFrame, "UIPanelButtonTemplate")
-	BuyInterfaceModule:SetFrameParameters(parentFrame.DefaultAHButton, 80, 24, "Default AH", "TOPRIGHT", -25, -30)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.DefaultAHButton, 80, 24, "Default AH", "TOPRIGHT", -25, -45)
 	parentFrame.DefaultAHButton:SetScript("OnClick", function() 
 		InterfaceFunctionsModule.switchingUI = true
 		parentFrame:Hide()
@@ -207,7 +208,7 @@ function BuyInterfaceModule:CreateBuyInterfaceGeneral(parentFrame)
 	end)
 	
 	parentFrame.BuyFrameButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_BuyFrame_Button", parentFrame, "UIPanelButtonTemplate")
-	BuyInterfaceModule:SetFrameParameters(parentFrame.BuyFrameButton, 80, 24, "Show Sell", "TOPRIGHT", -105, -30)
+	BuyInterfaceModule:SetFrameParameters(parentFrame.BuyFrameButton, 80, 24, "Show Sell", "TOPRIGHT", -105, -45)
 	parentFrame.BuyFrameButton:SetScript("OnClick", function() 
 		InterfaceFunctionsModule.switchingUI = true
 		parentFrame:Hide()
@@ -378,7 +379,6 @@ function BuyInterfaceModule:CreateBuyInterfaceSearchTablesOptions(parentFrame)
 			DatabaseModule:InsertNewSearch(DatabaseModule.favoriteSearchesLists[BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu.value][1], parentFrame.addFavoriteBar:GetText()) 
 			DatabaseModule:InsertDataFromDatabase(BuyInterfaceModule.mainFrame.favoriteSearchesTable, DatabaseModule.favoriteSearchesLists[BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu.value][1])
 			parentFrame.addFavoriteBar:SetText("")
-			parentFrame.addFavoriteBar:ClearFocus()
 		else
 			self:SendMessage("AUCTIONBUDDY_ERROR", "CannotAddEmptySearch")
 		end
@@ -476,6 +476,7 @@ function BuyInterfaceModule:OnShowBuyFrame()
 	BuyInterfaceModule.mainFrame.totalBidCost:SetText(BuyInterfaceModule.mainFrame.totalBuyCost.value)
 	BuyInterfaceModule.mainFrame.scrollTable:ClearSelection()
 	BuyInterfaceModule.mainFrame.alreadyBidText:Hide()
+	BuyInterfaceModule.mainFrame.scrollTable.scanRunningText:Hide()
 
 	InterfaceFunctionsModule.switchingUI = false
 
@@ -485,9 +486,9 @@ function BuyInterfaceModule:OnAHScanRunning(isAHScanRunning)
 	UtilsModule:Log("BuyInterfaceModule", "OnAHScanRunning", 3)
 
 	if isAHScanRunning then
-		BuyInterfaceModule.mainFrame.scanRunningText:Show()
+		BuyInterfaceModule.mainFrame.scrollTable.scanRunningText:Show()
 	else
-		BuyInterfaceModule.mainFrame.scanRunningText:Hide()
+		BuyInterfaceModule.mainFrame.scrollTable.scanRunningText:Hide()
 	end
 
 end

@@ -47,11 +47,11 @@ function InterfaceFunctionsModule:AUCTION_ITEM_LIST_UPDATE()
 		BuyInterfaceModule.mainFrame.currentPlayerGold:SetText(BuyInterfaceModule.mainFrame.currentPlayerGold.value)
 	end)
 
-	--local valueGoldFormat = GetCoinTextureString(0, 15)
-	--BuyInterfaceModule.mainFrame.totalBidCost:SetText(valueGoldFormat)
-	--BuyInterfaceModule.mainFrame.totalBuyCost:SetText(valueGoldFormat)
-	--SellInterfaceModule.mainFrame.totalBidCost:SetText(valueGoldFormat)
-	--SellInterfaceModule.mainFrame.totalBuyCost:SetText(valueGoldFormat)
+	local valueGoldFormat = GetCoinTextureString(0, 15)
+	BuyInterfaceModule.mainFrame.totalBidCost:SetText(valueGoldFormat)
+	BuyInterfaceModule.mainFrame.totalBuyCost:SetText(valueGoldFormat)
+	SellInterfaceModule.mainFrame.totalBidCost:SetText(valueGoldFormat)
+	SellInterfaceModule.mainFrame.totalBuyCost:SetText(valueGoldFormat)
 	
 end
 
@@ -145,7 +145,7 @@ function InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame, bu
 	print(buyoutPrice, " ", buttonBuyoutPrice)
 	print(minBid, " ", buttonBidPrice)
 	print(stackSize, " ", buttonStackSize)
-	-- Checking if the selected button auction has been sold
+	-- Checking if the selected button auction has been sold or someone else already bid on it
 	if buyoutPrice ~= buttonBuyoutPrice or minBid ~= buttonBidPrice or stackSize ~= buttonStackSize then
 		UtilsModule:Log(self, "RemovingSelectedRow", 0)
 		InterfaceFunctionsModule:SendMessage("REMOVE_SELECTED_RESULTS_ROW", parentFrame.scrollTable:GetSelection())

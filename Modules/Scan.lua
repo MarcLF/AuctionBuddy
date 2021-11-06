@@ -213,19 +213,24 @@ function ScanModule:InsertResultsPage()
 		print(i + ScanModule.page * ScanModule.shownPerBlizzardPage)
 		print(itemName)
 		print(buyoutPrice)
+
+
 		-- This data is compared to each index of columnType array from the CreateResultsScrollFrameTable function inside ResultsTable.lua
-		tinsert(resultsTableData, 
-		{
-			texture = myTexture,
-			itemLink = tostring(GetAuctionItemLink("list", i)),
-			name = itemName,
-			owner = tostring(aucOwner),
-			count = aucCount,
-			itlvl = itemLevel,
-			bid = totalBidItem,
-			buy = buyOutPerItem,
-			totalPrice = buyoutPrice
-		})
+		if tostring(GetAuctionItemLink("list", i)) ~= nil then
+			tinsert(resultsTableData, 
+			{
+				texture = myTexture,
+				itemLink = tostring(GetAuctionItemLink("list", i)),
+				name = itemName,
+				owner = tostring(aucOwner),
+				count = aucCount,
+				itlvl = itemLevel,
+				bid = totalBidItem,
+				buy = buyOutPerItem,
+				totalPrice = buyoutPrice
+			})
+		end
+
 	end
 	hasCurrentPageBeenAdded = true
 

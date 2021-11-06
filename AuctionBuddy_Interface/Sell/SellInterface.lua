@@ -108,7 +108,7 @@ end
 function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 	
 	parentFrame.DefaultAHButton = CreateFrame("Button", "AB_SellInterface_MainFrame_DefaultAH_Button", parentFrame, "UIPanelButtonTemplate")
-	SellInterfaceModule:SetFrameParameters(parentFrame.DefaultAHButton, 80, 24, "Default AH", "TOPRIGHT", -25, -30)
+	SellInterfaceModule:SetFrameParameters(parentFrame.DefaultAHButton, 80, 24, "Default AH", "TOPRIGHT", -25, -45)
 	parentFrame.DefaultAHButton:SetScript("OnClick", function() 
 		InterfaceFunctionsModule.switchingUI = true
 		parentFrame:Hide()
@@ -119,7 +119,7 @@ function SellInterfaceModule:CreateSellInterfaceButtons(parentFrame)
 	end)
 	
 	parentFrame.BuyFrameButton = CreateFrame("Button", "AB_SellInterface_MainFrame_SellFrame_Button", parentFrame, "UIPanelButtonTemplate")
-	SellInterfaceModule:SetFrameParameters(parentFrame.BuyFrameButton, 80, 24, "Show Buy", "TOPRIGHT", -105, -30)
+	SellInterfaceModule:SetFrameParameters(parentFrame.BuyFrameButton, 80, 24, "Show Buy", "TOPRIGHT", -105, -45)
 	parentFrame.BuyFrameButton:SetScript("OnClick", function()
 		InterfaceFunctionsModule.switchingUI = true
 		parentFrame:Hide()
