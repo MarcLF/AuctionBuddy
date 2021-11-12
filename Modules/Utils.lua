@@ -15,7 +15,7 @@ UtilsModule.verbose = 0
 function UtilsModule:Log(...)
 
 	--@debug@ 
-	local verbose = select(3, ...)
+	local verbose = select(#{...}, ...)
 
 	if tonumber(verbose) <= UtilsModule.verbose then	
 		print(...)

@@ -104,14 +104,12 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 	parentFrame.scrollTable:EnableSelection(true)
 	parentFrame.scrollTable:RegisterEvents({
 		OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)	
-			if button == "LeftButton" or button == "RightButton" then
+			if (button == "LeftButton" or button == "RightButton") and CanSendAuctionQuery() then
 				UtilsModule:Log(self, "OnClickResultsTable", 2)
 				parentFrame.scrollTable:SetSelection(rowIndex)
 
 				local prevContainedInPageNumber = containedInPageNumber or ScanModule.page
 				containedInPageNumber = math.floor((parentFrame.scrollTable:GetSelection() - 1) / 50)
-				print("prev page: ", prevContainedInPageNumber)
-				print("current page: ", containedInPageNumber)
 
 				local buyoutPrice = nil
 				local bidPrice = nil
@@ -129,11 +127,14 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 
 				if prevContainedInPageNumber ~= containedInPageNumber then
 					ResultsTableModule:SendMessage("SCAN_SELECTED_ITEM_AH_PAGE", nil, nil, containedInPageNumber)
-				end
-
-				C_Timer.After(0.2, function() 	
+					C_Timer.After(0.2, function() 	
 					ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame, buyoutPrice, bidPrice, stackSize)
 				end)
+				else 
+					ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame, buyoutPrice, bidPrice, stackSize)
+				end
+			else
+				ResultsTableModule:SendMessage("AUCTIONBUDDY_ERROR", "FailedToSelectItem")
 			end
 			return true
 		end,

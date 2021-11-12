@@ -83,11 +83,8 @@ end
 function ItemsModule:OnBuySelectedItem(selectedItemData)
 	UtilsModule:Log(self, "BuySelectedItem", 1)
 	
-	print("Select Item original: ", selectedItemData)
 	local intervalModifier =  50 * math.floor((selectedItemData - 1) / 50)
-	print("Interval: ", intervalModifier)
 	selectedItemData = selectedItemData - intervalModifier
-	print("Select Item post conversion: ", selectedItemData)
 
 	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
 

@@ -141,6 +141,7 @@ function BuyInterfaceModule:CreateBuyInterfaceGeneral(parentFrame)
 	BuyInterfaceModule:SetFrameParameters(parentFrame.searchButton, 80, 24, "Search", "TOPLEFT", 235, -34)
 	parentFrame.searchButton:SetScript("OnClick", function() 
 		self:SendMessage("ON_AUCTION_HOUSE_SEARCH", parentFrame.searchBar:GetText())
+		parentFrame.searchBar:ClearFocus()
 		InterfaceFunctionsModule.autoCompleteTextPos = strlen(parentFrame.searchBar:GetText())
 	end)
 

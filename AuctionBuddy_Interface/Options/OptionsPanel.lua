@@ -19,7 +19,7 @@ function OptionsPanelModule:Enable()
 
 	if DatabaseModule.favoriteSearchesLists == nil then
 		C_Timer.After(1, function() self:CreatingInterfaceOnEnable() end)
-		print("AuctionBuddy encountered an error while loading the Options menu, trying again in 1 second...")
+		print("AuctionBuddy: Encountered an error while loading the Options menu, trying again in 1 second...")
 	else
 		self:CreatingInterfaceOnEnable()
 	end

@@ -16,7 +16,6 @@ local BuyInterfaceModule = nil
 local SellInterfaceModule = nil
 
 local isScanningRunning = false
-local scanDataSent = false
 
 local ScanResultsCoroutine = nil
 local scanFrame = nil
@@ -38,7 +37,6 @@ function ScanModule:Enable()
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 
 	self:RegisterMessage("ON_AUCTION_HOUSE_SEARCH", self.AuctionHouseSearchStart)
-	self:RegisterMessage("ON_SCAN_NEXT_AH_PAGE", self.AuctionHouseSearch)
 	self:RegisterMessage("SCAN_SELECTED_ITEM_AH_PAGE", self.AuctionHouseSearch)
 
 	self:RegisterMessage("REMOVE_SELECTED_RESULTS_ROW", self.RemoveSelectedResultsRow)
@@ -62,15 +60,13 @@ end
 
 function ScanModule:AUCTION_ITEM_LIST_UPDATE()
 	UtilsModule:Log(self, "AUCTION_ITEM_LIST_UPDATE", 1)
-	print("update")
+
 	if not isScanningRunning then
 		ScanModule.shownPerBlizzardPage, ScanModule.total = GetNumAuctionItems("list")
 		isScanningRunning = true
 	end
-	print(ScanModule.page)
-	print(gettingDataFromPageNum)
+
 	if isScanningRunning and gettingDataFromPageNum == ScanModule.page then
-		print("calling insert")
 		ScanModule:InsertResultsPage()
 		gettingDataFromPageNum = gettingDataFromPageNum + 1
 	end
@@ -113,7 +109,7 @@ end
 
 function ScanModule:AuctionHouseSearch(textToSearch, exactMatch, pageToSearch)
 	UtilsModule:Log(self, "AuctionHouseSearch", 0)
-	print("querying")
+
 	if textToSearch ~= nil and textToSearch ~= AuctionBuddy.searchText then
 		ScanModule.page = 0
 	end
@@ -147,7 +143,6 @@ function ScanModule:AuctionHouseSearch(textToSearch, exactMatch, pageToSearch)
     end
 
 	local currentPageToSearch = pageToSearch or ScanModule.page
-	print("Searching Page: ", currentPageToSearch)
 
 	QueryAuctionItems(	
 		AuctionBuddy.searchText, 
@@ -169,7 +164,7 @@ function ScanModule:ScanResults()
 	local interval = math.max(ScanModule.shownPerBlizzardPage - 1, 1)
 
 	for currentScanSize = 0, ScanModule.total, interval do
-		print("loop1")
+
 		coroutine.yield()
 		ScanModule.page = ScanModule.page + 1
 
@@ -184,7 +179,6 @@ end
 
 function ScanModule:InsertResultsPage()
 	UtilsModule:Log("ScanModule", "InsertResultsPage", 0)
-	print("inserting")
 
 	hasCurrentPageBeenAdded = false
 
@@ -194,9 +188,7 @@ function ScanModule:InsertResultsPage()
 
 	for i = 1, ScanModule.shownPerBlizzardPage do
 		if i + ScanModule.page * ScanModule.shownPerBlizzardPage > ScanModule.total then
-			print("breaking")
-			print(ScanModule.page)
-			print(i + ScanModule.page * ScanModule.shownPerBlizzardPage)
+			UtilsModule:Log("ScanModule", "Breaking", ScanModule.page, 0)
 			break
 		end
 		local itemName, myTexture, aucCount, itemQuality, canUse, itemLevel, levelColHeader, minBid,
@@ -211,8 +203,6 @@ function ScanModule:InsertResultsPage()
 		else
 			totalBidItem = minBid
 		end
-
-		print(i + ScanModule.page * ScanModule.shownPerBlizzardPage)
 
 		-- This data is compared to each index of columnType array from the CreateResultsScrollFrameTable function inside ResultsTable.lua
 		if tostring(GetAuctionItemLink("list", i)) ~= nil then
@@ -245,7 +235,7 @@ end
 
 function ScanModule:SendResultsTable()
 	UtilsModule:Log("ScanModule", "SendResultsTable", 2)
-	print("sending results")
+
 	local scrollTable = nil
 
 	if BuyInterfaceModule.mainFrame:IsShown() then

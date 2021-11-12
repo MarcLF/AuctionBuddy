@@ -130,25 +130,24 @@ function InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame, bu
 	UtilsModule:Log(self, "UpdateTotalBuyoutAndBidCostBuy", 0)
 
 	local selectedItemData = parentFrame.scrollTable:GetSelection()
-	print("Select Item original: ", selectedItemData)
 	local intervalModifier =  50 * math.floor((selectedItemData - 1) / 50)
-	print("Interval: ", intervalModifier)
 	selectedItemData = selectedItemData - intervalModifier
-	print("Select Item post conversion: ", selectedItemData)
+
+	UtilsModule:Log("Select Item post conversion: ", "selectedItemData", 0)
+
 	local stackSize = select(3, GetAuctionItemInfo("list", selectedItemData))
 	local minBid = select(8, GetAuctionItemInfo("list", selectedItemData))
 	local minBidIncrement = select(9, GetAuctionItemInfo("list", selectedItemData))
 	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
 	local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemData))
 	local highBidder = select(12, GetAuctionItemInfo("list", selectedItemData))
-
-	print(buyoutPrice, " ", buttonBuyoutPrice)
-	print(minBid, " ", buttonBidPrice)
-	print(stackSize, " ", buttonStackSize)
+	
 	-- Checking if the selected button auction has been sold or someone else already bid on it
 	if buyoutPrice ~= buttonBuyoutPrice or minBid ~= buttonBidPrice or stackSize ~= buttonStackSize then
 		UtilsModule:Log(self, "RemovingSelectedRow", 0)
 		InterfaceFunctionsModule:SendMessage("REMOVE_SELECTED_RESULTS_ROW", parentFrame.scrollTable:GetSelection())
+		InterfaceFunctionsModule:SendMessage("AUCTIONBUDDY_ERROR", "SelectedItemRemoved")
+		UtilsModule:Log(self, "UpdateTotalBuyoutAndBidCostBuy", 0)
 		return
 	end
 
