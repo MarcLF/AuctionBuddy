@@ -129,6 +129,10 @@ end
 function InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame, buttonBuyoutPrice, buttonBidPrice, buttonStackSize)
 	UtilsModule:Log(self, "UpdateTotalBuyoutAndBidCostBuy", 0)
 
+	if parentFrame.scrollTable:GetSelection() == nil then
+		return
+	end
+
 	local selectedItemData = parentFrame.scrollTable:GetSelection()
 	local intervalModifier =  50 * math.floor((selectedItemData - 1) / 50)
 	selectedItemData = selectedItemData - intervalModifier

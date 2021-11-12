@@ -140,11 +140,22 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 		end,
 		
 		OnDoubleClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)
+			local buyoutPrice = nil
+			local bidPrice = nil
+
+			for key, value in pairs(rowData) do
+				if key == "totalPrice" then
+					buyoutPrice = value
+				elseif key == "bid" then
+					bidPrice = value
+				end
+			end
+
 			if button == "LeftButton" and DatabaseModule.buyOptions.doubleClickToBuy == true then
-				ResultsTableModule:SendMessage("ON_BUY_SELECTED_ITEM", parentFrame.scrollTable:GetSelection())
+				ResultsTableModule:SendMessage("ON_BUY_SELECTED_ITEM", parentFrame.scrollTable:GetSelection(), buyoutPrice)
 				parentFrame.scrollTable:ClearSelection()
 			elseif button == "RightButton" and DatabaseModule.buyOptions.doubleClickToBid == true then
-				ResultsTableModule:SendMessage("ON_BID_SELECTED_ITEM", parentFrame.scrollTable:GetSelection())
+				ResultsTableModule:SendMessage("ON_BID_SELECTED_ITEM", parentFrame.scrollTable:GetSelection(), bidPrice)
 				parentFrame.scrollTable:ClearSelection()
 			end
 			return true

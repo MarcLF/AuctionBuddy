@@ -67,7 +67,7 @@ function ItemsModule:OnClickItemToSell(frameClicked)
 
 end
 
-function ItemsModule:OnBidSelectedItem(selectedItemData)
+function ItemsModule:OnBidSelectedItem(selectedItemData, buttonBidPrice)
 	UtilsModule:Log(self, "OnBidSelectedItem", 1)
 
 	local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemData))
@@ -80,13 +80,18 @@ function ItemsModule:OnBidSelectedItem(selectedItemData)
 
 end
 
-function ItemsModule:OnBuySelectedItem(selectedItemData)
+function ItemsModule:OnBuySelectedItem(selectedItemData, buttonBuyoutPrice)
 	UtilsModule:Log(self, "BuySelectedItem", 1)
 	
 	local intervalModifier =  50 * math.floor((selectedItemData - 1) / 50)
 	selectedItemData = selectedItemData - intervalModifier
 
 	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
+
+	if buttonBuyoutPrice ~= nil and buyoutPrice ~= buttonBuyoutPrice then
+		InterfaceFunctionsModule:SendMessage("AUCTIONBUDDY_ERROR", "FailedToBuyAuction")
+		return
+	end
 
 	PlaceAuctionBid('list', selectedItemData, buyoutPrice)
 	
