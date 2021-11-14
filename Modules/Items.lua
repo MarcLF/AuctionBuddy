@@ -95,6 +95,8 @@ function ItemsModule:OnBuySelectedItem(selectedItemData, buttonBuyoutPrice)
 		return
 	end
 
+	local prevPlayerGold = GetMoney()
+
 	local blizzardPageSize = 50
 	local itemPage = math.floor((selectedItemData - 1) / blizzardPageSize)
 	local selectedItemPos = selectedItemData - itemPage * blizzardPageSize
@@ -107,7 +109,10 @@ function ItemsModule:OnBuySelectedItem(selectedItemData, buttonBuyoutPrice)
 	end
 
 	PlaceAuctionBid('list', selectedItemPos, buyoutPrice)
-	InterfaceFunctionsModule:SendMessage("REMOVE_SELECTED_RESULTS_ROW", selectedItemData)
+
+	if prevPlayerGold ~= GetMoney() then
+		InterfaceFunctionsModule:SendMessage("REMOVE_SELECTED_RESULTS_ROW", selectedItemData)
+	end
 	
 end
 

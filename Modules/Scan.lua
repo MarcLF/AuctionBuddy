@@ -226,7 +226,7 @@ function ScanModule:InsertResultsPage()
 end
 
 function ScanModule:RemoveSelectedResultsRow(rowToRemove)
-	UtilsModule:Log("ScanModule", "RemoveSelectedResultsRow", 2)
+	UtilsModule:Log("ScanModule", "RemoveSelectedResultsRow", 0)
 
 	table.remove(resultsTableData, rowToRemove)
 	ScanModule:SendResultsTable()
