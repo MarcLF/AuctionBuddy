@@ -5,14 +5,14 @@ local StdUi = LibStub('StdUi')
 
 local SearchesModule = AuctionBuddy:NewModule("SearchesModule", "AceEvent-3.0")
 
-local DebugModule = nil
+local UtilsModule = nil
 local BuyInterfaceModule = nil
 local DatabaseModule = nil
 
 function SearchesModule:Enable()
 
-	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable", 0)
+	UtilsModule = AuctionBuddy:GetModule("UtilsModule")
+	UtilsModule:Log(self, "Enable", 0)
 
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
 
@@ -46,7 +46,7 @@ function SearchesModule:Enable()
 end
 
 function SearchesModule:AUCTION_HOUSE_CLOSED()
-	DebugModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
+	UtilsModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
 
 	self:ResetData()
 	self:UnregisterAllEvents()
@@ -54,7 +54,7 @@ function SearchesModule:AUCTION_HOUSE_CLOSED()
 end
 
 function SearchesModule:CreateRecentSearchesScrollFrameTable(parentFrame, xPos, yPos, tableName)
-	DebugModule:Log(self, "CreateRecentSearchesScrollFrameTable", 2)
+	UtilsModule:Log(self, "CreateRecentSearchesScrollFrameTable", 2)
 
 	local columnType = 
 	{
@@ -68,12 +68,12 @@ function SearchesModule:CreateRecentSearchesScrollFrameTable(parentFrame, xPos, 
 	}
 	
 	parentFrame.recentSearchesTable = StdUi:ScrollTable(parentFrame, columnType, 8, 16)
-	StdUi:GlueTop(parentFrame.recentSearchesTable, parentFrame, xPos,yPos, 0, 0)
+	StdUi:GlueTop(parentFrame.recentSearchesTable, parentFrame, xPos, yPos, 0, 0)
 	parentFrame.recentSearchesTable:EnableSelection(true)
 	parentFrame.recentSearchesTable:RegisterEvents({
 		OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)	
 			if button == "LeftButton" then
-					AuctionBuddy:AuctionHouseSearch(rowData.searchName)	
+				self:SendMessage("ON_AUCTION_HOUSE_SEARCH", rowData.searchName)
 			end
 			return true
 		end,
@@ -82,7 +82,7 @@ function SearchesModule:CreateRecentSearchesScrollFrameTable(parentFrame, xPos, 
 end
 
 function SearchesModule:CreateFavoriteSearchesScrollFrameTable(parentFrame, xPos, yPos, tableName)
-	DebugModule:Log(self, "CreateFavoriteSearchesScrollFrameTable", 2)
+	UtilsModule:Log(self, "CreateFavoriteSearchesScrollFrameTable", 2)
 
 	local columnType = {
 		{
@@ -100,7 +100,7 @@ function SearchesModule:CreateFavoriteSearchesScrollFrameTable(parentFrame, xPos
 	parentFrame.favoriteSearchesTable:RegisterEvents({
 		OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)	
 			if button == "LeftButton" then
-					AuctionBuddy:AuctionHouseSearch(rowData.searchName)	
+				self:SendMessage("ON_AUCTION_HOUSE_SEARCH", rowData.searchName)
 			end
 			return true
 		end,
@@ -109,7 +109,7 @@ function SearchesModule:CreateFavoriteSearchesScrollFrameTable(parentFrame, xPos
 end
 
 function SearchesModule:CreateFavoriteSearchesDropDownMenu(parentFrame, xPos, yPos)
-	DebugModule:Log(self, "CreateFavoriteSearchesDropDownMenu", 2)
+	UtilsModule:Log(self, "CreateFavoriteSearchesDropDownMenu", 2)
 
 	parentFrame.selectFavListText = parentFrame:CreateFontString("AB_BuyInterface_MainFrame_FavoriteLists_SelectFavListText", "OVERLAY", "GameFontWhite")
 	parentFrame.selectFavListText:SetPoint("RIGHT", xPos - 195, yPos + 2)
@@ -125,7 +125,7 @@ function SearchesModule:CreateFavoriteSearchesDropDownMenu(parentFrame, xPos, yP
 end
 
 local function SelectList(self, arg1, arg2, checked)
-	DebugModule:Log("SearchesModule", "SelectList", 3)
+	UtilsModule:Log("SearchesModule", "SelectList", 3)
 
 	BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu.value = arg1
 	UIDropDownMenu_SetText(BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu, DatabaseModule.favoriteSearchesLists[arg1][arg2])
@@ -135,7 +135,7 @@ local function SelectList(self, arg1, arg2, checked)
 end
 
 function SearchesModule:FavoriteListsDropDown(frame, level, menuList)
-	DebugModule:Log(self, "FavoriteListsDropDown", 2)
+	UtilsModule:Log(self, "FavoriteListsDropDown", 2)
 
 	local info = UIDropDownMenu_CreateInfo()
 	info.func = SelectList
@@ -155,7 +155,7 @@ function SearchesModule:FavoriteListsDropDown(frame, level, menuList)
 end
 
 function SearchesModule:ResetData()
-	DebugModule:Log(self, "ResetData", 1)
+	UtilsModule:Log(self, "ResetData", 1)
 
 	BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu.value = nil
 	UIDropDownMenu_ClearAll(BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu)

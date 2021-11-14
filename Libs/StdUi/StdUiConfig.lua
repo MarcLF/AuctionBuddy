@@ -32,16 +32,16 @@ function StdUi:ResetConfig()
 		},
 
 		backdrop    = {
-			texture        = nil,
-			panel          = { r = 0.0588, g = 0.0588, b = 0, a = 0.8 },
-			slider         = { r = 0.15, g = 0.15, b = 0.15, a = 1 },
+			texture        = [[Interface\Buttons\WHITE8X8]],
+			panel          = { r = 0.1, g = 0.1, b = 0.1, a = 0.8 },
+			slider         = { r = 0.9, g = 0.9, b = 0.9, a = 1 },
 
-			highlight      = { r = 0.40, g = 0.40, b = 0, a = 0.5 },
+			highlight      = { r = 0.40, g = 0.40, b = 0, a = 0.4 },
 			button         = { r = 0.20, g = 0.20, b = 0.20, a = 1 },
 			buttonDisabled = { r = 0.15, g = 0.15, b = 0.15, a = 1 },
 
-			border         = { r = 0.00, g = 0.00, b = 0.00, a = 1 },
-			borderDisabled = { r = 0.40, g = 0.40, b = 0.40, a = 1 }
+			border         = { r = 0.00, g = 0.00, b = 0.00, a = 0 },
+			borderDisabled = { r = 0.40, g = 0.40, b = 0.40, a = 0 }
 		},
 
 		progressBar = {
@@ -49,7 +49,7 @@ function StdUi:ResetConfig()
 		},
 
 		highlight   = {
-			color = { r = 0.9, g = 0.9, b = 0.4, a = 0.3 },
+			color = { r = 0.9, g = 0.9, b = 0.4, a = 0.2 },
 			blank = { r = 0, g = 0, b = 0, a = 0 }
 		},
 

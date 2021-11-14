@@ -1,28 +1,26 @@
 --
 local AuctionBuddy = unpack(select(2, ...))
 
-local StdUi = LibStub('StdUi')
-
 local ItemsModule = AuctionBuddy:NewModule("ItemsModule", "AceEvent-3.0")
 
 ItemsModule.currentItemPostedLink = nil
 
-local DebugModule = nil
+local UtilsModule = nil
 local InterfaceFunctionsModule = nil
 local BuyInterfaceModule = nil
 local SellInterfaceModule = nil
 
 function ItemsModule:Enable()
 
-	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable", 0)
+	UtilsModule = AuctionBuddy:GetModule("UtilsModule")
+	UtilsModule:Log(self, "Enable", 0)
 
 	InterfaceFunctionsModule = AuctionBuddy:GetModule("InterfaceFunctionsModule")
 	BuyInterfaceModule = AuctionBuddy:GetModule("BuyInterfaceModule")
 	SellInterfaceModule = AuctionBuddy:GetModule("SellInterfaceModule")
 
 	self:RegisterEvent("AUCTION_HOUSE_CLOSED")
-	self:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
+
 	self:RegisterMessage("CONTAINER_ITEM_SELECTED", self.OnContainerItemSelected)
 	self:RegisterMessage("ON_CLICK_ITEM_TO_SELL", self.OnClickItemToSell)
 	self:RegisterMessage("ON_BID_SELECTED_ITEM", self.OnBidSelectedItem)
@@ -32,11 +30,12 @@ function ItemsModule:Enable()
 	self:RegisterMessage("ON_CLICK_MAX_STACK_SIZE", self.OnClickMaxStackSize)
 	self:RegisterMessage("ON_CLICK_MAX_STACK_QUANTITY", self.OnClickMaxStackQuantity)
 	self:RegisterMessage("REMOVE_INSERTED_ITEM", self.RemoveInsertedItem)
+	self:RegisterMessage("UPDATE_SELL_ITEM_PRICE", self.UpdateSellItemPriceAfterSearch)
 	
 end
 
 function ItemsModule:AUCTION_HOUSE_CLOSED()
-	DebugModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
+	UtilsModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
 
 	if ItemsModule.currentItemPostedLink ~= nil then
 		PickupItem(ItemsModule.currentItemPostedLink) 
@@ -48,24 +47,8 @@ function ItemsModule:AUCTION_HOUSE_CLOSED()
 	
 end
 
-function ItemsModule:AUCTION_ITEM_LIST_UPDATE()
-	DebugModule:Log(self, "AUCTION_ITEM_LIST_UPDATE", 1)
-
-	self.shown, self.total = GetNumAuctionItems("list")
-
-	if BuyInterfaceModule.mainFrame:IsShown() then
-		ItemsModule:CreateAuctionItemButtons(self.shown, BuyInterfaceModule.mainFrame.scrollTable)
-	elseif SellInterfaceModule.mainFrame:IsShown() then
-		ItemsModule:CreateAuctionItemButtons(self.shown, SellInterfaceModule.mainFrame.scrollTable)
-		if self.total > 0 then 
-			ItemsModule:UpdateSellItemPriceAfterSearch(1,  self.shown, self.total)
-		end
-	end
-	
-end
-
 function ItemsModule:OnContainerItemSelected(parentFrame, bagID, bagSlot)
-	DebugModule:Log(self, "OnContainerItemSelected", 1)
+	UtilsModule:Log(self, "OnContainerItemSelected", 1)
 
 	ItemsModule:InsertSelectedItem(parentFrame)
 	ItemsModule:CalculateMaxStackValues(parentFrame, bagID, bagSlot)
@@ -73,7 +56,7 @@ function ItemsModule:OnContainerItemSelected(parentFrame, bagID, bagSlot)
 end
 
 function ItemsModule:OnClickItemToSell(frameClicked)
-	DebugModule:Log("ItemsModule", "OnClickItemToSell", 1)
+	UtilsModule:Log("ItemsModule", "OnClickItemToSell", 1)
 
 	if CursorHasItem() == false then
 		PickupItem(ItemsModule.currentItemPostedLink) 
@@ -84,47 +67,81 @@ function ItemsModule:OnClickItemToSell(frameClicked)
 
 end
 
-function ItemsModule:OnBidSelectedItem(selectedItemData)
-	DebugModule:Log("ItemsModule", "OnBidSelectedItem", 1)
+function ItemsModule:OnBidSelectedItem(selectedItemData, buttonBidPrice)
+	UtilsModule:Log(self, "OnBidSelectedItem", 1)
 
-	local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemData))
-	local minIncrement = select(9, GetAuctionItemInfo("list", selectedItemData))
-	local minBid = select(8, GetAuctionItemInfo("list", selectedItemData))
+	if selectedItemData == nil then
+		return
+	end
+
+	local selectedItemPos = nil
+
+	for key, value in pairs(selectedItemData) do
+		if key == "itemPos" then
+			selectedItemPos = value
+		end
+	end
+
+	local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemPos))
+	local minIncrement = select(9, GetAuctionItemInfo("list", selectedItemPos))
+	local minBid = select(8, GetAuctionItemInfo("list", selectedItemPos))
 
 	local totalAmountToBid = max(bidAmount, minBid) + minIncrement
 
-	PlaceAuctionBid('list', selectedItemData, totalAmountToBid)
-	--Refresh ResultsTable by doing a nil AH search
-	if GetMoney() > totalAmountToBid then
-		AuctionBuddy:AuctionHouseSearch(nil)
-	end
+	PlaceAuctionBid('list', selectedItemPos, totalAmountToBid)
 
 end
 
-function ItemsModule:OnBuySelectedItem(selectedItemData)
-	DebugModule:Log(self, "BuySelectedItem", 2)
-	
-	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
+function ItemsModule:OnBuySelectedItem(selectedItemData, buttonBuyoutPrice)
+	UtilsModule:Log(self, "BuySelectedItem", 1)
 
-	PlaceAuctionBid('list', selectedItemData, buyoutPrice)
+	if selectedItemData == nil then
+		return
+	end
+
+	local selectedItemPos = nil
+
+	for key, value in pairs(selectedItemData) do
+		if key == "itemPos" then
+			selectedItemPos = value
+		end
+	end
+
+	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemPos))
+
+	if buttonBuyoutPrice ~= nil and buyoutPrice ~= buttonBuyoutPrice then
+		InterfaceFunctionsModule:SendMessage("AUCTIONBUDDY_ERROR", "FailedToBuyAuction")
+		return
+	end
+
+	PlaceAuctionBid('list', selectedItemPos, buyoutPrice)
 	
 end
 
 function ItemsModule:OnSellSelectedItem(parentFrame)
-	DebugModule:Log(self, "SellSelectedItem", 2)
+	UtilsModule:Log("ItemsModule", "SellSelectedItem", 2)
 
 	local stackPriceBid =  MoneyInputFrame_GetCopper(parentFrame.stackPriceBid)
-
-	local itemPrice = MoneyInputFrame_GetCopper(parentFrame.itemPrice)
 	local stackPrice = MoneyInputFrame_GetCopper(parentFrame.stackPrice)
 	
-	local stackSize = parentFrame.stackSize:GetText()
-	local stackNumber = parentFrame.stackQuantity:GetText()
-	
-	if (tonumber(stackSize) > 0 and tonumber(stackNumber) > 0) then
+	local stackSize = parentFrame.stackSize:GetNumber()
+	local stackNumber = parentFrame.stackQuantity:GetNumber()
+
+	local checkPostingErrors = false
+
+	if tonumber(stackSize) < 1 and tonumber(stackNumber) < 1 then
+		checkPostingErrors = true
+		ItemsModule:SendMessage("AUCTIONBUDDY_ERROR", "InvalidStackOrSizeQuantity")
+	end
+
+	if stackPriceBid < 1 or stackPrice < 1 then
+		checkPostingErrors = true
+		ItemsModule:SendMessage("AUCTIONBUDDY_ERROR", "InvalidAuctionPrice")
+	end
+
+	if checkPostingErrors == false then
 		PostAuction(stackPriceBid, stackPrice, parentFrame.auctionDuration.durationValue, stackSize, stackNumber)
-	else
-		print("AuctionBuddy: Can't place auctions without a valid stack size and quantity.")
+		ItemsModule:SendMessage("POSTING_ITEM_TO_AH")	
 	end
 
 	PickupItem(ItemsModule.currentItemPostedLink) 
@@ -132,76 +149,50 @@ function ItemsModule:OnSellSelectedItem(parentFrame)
 	
 end
 
-function ItemsModule:CreateAuctionItemButtons(itemsShown, scrollTable)
-	DebugModule:Log(self, "CreateAuctionItemButtons", 2)
+function ItemsModule:UpdateSellItemPriceAfterSearch(resultsTable)
+	UtilsModule:Log(self, "UpdateSellItemPriceAfterSearch", 2)
 
-	local tableData = {}
-	
-	for i = 1, itemsShown do
-		local itemName, myTexture, aucCount, itemQuality, canUse, itemLevel, levelColHeader, minBid,
-		minIncrement, buyoutPrice, bidAmount, highBidder, bidderFullName, aucOwner,
-		ownerFullName, saleStatus, itemId, hasAllInfo = GetAuctionItemInfo("list", i);
-		
-		local buyOutPerItem = buyoutPrice/aucCount
-		local totalBidItem
+	if shown == 0 then
+		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, 0)
+		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPriceBid, 0)
+		return
+	end
 
-		if bidAmount > 0 then
-			totalBidItem = bidAmount
-		else
-			totalBidItem = minBid
+	local buyoutPrice = 0
+	local prevBuyoutPrice = 0
+
+	local bidPrice = 0
+	local prevBidPrice = 0
+
+	for key, value in pairs(resultsTable) do
+		for nestedKey, nestedValue in pairs(value) do
+			if nestedKey == "buy" and nestedValue > 0 then
+				prevBuyoutPrice = nestedValue
+			elseif nestedKey == "bid" and nestedValue > 0 then
+				prevBidPrice = nestedValue
+			end
+
+			if prevBuyoutPrice <= buyoutPrice or buyoutPrice == 0 then
+				buyoutPrice = prevBuyoutPrice
+			end
+
+			if prevBidPrice <= bidPrice or bidPrice == 0 then
+				bidPrice = prevBidPrice
+			end
 		end
-
-		-- This data is compared to each index of columnType array from the CreateResultsScrollFrameTable function inside ResultsTable.lua
-		tinsert(tableData, 
-		{
-			texture = myTexture,
-			itemLink = tostring(GetAuctionItemLink("list", i)),
-			name = itemName,
-			owner = tostring(aucOwner),
-			count = aucCount,
-			quality = itemQuality,
-			itlvl = itemLevel,
-			bid = totalBidItem,
-			buy = buyOutPerItem,
-			totalPrice = buyoutPrice
-		})
 	end
-	
-	scrollTable:Show()
-	scrollTable:SetData(tableData, true)
-	
-end
 
-function ItemsModule:UpdateSellItemPriceAfterSearch(numberList, shown, total)
-	DebugModule:Log(self, "UpdateSellItemPriceAfterSearch", 2)
-	
-	local buyoutPrice = select(10, GetAuctionItemInfo("list", numberList))
-	local itemQuantity = select(3, GetAuctionItemInfo("list", numberList))
-
-	local priceToSell = math.floor(buyoutPrice/itemQuantity) - 1
-
-	if buyoutPrice == 0 and total > 1 and numberList < shown then
-		numberList = numberList + 1
-		self:UpdateSellItemPriceAfterSearch(numberList, shown, total)
-	else
-		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, priceToSell)
-		MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPriceBid, priceToSell)
+	if bidPrice > buyoutPrice then
+		bidPrice = buyoutPrice
 	end
-	
-end
 
-function ItemsModule:SearchSelectedContainerItem()
-	DebugModule:Log(self, "SearchSelectedContainerItem", 2)
-	
-	infoType, info1, info2 = GetCursorInfo()
-	local itemName = GetItemInfo(info2) 
-	ClearCursor()
-	AuctionBuddy:AuctionHouseSearch(itemName)
+	MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPriceBid, math.max(bidPrice - 1, 0))
+	MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, math.max(buyoutPrice - 1, 0))
 	
 end
 
 function ItemsModule:InsertSelectedItem(parentFrame)
-	DebugModule:Log(self, "InsertSelectedItem", 2)
+	UtilsModule:Log(self, "InsertSelectedItem", 2)
 		
 	infoType, info1, info2 = GetCursorInfo()
 	
@@ -227,7 +218,7 @@ function ItemsModule:InsertSelectedItem(parentFrame)
 		parentFrame.stackSize:SetText(1)
 		
 		local itemName = GetItemInfo(info2) 
-		AuctionBuddy:AuctionHouseSearch(itemName, true)		
+		ItemsModule:SendMessage("ON_AUCTION_HOUSE_SEARCH", itemName, nil, true)
 					
 		ClickAuctionSellItemButton()
 		
@@ -241,7 +232,7 @@ function ItemsModule:InsertSelectedItem(parentFrame)
 end
 
 function ItemsModule:CalculateMaxStackValues(parentFrame, bagID, bagSlot)
-	DebugModule:Log(self, "CalculateMaxStackValues", 0)
+	UtilsModule:Log(self, "CalculateMaxStackValues", 0)
 
 	local itemAmountInBag = 0
 	local itemLink = select(7, GetContainerItemInfo(bagID, bagSlot))
@@ -250,7 +241,7 @@ function ItemsModule:CalculateMaxStackValues(parentFrame, bagID, bagSlot)
 
 	itemAmountInBag = ItemsModule:GetTotalItemAmountInBag(parentFrame, itemLink)
 
-	local maxStackSizeValue = math.min(itemAmountInBag, itemStackCount)
+	local maxStackSizeValue = math.max(math.min(itemAmountInBag, itemStackCount), 1)
 	local maxStackNumberValue = math.max(math.floor(itemAmountInBag / tonumber(parentFrame.stackSize:GetText())), 1)
 
 	parentFrame.stackSize.maxStackValue:SetText(tostring(maxStackSizeValue))
@@ -262,7 +253,7 @@ function ItemsModule:CalculateMaxStackValues(parentFrame, bagID, bagSlot)
 end
 
 function ItemsModule:UpdateMaxStackValues(parentFrame)
-	DebugModule:Log(self, "CalculateMaxStackValues", 0)
+	UtilsModule:Log(self, "CalculateMaxStackValues", 0)
 
 	local itemLink = parentFrame.itemToSellButton.text:GetText()
 	local itemAmountInBag = 0
@@ -270,16 +261,8 @@ function ItemsModule:UpdateMaxStackValues(parentFrame)
 
 	local itemStackCount = select(8, GetItemInfo(itemLink)) or 1
 
-	local stackSizeValue = 1
-	local stackQuantityValue = 1
-
-	if parentFrame.stackSize:GetText() ~= "" then
-		stackSizeValue = tonumber(parentFrame.stackSize:GetText())
-	end
-
-	if parentFrame.stackQuantity:GetText() ~= "" then
-		stackQuantityValue = tonumber(parentFrame.stackQuantity:GetText())
-	end
+	local stackSizeValue = math.max(parentFrame.stackSize:GetNumber(), 1)
+	local stackQuantityValue = math.max(parentFrame.stackQuantity:GetNumber(), 1)
 
 	local maxStackSizeValue = math.max(math.floor(itemAmountInBag / stackQuantityValue), 1)
 	local maxStackQuantityValue = itemAmountInBag
@@ -293,14 +276,14 @@ function ItemsModule:UpdateMaxStackValues(parentFrame)
 end
 
 function ItemsModule:OnClickMaxStackSize(parentFrame)
-	DebugModule:Log(self, "OnClickMaxStackSize", 0)
+	UtilsModule:Log(self, "OnClickMaxStackSize", 0)
 
 	parentFrame.stackSize:SetText(parentFrame.stackSize.maxStackValue:GetText())
 
 end
 
 function ItemsModule:OnClickMaxStackQuantity(parentFrame)
-	DebugModule:Log(self, "OnClickMaxStackQuantity", 0)
+	UtilsModule:Log(self, "OnClickMaxStackQuantity", 0)
 
 	parentFrame.stackQuantity:SetText(parentFrame.stackQuantity.maxStackValue:GetText())
 
@@ -332,7 +315,7 @@ function ItemsModule:GetTotalItemAmountInBag(parentFrame, itemLink)
 end
 
 function ItemsModule:RemoveInsertedItem()
-	DebugModule:Log(self, "RemoveInsertedItem", 2)
+	UtilsModule:Log(self, "RemoveInsertedItem", 2)
 	
 	infoType, info1, info2 = GetCursorInfo()
 
@@ -344,7 +327,7 @@ function ItemsModule:RemoveInsertedItem()
 end
 
 function ItemsModule:ShowToolTip(frame, link, show)
-	DebugModule:Log(self, "ShowToolTip", 3)
+	UtilsModule:Log(self, "ShowToolTip", 3)
 
 	if show == true then
 		GameTooltip:SetOwner(frame)
@@ -357,14 +340,14 @@ function ItemsModule:ShowToolTip(frame, link, show)
 end
 
 function ItemsModule:AddCursorItem(frame)
-	DebugModule:Log(self, "AddCursorItem", 2)
+	UtilsModule:Log(self, "AddCursorItem", 2)
 
 	local infoType, info1, info2 = GetCursorInfo()
 	local bindType = select(14, GetItemInfo(info2))
 	if bindType ~= 1 then
 		ItemsModule:InsertSelectedItem(frame.mainFrame)
 	else
-		print("AuctionBuddy: Can't auction Soulbound items")
+		ItemsModule:SendMessage("AUCTIONBUDDY_ERROR", "CannotSellSoulboundItems")
 	end
 
 end

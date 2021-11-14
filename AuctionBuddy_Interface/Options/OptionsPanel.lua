@@ -5,21 +5,21 @@ local StdUi = LibStub('StdUi')
 
 local OptionsPanelModule = AuctionBuddy:NewModule("OptionsPanelModule", "AceEvent-3.0")
 
-local DebugModule = nil
+local UtilsModule = nil
 local DatabaseModule = nil
 local OptionsFunctionsModule = nil
 
 function OptionsPanelModule:Enable()
 
-	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable", 0)
+	UtilsModule = AuctionBuddy:GetModule("UtilsModule")
+	UtilsModule:Log(self, "Enable", 0)
 
 	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
 	OptionsFunctionsModule = AuctionBuddy:GetModule("OptionsFunctionsModule")
 
 	if DatabaseModule.favoriteSearchesLists == nil then
 		C_Timer.After(1, function() self:CreatingInterfaceOnEnable() end)
-		print("AuctionBuddy encountered an error while loading the Options menu, trying again in 1 second...")
+		print("AuctionBuddy: Encountered an error while loading the Options menu, trying again in 1 second...")
 	else
 		self:CreatingInterfaceOnEnable()
 	end
@@ -27,7 +27,7 @@ function OptionsPanelModule:Enable()
 end
 
 function OptionsPanelModule:CreatingInterfaceOnEnable()
-	DebugModule:Log(self, "CreatingInterfaceOnEnable", 1)
+	UtilsModule:Log(self, "CreatingInterfaceOnEnable", 1)
 
 	self:CreateOptionsPanel()
 	self:CreateOptionsPanelChildFavoriteLists()
@@ -39,7 +39,7 @@ function OptionsPanelModule:CreatingInterfaceOnEnable()
 end
 
 function OptionsPanelModule:CreateOptionsPanel()
-	DebugModule:Log(self, "CreateOptionsPanel", 1)
+	UtilsModule:Log(self, "CreateOptionsPanel", 1)
 
 	self.panel = CreateFrame("Frame", "AuctionBuddy_OptionsPanel", UIParent)
 	self.panel.name = "AuctionBuddy"
@@ -59,14 +59,14 @@ function OptionsPanelModule:CreateOptionsPanel()
 	self.ABInfoFrame.text:SetWidth(500)
 	self.ABInfoFrame.text:SetPoint("TOPLEFT", 15, -12)
 	self.ABInfoFrame.text:SetJustifyH("LEFT")
-	self.ABInfoFrame.text:SetText("A user guide is coming in a future update. In the meanwhile, if you have any questions, please submit them in the comment section of the AuctionBuddy addon webpage.\n\nThank you.")
+	self.ABInfoFrame.text:SetText("AuctionBuddy is a small fast auction house addon using Blizzard artstyle.\nIt is intended to be an improvement from the vanilla auction house.\nIt's main features are:\n\nFast Search:\nAuctionBuddy scans the items from your bags and puts them on a list inside the User Interface so you can search any by just left clicking on them.\n\nSearch History:\nPrevious searches are stored into an easily accessible list.\n\nFavorite Lists System:\nSimilar to the previous category, you will be able to save (and then remove) specific searches, either by introducing manually the name of them or by right-clicking any item from your bag items list.\nAlso you will be able to create delete and rename multiple favorite lists.\n\nSmart Sell:\nA related list to the one from Fast Search be shown in the Sell window, where you will be able to sell any item from your bags by left clicking on that list.\nIt will as well set the price per item equal to the lowest posted in that moment.\n\nOther Actions:\nAll windows are draggable.\nDouble left click to insta buy.\nMultiple search filters.\nUI Scaling.\nAuto-complete input search text.\n\n\nFor more information or to submit any feedback, please visit the link down below. Thank you!\n\nhttps://www.curseforge.com/wow/addons/auctionbuddy")
 
 	InterfaceOptions_AddCategory(self.panel)
 
 end
 
 function OptionsPanelModule:CreateOptionsPanelChildFavoriteLists()
-	DebugModule:Log(self, "CreateOptionsPanelChildFavoriteLists", 2)
+	UtilsModule:Log(self, "CreateOptionsPanelChildFavoriteLists", 2)
 
 	self.favoriteLists = CreateFrame("Frame", "AuctionBuddy_OptionsPanel_FavoriteLists", self.panel)
 	self.favoriteLists.name = "Favorite Lists"
@@ -156,7 +156,7 @@ function OptionsPanelModule:CreateOptionsPanelChildFavoriteLists()
 end
 
 function OptionsPanelModule:CreateOptionsPanelChildFavoriteListsButtons(parentFrame)
-	DebugModule:Log(self, "CreateOptionsPanelChildFavoriteListsButtons", 3)
+	UtilsModule:Log(self, "CreateOptionsPanelChildFavoriteListsButtons", 3)
 
 	parentFrame.textInputEditList = CreateFrame("EditBox", "AuctionBuddy_OptionsPanel_FavoriteLists_ManageList_EditBox", parentFrame, "InputBoxTemplate")
 	parentFrame.textInputEditList:SetWidth(200)
@@ -230,7 +230,7 @@ function OptionsPanelModule:CreateOptionsPanelChildFavoriteListsButtons(parentFr
 end
 
 function OptionsPanelModule:CreateOptionsPanelChildSellParameters()
-	DebugModule:Log(self, "CreateOptionsPanelChildSellParameters", 3)
+	UtilsModule:Log(self, "CreateOptionsPanelChildSellParameters", 3)
 
 	self.sellParameters = CreateFrame("Frame", "AuctionBuddy_OptionsPanel_SellParameters", OptionsPanelModule.panel)
 	self.sellParameters.name = "Sell Parameters"
@@ -294,7 +294,7 @@ function OptionsPanelModule:CreateOptionsPanelChildSellParameters()
 end
 
 local function SelectList(self, arg1, arg2, checked)
-	DebugModule:Log("OptionsPanelModule", "SelectList", 2)
+	UtilsModule:Log("OptionsPanelModule", "SelectList", 2)
 
 	OptionsPanelModule.favoriteLists.selectList.value = arg1
 	UIDropDownMenu_SetText(OptionsPanelModule.favoriteLists.selectList, DatabaseModule.favoriteSearchesLists[arg1][arg2])
@@ -304,7 +304,7 @@ local function SelectList(self, arg1, arg2, checked)
 end
 
 function OptionsPanelModule:FavoriteListsDropDown(frame, level, menuList)
-	DebugModule:Log(self, "FavoriteListsDropDown", 3)
+	UtilsModule:Log(self, "FavoriteListsDropDown", 3)
 
 	local info = UIDropDownMenu_CreateInfo()
 	info.func = SelectList
@@ -324,7 +324,7 @@ function OptionsPanelModule:FavoriteListsDropDown(frame, level, menuList)
 end
 
 function OptionsPanelModule:CreateFavoriteSearchesScrollFrameTable(parentFrame, xPos, yPos)
-	DebugModule:Log(self, "CreateFavoriteSearchesScrollFrameTable", 3)
+	UtilsModule:Log(self, "CreateFavoriteSearchesScrollFrameTable", 3)
 
 	local columnType = {
 		{

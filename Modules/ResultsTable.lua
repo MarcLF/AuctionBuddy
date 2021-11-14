@@ -5,22 +5,26 @@ local StdUi = LibStub('StdUi')
 
 local ResultsTableModule = AuctionBuddy:NewModule("ResultsTableModule", "AceEvent-3.0")
 
-local DebugModule = nil
+local UtilsModule = nil
 local ItemsModule = nil
 local DatabaseModule = nil
+local ScanModule = nil
+
+local containedInPageNumber = nil
 
 function ResultsTableModule:Enable()
 
-	DebugModule = AuctionBuddy:GetModule("DebugModule")
-	DebugModule:Log(self, "Enable", 0)
+	UtilsModule = AuctionBuddy:GetModule("UtilsModule")
+	UtilsModule:Log(self, "Enable", 0)
 
 	ItemsModule = AuctionBuddy:GetModule("ItemsModule")
 	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
+	ScanModule = AuctionBuddy:GetModule("ScanModule")
 
 end
 
 function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPos)
-	DebugModule:Log(self, "CreateResultsScrollFrameTable", 2)
+	UtilsModule:Log(self, "CreateResultsScrollFrameTable", 2)
 	
 	if parentFrame.scrollTableCreated then
 		return
@@ -29,7 +33,7 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 	local columnType = {
 		{
 			name         = "Icon",
-			width        = 48,
+			width        = 36,
 			align        = "LEFT",
 			index        = "texture",
 			format       = "icon",
@@ -46,9 +50,9 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 		},
 		{
 			name         = "Name",
-			width        = 80,
+			width        = 150,
 			align        = "LEFT",
-			index        = "itemLink",
+			index        = "name",
 			format       = "string",
 		},
 		{
@@ -59,65 +63,109 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 			format       = "string",
 		},
 		{
-			name         = "Quantity",
-			width        = 60,
-			align        = "CENTER",
+			name         = "Size",
+			width        = 50,
+			align        = "LEFT",
 			index        = "count",
-			format       = "number",
-		},
-		{
-			name         = "Quality",
-			width        = 60,
-			align        = "CENTER",
-			index        = "quality",
 			format       = "string",
 		},
 		{
-			name         = "Level",
-			width        = 50,
+			name         = " Lvl",
+			width        = 45,
 			align        = "CENTER",
 			index        = "itlvl",
 			format       = "string",
 		},
 		{
 			name         = "Bid / Total",
-			width        = 80,
+			width        = 90,
 			align        = "RIGHT",
 			index        = "bid",
 			format       = "money",
 		},
 		{
 			name         = "Buy / Item",
-			width        = 80,
+			width        = 90,
 			align        = "RIGHT",
 			index        = "buy",
 			format       = "money",
 		},
 			{
-			name         = 'Total Price',
-			width        = 80,
+			name         = "Buy / Total",
+			width        = 90,
 			align        = 'RIGHT',
 			index        = 'totalPrice',
 			format       = 'money',
 		},
 	}
 	
-	parentFrame.scrollTable = StdUi:ScrollTable(parentFrame, columnType, 16, 32)
-	StdUi:GlueTop(parentFrame.scrollTable, parentFrame, xPos,yPos, 0, 0)
+	parentFrame.scrollTable = StdUi:ScrollTable(parentFrame, columnType, 18, 28)
+	StdUi:GlueTop(parentFrame.scrollTable, parentFrame, xPos, yPos, 0, 0)
 	parentFrame.scrollTable:EnableSelection(true)
 	parentFrame.scrollTable:RegisterEvents({
 		OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)	
-			if button == "LeftButton" then
-				DebugModule:Log(self, "OnLeftClickResultsTable", 2)
+			if (button == "LeftButton" or button == "RightButton") and CanSendAuctionQuery() then
+				UtilsModule:Log(self, "OnClickResultsTable", 2)
 				parentFrame.scrollTable:SetSelection(rowIndex)
-				self:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame)	
+
+				local buyoutPrice = nil
+				local bidPrice = nil
+				local stackSize = nil
+				local itemPos = nil
+				local itemPage = nil
+
+				for key, value in pairs(rowData) do
+					if key == "totalPrice" then
+						buyoutPrice = value
+					elseif key == "bid" then
+						bidPrice = value
+					elseif key == "count" then
+						stackSize = value
+					elseif key == "itemPos" then
+						itemPos = value
+					elseif key == "itemPage" then
+						itemPage = value
+					end
+				end
+
+				local prevContainedInPageNumber = ScanModule.page
+				containedInPageNumber = itemPage
+				UtilsModule:Log("Selected item page number", itemPage, 0)
+				UtilsModule:Log("Prev page number", prevContainedInPageNumber, 0)
+				if prevContainedInPageNumber ~= containedInPageNumber then
+					ResultsTableModule:SendMessage("SCAN_SELECTED_ITEM_AH_PAGE", nil, containedInPageNumber)
+					C_Timer.After(0.2, function() 	
+					ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame, buyoutPrice, bidPrice, stackSize, itemPos)
+				end)
+				else 
+					ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame, buyoutPrice, bidPrice, stackSize, itemPos)
+				end
+			else
+				ResultsTableModule:SendMessage("AUCTIONBUDDY_ERROR", "FailedToSelectItem")
 			end
 			return true
 		end,
 		
 		OnDoubleClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)
+			local buyoutPrice = nil
+			local bidPrice = nil
+			local itemPos = nil
+
+			for key, value in pairs(rowData) do
+				if key == "totalPrice" then
+					buyoutPrice = value
+				elseif key == "bid" then
+					bidPrice = value
+				elseif key == "itemPos" then
+					itemPos = value
+				end
+			end
+
 			if button == "LeftButton" and DatabaseModule.buyOptions.doubleClickToBuy == true then
-				self:SendMessage("ON_BUY_SELECTED_ITEM", parentFrame.scrollTable:GetSelection())
+				ResultsTableModule:SendMessage("ON_BUY_SELECTED_ITEM", itemPos, buyoutPrice)
+				parentFrame.scrollTable:ClearSelection()
+			elseif button == "RightButton" and DatabaseModule.buyOptions.doubleClickToBid == true then
+				ResultsTableModule:SendMessage("ON_BID_SELECTED_ITEM", itemPos, bidPrice)
 				parentFrame.scrollTable:ClearSelection()
 			end
 			return true
