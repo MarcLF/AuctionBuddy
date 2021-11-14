@@ -26,8 +26,8 @@ function SellInterfaceModule:Enable()
 	self:RegisterMessage("RESULTSTABLE_ITEM_SELECTED", self.OnResultsTableItemSelected)	
 	self:RegisterMessage("SHOW_AB_SELL_FRAME", self.OnShowSellFrame)	
 	self:RegisterMessage("ON_AH_SCAN_RUNNING", self.OnAHScanRunning)
-	self:RegisterMessage("SCAN_SELECTED_ITEM_AH_PAGE", self.DisableBuyBidButtons)
-	self:RegisterMessage("REMOVE_SELECTED_RESULTS_ROW", self.DisableBuyBidButtons)
+	self:RegisterMessage("SCAN_SELECTED_ITEM_AH_PAGE", self.ResetSelectedItemData)
+	self:RegisterMessage("REMOVE_SELECTED_RESULTS_ROW", self.ResetSelectedItemData)
 
 	if self.interfaceCreated == true then
 		return
@@ -290,7 +290,7 @@ function SellInterfaceModule:CreateSellInterfaceOptions(parentFrame)
 	parentFrame.buySelectedItem = CreateFrame("Button", "AB_SellInterface_MainFrame_SellSelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
 	SellInterfaceModule:SetFrameParameters(parentFrame.buySelectedItem, 125, 24, "Buy Selected Item", "LEFT", 160, -253)
 	parentFrame.buySelectedItem:SetScript("OnClick", function() 
-		self:SendMessage("ON_BUY_SELECTED_ITEM", parentFrame.scrollTable:GetSelection())
+		self:SendMessage("ON_BUY_SELECTED_ITEM", parentFrame.scrollTable:GetRow(parentFrame.scrollTable:GetSelection()))
 		SellInterfaceModule:DisableBuyBidButtons()
 		parentFrame.scrollTable:ClearSelection()
 	end)
@@ -299,7 +299,7 @@ function SellInterfaceModule:CreateSellInterfaceOptions(parentFrame)
 	parentFrame.bidSelectedItem = CreateFrame("Button", "AB_SellInterface_MainFrame_BidSelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
 	SellInterfaceModule:SetFrameParameters(parentFrame.bidSelectedItem, 125, 24, "Bid Selected Item", "LEFT", 20, -253)
 	parentFrame.bidSelectedItem:SetScript("OnClick", function() 
-		self:SendMessage("ON_BID_SELECTED_ITEM", parentFrame.scrollTable:GetSelection())
+		self:SendMessage("ON_BID_SELECTED_ITEM", parentFrame.scrollTable:GetRow(parentFrame.scrollTable:GetSelection()))
 		self:DisableBuyBidButtons()
 		parentFrame.alreadyBidText:Hide()
 		parentFrame.scrollTable:ClearSelection() 
@@ -614,10 +614,7 @@ function SellInterfaceModule:OnShowSellFrame()
 	SellInterfaceModule.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale)
 	SellInterfaceModule.mainFrame.currentPlayerGold.value = GetCoinTextureString(GetMoney(), 15)
 	SellInterfaceModule.mainFrame.currentPlayerGold:SetText(SellInterfaceModule.mainFrame.currentPlayerGold.value)
-	SellInterfaceModule.mainFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
-	SellInterfaceModule.mainFrame.totalBuyCost:SetText(SellInterfaceModule.mainFrame.totalBuyCost.value)
-	SellInterfaceModule.mainFrame.totalBidCost.value = GetCoinTextureString(0, 15)
-	SellInterfaceModule.mainFrame.totalBidCost:SetText(SellInterfaceModule.mainFrame.totalBuyCost.value)
+	SellInterfaceModule:ResetItemCosts()
 	SellInterfaceModule.mainFrame.scrollTable:ClearSelection()
 	SellInterfaceModule.mainFrame.alreadyBidText:Hide()
 	SellInterfaceModule.mainFrame.scrollTable.scanRunningText:Hide()
@@ -636,6 +633,22 @@ function SellInterfaceModule:OnAHScanRunning(isAHScanRunning)
 	else
 		SellInterfaceModule.mainFrame.scrollTable.scanRunningText:Hide()
 	end
+
+end
+
+function SellInterfaceModule:ResetSelectedItemData()
+
+	SellInterfaceModule:ResetItemCosts()
+	SellInterfaceModule:DisableBuyBidButtons()
+
+end
+
+function SellInterfaceModule:ResetItemCosts()
+
+	SellInterfaceModule.mainFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
+	SellInterfaceModule.mainFrame.totalBuyCost:SetText(BuyInterfaceModule.mainFrame.totalBuyCost.value)
+	SellInterfaceModule.mainFrame.totalBidCost.value = GetCoinTextureString(0, 15)
+	SellInterfaceModule.mainFrame.totalBidCost:SetText(BuyInterfaceModule.mainFrame.totalBuyCost.value)
 
 end
 

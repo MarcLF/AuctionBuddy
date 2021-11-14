@@ -111,12 +111,12 @@ function ScanModule:AuctionHouseSearch(textToSearch, pageToSearch)
 	UtilsModule:Log(self, "AuctionHouseSearch", 0)
 
 	if textToSearch ~= nil then
-		AuctionBuddy.searchText = textToSearch
+		ScanModule.searchText = textToSearch
 	end
 
-	local checkWhiteSpaces = string.gsub(AuctionBuddy.searchText, " ", "")
+	local checkWhiteSpaces = string.gsub(ScanModule.searchText, " ", "")
 
-	if string.len(AuctionBuddy.searchText) > 0 and string.len(checkWhiteSpaces) > 0 then
+	if string.len(ScanModule.searchText) > 0 and string.len(checkWhiteSpaces) > 0 then
 		DatabaseModule:InsertNewSearch(DatabaseModule.recentSearches, AuctionBuddy.searchText)
 		DatabaseModule:InsertDataFromDatabase(BuyInterfaceModule.mainFrame.recentSearchesTable, DatabaseModule.recentSearches)
 	end
@@ -140,7 +140,7 @@ function ScanModule:AuctionHouseSearch(textToSearch, pageToSearch)
 	ScanModule.page = currentPageToSearch
 
 	QueryAuctionItems(	
-		AuctionBuddy.searchText, 
+		ScanModule.searchText, 
 		BuyInterfaceModule.mainFrame.minILvl:GetNumber(),
 		BuyInterfaceModule.mainFrame.maxILvl:GetNumber(), 
 		currentPageToSearch,

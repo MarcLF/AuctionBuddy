@@ -13,8 +13,6 @@ local DatabaseModule = nil
 
 local containerNumOfSlots = nil
 
-ContainerModule.bagID = nil
-ContainerModule.bagSlot = nil
 ContainerModule.interfaceCreated = nil
 ContainerModule.isPostingItemToAH = false
 ContainerModule.isMultisellingItemsToAH = false
@@ -267,10 +265,8 @@ function ContainerModule:CreateSellContainerScrollFrameTable(parentFrame, xPos, 
 			if ContainerModule:CanSelectContainerItem() then
 				if button == "LeftButton" and ItemsModule.currentItemPostedLink ~= rowData.itemLink then
 					PickupContainerItem(rowData.bagID, rowData.slot)
-					ContainerModule.bagID = rowData.bagID
-					ContainerModule.bagSlot = rowData.slot
 					
-					ContainerModule:SendMessage("CONTAINER_ITEM_SELECTED", parentFrame, ContainerModule.bagID, ContainerModule.bagSlot)			
+					ContainerModule:SendMessage("CONTAINER_ITEM_SELECTED", parentFrame, rowData.bagID, rowData.slot)			
 
 					parentFrame.scrollTableContainer:ClearSelection()
 				end

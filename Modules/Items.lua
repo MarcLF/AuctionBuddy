@@ -70,13 +70,25 @@ end
 function ItemsModule:OnBidSelectedItem(selectedItemData, buttonBidPrice)
 	UtilsModule:Log(self, "OnBidSelectedItem", 1)
 
-	local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemData))
-	local minIncrement = select(9, GetAuctionItemInfo("list", selectedItemData))
-	local minBid = select(8, GetAuctionItemInfo("list", selectedItemData))
+	if selectedItemData == nil then
+		return
+	end
+
+	local selectedItemPos = nil
+
+	for key, value in pairs(selectedItemData) do
+		if key == "itemPos" then
+			selectedItemPos = value
+		end
+	end
+
+	local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemPos))
+	local minIncrement = select(9, GetAuctionItemInfo("list", selectedItemPos))
+	local minBid = select(8, GetAuctionItemInfo("list", selectedItemPos))
 
 	local totalAmountToBid = max(bidAmount, minBid) + minIncrement
 
-	PlaceAuctionBid('list', selectedItemData, totalAmountToBid)
+	PlaceAuctionBid('list', selectedItemPos, totalAmountToBid)
 
 end
 
@@ -86,18 +98,23 @@ function ItemsModule:OnBuySelectedItem(selectedItemData, buttonBuyoutPrice)
 	if selectedItemData == nil then
 		return
 	end
-	
-	local intervalModifier =  50 * math.floor((selectedItemData - 1) / 50)
-	selectedItemData = selectedItemData - intervalModifier
 
-	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
+	local selectedItemPos = nil
+
+	for key, value in pairs(selectedItemData) do
+		if key == "itemPos" then
+			selectedItemPos = value
+		end
+	end
+
+	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemPos))
 
 	if buttonBuyoutPrice ~= nil and buyoutPrice ~= buttonBuyoutPrice then
 		InterfaceFunctionsModule:SendMessage("AUCTIONBUDDY_ERROR", "FailedToBuyAuction")
 		return
 	end
 
-	PlaceAuctionBid('list', selectedItemData, buyoutPrice)
+	PlaceAuctionBid('list', selectedItemPos, buyoutPrice)
 	
 end
 
