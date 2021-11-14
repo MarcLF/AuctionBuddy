@@ -79,11 +79,13 @@ function ScanModule:AUCTION_HOUSE_CLOSED()
 
 	scanFrame:Hide()
 	isScanningRunning = false
+	hasCurrentPageBeenAdded = false
+	gettingDataFromPageNum = 0
+
+	ScanModule:ResetData()
 
 	self:UnregisterAllMessages()
 	self:UnregisterAllEvents()
-
-	ScanModule.searchText = ""
 	
 end
 
@@ -261,5 +263,6 @@ function ScanModule:ResetData()
 	ScanModule.shownPerBlizzardPage = 0
 	ScanModule.total = 0
 	ScanModule.page = 0
+	ScanModule.searchText = ""
 
 end
