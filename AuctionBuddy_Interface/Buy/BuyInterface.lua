@@ -497,6 +497,7 @@ end
 
 function BuyInterfaceModule:ResetSelectedItemData()
 
+	BuyInterfaceModule.mainFrame.alreadyBidText:Hide()
 	BuyInterfaceModule:ResetItemCosts()
 	BuyInterfaceModule:DisableBuyBidButtons()
 

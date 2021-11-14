@@ -638,6 +638,7 @@ end
 
 function SellInterfaceModule:ResetSelectedItemData()
 
+	SellInterfaceModule.mainFrame.alreadyBidText:Hide()
 	SellInterfaceModule:ResetItemCosts()
 	SellInterfaceModule:DisableBuyBidButtons()
 
