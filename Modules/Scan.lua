@@ -216,9 +216,7 @@ function ScanModule:InsertResultsPage()
 				itlvl = itemLevel,
 				bid = totalBidItem,
 				buy = buyOutPerItem,
-				totalPrice = buyoutPrice,
-				itemPos = i,
-				itemPage = ScanModule.page
+				totalPrice = buyoutPrice
 			})
 		end
 

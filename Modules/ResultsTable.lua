@@ -11,6 +11,7 @@ local DatabaseModule = nil
 local ScanModule = nil
 
 local containedInPageNumber = nil
+local prevContainedInPageNumber = nil
 
 function ResultsTableModule:Enable()
 
@@ -111,8 +112,6 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 				local buyoutPrice = nil
 				local bidPrice = nil
 				local stackSize = nil
-				local itemPos = nil
-				local itemPage = nil
 
 				for key, value in pairs(rowData) do
 					if key == "totalPrice" then
@@ -121,17 +120,19 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 						bidPrice = value
 					elseif key == "count" then
 						stackSize = value
-					elseif key == "itemPos" then
-						itemPos = value
-					elseif key == "itemPage" then
-						itemPage = value
 					end
 				end
 
-				local prevContainedInPageNumber = ScanModule.page
+				local blizzardPageSize = 50
+				local itemPage = math.floor((parentFrame.scrollTable:GetSelection() - 1) / blizzardPageSize)
+				local itemPos = parentFrame.scrollTable:GetSelection() - itemPage * blizzardPageSize
+
+				prevContainedInPageNumber = ScanModule.page
 				containedInPageNumber = itemPage
+
 				UtilsModule:Log("Selected item page number", itemPage, 0)
 				UtilsModule:Log("Prev page number", prevContainedInPageNumber, 0)
+
 				if prevContainedInPageNumber ~= containedInPageNumber then
 					ResultsTableModule:SendMessage("SCAN_SELECTED_ITEM_AH_PAGE", nil, containedInPageNumber)
 					C_Timer.After(0.2, function() 	
@@ -149,23 +150,31 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 		OnDoubleClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)
 			local buyoutPrice = nil
 			local bidPrice = nil
-			local itemPos = nil
 
 			for key, value in pairs(rowData) do
 				if key == "totalPrice" then
 					buyoutPrice = value
 				elseif key == "bid" then
 					bidPrice = value
-				elseif key == "itemPos" then
-					itemPos = value
 				end
 			end
 
+			local blizzardPageSize = 50
+			local itemPage = math.floor((parentFrame.scrollTable:GetSelection() - 1) / blizzardPageSize)
+
+			UtilsModule:Log("Selected item page number", itemPage, 0)
+			UtilsModule:Log("Prev page number", prevContainedInPageNumber, 0)
+
+			if prevContainedInPageNumber ~= itemPage then
+				ResultsTableModule:SendMessage("AUCTIONBUDDY_ERROR", "FailedToDoubleClick")
+				return true
+			end
+
 			if button == "LeftButton" and DatabaseModule.buyOptions.doubleClickToBuy == true then
-				ResultsTableModule:SendMessage("ON_BUY_SELECTED_ITEM", itemPos, buyoutPrice)
+				ResultsTableModule:SendMessage("ON_BUY_SELECTED_ITEM", parentFrame.scrollTable:GetSelection(), buyoutPrice)
 				parentFrame.scrollTable:ClearSelection()
 			elseif button == "RightButton" and DatabaseModule.buyOptions.doubleClickToBid == true then
-				ResultsTableModule:SendMessage("ON_BID_SELECTED_ITEM", itemPos, bidPrice)
+				ResultsTableModule:SendMessage("ON_BID_SELECTED_ITEM", parentFrame.scrollTable:GetSelection(), bidPrice)
 				parentFrame.scrollTable:ClearSelection()
 			end
 			return true
