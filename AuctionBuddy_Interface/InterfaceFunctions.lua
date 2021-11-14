@@ -55,10 +55,10 @@ function InterfaceFunctionsModule:AUCTION_ITEM_LIST_UPDATE()
 	
 end
 
-function InterfaceFunctionsModule:OnResultsTableItemSelected(parentFrame, buyoutPrice, bidPrice, stackSize)
+function InterfaceFunctionsModule:OnResultsTableItemSelected(parentFrame, buyoutPrice, bidPrice, stackSize, itemPos)
 	UtilsModule:Log("InterfaceFunctionsModule", "OnResultsTableItemSelected", 0)
 
-	InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame, buyoutPrice, bidPrice, stackSize)
+	InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame, buyoutPrice, bidPrice, stackSize, itemPos)
 
 end
 
@@ -126,32 +126,29 @@ function InterfaceFunctionsModule:ItemPriceUpdated(itemPriceFrame, stackSizeFram
 	
 end
 
-function InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame, buttonBuyoutPrice, buttonBidPrice, buttonStackSize)
+function InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame, buttonBuyoutPrice, buttonBidPrice, buttonStackSize, itemPos)
 	UtilsModule:Log(self, "UpdateTotalBuyoutAndBidCostBuy", 0)
 
 	if parentFrame.scrollTable:GetSelection() == nil then
 		return
 	end
 
-	local selectedItemData = parentFrame.scrollTable:GetSelection()
-	local intervalModifier =  50 * math.floor((selectedItemData - 1) / 50)
-	selectedItemData = selectedItemData - intervalModifier
+	UtilsModule:Log("Select Item Pos: ", itemPos, 0)
 
-	UtilsModule:Log("Select Item post conversion: ", "selectedItemData", 0)
-
-	local stackSize = select(3, GetAuctionItemInfo("list", selectedItemData))
-	local minBid = select(8, GetAuctionItemInfo("list", selectedItemData))
-	local minBidIncrement = select(9, GetAuctionItemInfo("list", selectedItemData))
-	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemData))
-	local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemData))
-	local highBidder = select(12, GetAuctionItemInfo("list", selectedItemData))
+	local stackSize = select(3, GetAuctionItemInfo("list", itemPos))
+	local minBid = select(8, GetAuctionItemInfo("list", itemPos))
+	local minBidIncrement = select(9, GetAuctionItemInfo("list", itemPos))
+	local buyoutPrice = select(10, GetAuctionItemInfo("list", itemPos))
+	local bidAmount = select(11, GetAuctionItemInfo("list", itemPos))
+	local highBidder = select(12, GetAuctionItemInfo("list", itemPos))
 	
 	-- Checking if the selected button auction has been sold or someone else already bid on it
 	if buyoutPrice ~= buttonBuyoutPrice or minBid ~= buttonBidPrice or stackSize ~= buttonStackSize then
 		UtilsModule:Log(self, "RemovingSelectedRow", 0)
 		InterfaceFunctionsModule:SendMessage("REMOVE_SELECTED_RESULTS_ROW", parentFrame.scrollTable:GetSelection())
 		InterfaceFunctionsModule:SendMessage("AUCTIONBUDDY_ERROR", "SelectedItemRemoved")
-		UtilsModule:Log(self, "UpdateTotalBuyoutAndBidCostBuy", 0)
+		parentFrame.scrollTable:ClearSelection()
+		UtilsModule:Log(buyoutPrice, buttonBuyoutPrice, 0)
 		return
 	end
 

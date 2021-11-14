@@ -108,12 +108,11 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 				UtilsModule:Log(self, "OnClickResultsTable", 2)
 				parentFrame.scrollTable:SetSelection(rowIndex)
 
-				local prevContainedInPageNumber = containedInPageNumber or ScanModule.page
-				containedInPageNumber = math.floor((parentFrame.scrollTable:GetSelection() - 1) / 50)
-
 				local buyoutPrice = nil
 				local bidPrice = nil
 				local stackSize = nil
+				local itemPos = nil
+				local itemPage = nil
 
 				for key, value in pairs(rowData) do
 					if key == "totalPrice" then
@@ -122,16 +121,24 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 						bidPrice = value
 					elseif key == "count" then
 						stackSize = value
+					elseif key == "itemPos" then
+						itemPos = value
+					elseif key == "itemPage" then
+						itemPage = value
 					end
 				end
 
+				local prevContainedInPageNumber = ScanModule.page
+				containedInPageNumber = itemPage
+				UtilsModule:Log("Selected item page number", itemPage, 0)
+				UtilsModule:Log("Prev page number", prevContainedInPageNumber, 0)
 				if prevContainedInPageNumber ~= containedInPageNumber then
-					ResultsTableModule:SendMessage("SCAN_SELECTED_ITEM_AH_PAGE", nil, nil, containedInPageNumber)
+					ResultsTableModule:SendMessage("SCAN_SELECTED_ITEM_AH_PAGE", nil, containedInPageNumber)
 					C_Timer.After(0.2, function() 	
-					ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame, buyoutPrice, bidPrice, stackSize)
+					ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame, buyoutPrice, bidPrice, stackSize, itemPos)
 				end)
 				else 
-					ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame, buyoutPrice, bidPrice, stackSize)
+					ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame, buyoutPrice, bidPrice, stackSize, itemPos)
 				end
 			else
 				ResultsTableModule:SendMessage("AUCTIONBUDDY_ERROR", "FailedToSelectItem")

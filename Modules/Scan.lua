@@ -3,7 +3,6 @@ local AuctionBuddy = unpack(select(2, ...))
 
 local ScanModule = AuctionBuddy:NewModule("ScanModule", "AceEvent-3.0")
 
-ScanModule.searchActive = nil
 ScanModule.page = nil
 ScanModule.searchText = nil
 
@@ -16,6 +15,7 @@ local BuyInterfaceModule = nil
 local SellInterfaceModule = nil
 
 local isScanningRunning = false
+local isExactMatchScan = false
 
 local ScanResultsCoroutine = nil
 local scanFrame = nil
@@ -53,7 +53,6 @@ function ScanModule:Enable()
 		end
 	end)
 
-	self.searchActive = false
 	self.page = 0
 
 end
@@ -88,7 +87,7 @@ function ScanModule:AUCTION_HOUSE_CLOSED()
 	
 end
 
-function ScanModule:AuctionHouseSearchStart(textToSearch, exactMatch, pageToSearch)
+function ScanModule:AuctionHouseSearchStart(textToSearch, pageToSearch, exactMatch)
 	UtilsModule:Log(self, "AuctionHouseSearchStart", 0)
 
 	if CanSendAuctionQuery() then
@@ -96,29 +95,24 @@ function ScanModule:AuctionHouseSearchStart(textToSearch, exactMatch, pageToSear
 		ScanModule:SendResultsTable()
 		ScanModule.page = 0
 		gettingDataFromPageNum = 0
+		isExactMatchScan = exactMatch
 
 		ScanModule:SendMessage("ON_AH_SCAN_RUNNING", true)
 
 		ScanModule:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
-		ScanModule:AuctionHouseSearch(textToSearch, exactMatch, pageToSearch)
+		ScanModule:AuctionHouseSearch(textToSearch, pageToSearch)
 	else
 		AuctionBuddy:SendMessage("AUCTIONBUDDY_ERROR", "CannotSendAHQuery")
 	end
 
 end
 
-function ScanModule:AuctionHouseSearch(textToSearch, exactMatch, pageToSearch)
+function ScanModule:AuctionHouseSearch(textToSearch, pageToSearch)
 	UtilsModule:Log(self, "AuctionHouseSearch", 0)
-
-	if textToSearch ~= nil and textToSearch ~= AuctionBuddy.searchText then
-		ScanModule.page = 0
-	end
 
 	if textToSearch ~= nil then
 		AuctionBuddy.searchText = textToSearch
 	end
-	
-	ScanModule.searchActive = true
 
 	local checkWhiteSpaces = string.gsub(AuctionBuddy.searchText, " ", "")
 
@@ -143,6 +137,7 @@ function ScanModule:AuctionHouseSearch(textToSearch, exactMatch, pageToSearch)
     end
 
 	local currentPageToSearch = pageToSearch or ScanModule.page
+	ScanModule.page = currentPageToSearch
 
 	QueryAuctionItems(	
 		AuctionBuddy.searchText, 
@@ -152,7 +147,7 @@ function ScanModule:AuctionHouseSearch(textToSearch, exactMatch, pageToSearch)
 		false,
 		BuyInterfaceModule.mainFrame.rarity.value,
 		false,
-		DatabaseModule.buyOptions.exactMatch or exactMatch,
+		DatabaseModule.buyOptions.exactMatch or isExactMatchScan,
 		filterData
 	)
 	
@@ -161,7 +156,7 @@ end
 function ScanModule:ScanResults()
 	UtilsModule:Log("ScanModule", "ScanResults", 0)
 
-	local interval = math.max(ScanModule.shownPerBlizzardPage - 1, 1)
+	local interval = math.max(ScanModule.shownPerBlizzardPage, 1)
 
 	for currentScanSize = 0, ScanModule.total, interval do
 
@@ -187,10 +182,13 @@ function ScanModule:InsertResultsPage()
 	end
 
 	for i = 1, ScanModule.shownPerBlizzardPage do
-		if i + ScanModule.page * ScanModule.shownPerBlizzardPage > ScanModule.total then
-			UtilsModule:Log("ScanModule", "Breaking", ScanModule.page, 0)
+		local currentScanSize = i + ScanModule.page * ScanModule.shownPerBlizzardPage
+		if  currentScanSize > ScanModule.total or GetAuctionItemInfo("list", i) == nil then
+			UtilsModule:Log("Breaking Insert Result Loop", ScanModule.page, i, 0)
+			UtilsModule:Log("Total items: ", ScanModule.total, "Items per page: ", ScanModule.shownPerBlizzardPage, 0)
 			break
 		end
+
 		local itemName, myTexture, aucCount, itemQuality, canUse, itemLevel, levelColHeader, minBid,
 		minIncrement, buyoutPrice, bidAmount, highBidder, bidderFullName, aucOwner,
 		ownerFullName, saleStatus, itemId, hasAllInfo = GetAuctionItemInfo("list", i);
@@ -216,7 +214,9 @@ function ScanModule:InsertResultsPage()
 				itlvl = itemLevel,
 				bid = totalBidItem,
 				buy = buyOutPerItem,
-				totalPrice = buyoutPrice
+				totalPrice = buyoutPrice,
+				itemPos = i,
+				itemPage = ScanModule.page
 			})
 		end
 

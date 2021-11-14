@@ -21,8 +21,8 @@ function BuyInterfaceModule:Enable()
 	self:RegisterMessage("RESULTSTABLE_ITEM_SELECTED", self.OnResultsTableItemSelected)	
 	self:RegisterMessage("SHOW_AB_BUY_FRAME", self.OnShowBuyFrame)
 	self:RegisterMessage("ON_AH_SCAN_RUNNING", self.OnAHScanRunning)
-	self:RegisterMessage("SCAN_SELECTED_ITEM_AH_PAGE", self.DisableBuyBidButtons)
-	self:RegisterMessage("REMOVE_SELECTED_RESULTS_ROW", self.DisableBuyBidButtons)
+	self:RegisterMessage("SCAN_SELECTED_ITEM_AH_PAGE", self.ResetSelectedItemData)
+	self:RegisterMessage("REMOVE_SELECTED_RESULTS_ROW", self.ResetSelectedItemData)
 	
 	if self.interfaceCreated == true then
 		return
@@ -473,10 +473,7 @@ function BuyInterfaceModule:OnShowBuyFrame()
 	BuyInterfaceModule.mainFrame:SetScale(DatabaseModule.generalOptions.uiScale)
 	BuyInterfaceModule.mainFrame.currentPlayerGold.value = GetCoinTextureString(GetMoney(), 15)
 	BuyInterfaceModule.mainFrame.currentPlayerGold:SetText(BuyInterfaceModule.mainFrame.currentPlayerGold.value)
-	BuyInterfaceModule.mainFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
-	BuyInterfaceModule.mainFrame.totalBuyCost:SetText(BuyInterfaceModule.mainFrame.totalBuyCost.value)
-	BuyInterfaceModule.mainFrame.totalBidCost.value = GetCoinTextureString(0, 15)
-	BuyInterfaceModule.mainFrame.totalBidCost:SetText(BuyInterfaceModule.mainFrame.totalBuyCost.value)
+	BuyInterfaceModule:ResetItemCosts()
 	BuyInterfaceModule.mainFrame.scrollTable:ClearSelection()
 	BuyInterfaceModule.mainFrame.alreadyBidText:Hide()
 	BuyInterfaceModule.mainFrame.scrollTable.scanRunningText:Hide()
@@ -495,6 +492,22 @@ function BuyInterfaceModule:OnAHScanRunning(isAHScanRunning)
 	else
 		BuyInterfaceModule.mainFrame.scrollTable.scanRunningText:Hide()
 	end
+
+end
+
+function BuyInterfaceModule:ResetSelectedItemData()
+
+	BuyInterfaceModule:ResetItemCosts()
+	BuyInterfaceModule:DisableBuyBidButtons()
+
+end
+
+function BuyInterfaceModule:ResetItemCosts()
+
+	BuyInterfaceModule.mainFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
+	BuyInterfaceModule.mainFrame.totalBuyCost:SetText(BuyInterfaceModule.mainFrame.totalBuyCost.value)
+	BuyInterfaceModule.mainFrame.totalBidCost.value = GetCoinTextureString(0, 15)
+	BuyInterfaceModule.mainFrame.totalBidCost:SetText(BuyInterfaceModule.mainFrame.totalBuyCost.value)
 
 end
 

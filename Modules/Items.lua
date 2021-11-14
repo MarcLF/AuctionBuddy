@@ -82,6 +82,10 @@ end
 
 function ItemsModule:OnBuySelectedItem(selectedItemData, buttonBuyoutPrice)
 	UtilsModule:Log(self, "BuySelectedItem", 1)
+
+	if selectedItemData == nil then
+		return
+	end
 	
 	local intervalModifier =  50 * math.floor((selectedItemData - 1) / 50)
 	selectedItemData = selectedItemData - intervalModifier
@@ -170,16 +174,6 @@ function ItemsModule:UpdateSellItemPriceAfterSearch(resultsTable)
 	
 end
 
-function ItemsModule:SearchSelectedContainerItem()
-	UtilsModule:Log(self, "SearchSelectedContainerItem", 2)
-	
-	infoType, info1, info2 = GetCursorInfo()
-	local itemName = GetItemInfo(info2) 
-	ClearCursor()
-	self:SendMessage("ON_AUCTION_HOUSE_SEARCH", itemName)
-	
-end
-
 function ItemsModule:InsertSelectedItem(parentFrame)
 	UtilsModule:Log(self, "InsertSelectedItem", 2)
 		
@@ -207,7 +201,7 @@ function ItemsModule:InsertSelectedItem(parentFrame)
 		parentFrame.stackSize:SetText(1)
 		
 		local itemName = GetItemInfo(info2) 
-		ItemsModule:SendMessage("ON_AUCTION_HOUSE_SEARCH", itemName, true)
+		ItemsModule:SendMessage("ON_AUCTION_HOUSE_SEARCH", itemName, nil, true)
 					
 		ClickAuctionSellItemButton()
 		

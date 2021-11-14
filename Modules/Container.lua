@@ -195,7 +195,7 @@ function ContainerModule:CreateBuyContainerScrollFrameTable(parentFrame, xPos, y
 		OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)
 			if button == "LeftButton" then	
 				local itemName = GetItemInfo(rowData.itemLink)
-				ContainerModule:SendMessage("ON_AUCTION_HOUSE_SEARCH", itemName, true)
+				ContainerModule:SendMessage("ON_AUCTION_HOUSE_SEARCH", itemName, nil, true)
 			end
 			if button == "RightButton" then	
 				if BuyInterfaceModule.mainFrame.favoriteListsDropDownMenu.value ~= nil then
