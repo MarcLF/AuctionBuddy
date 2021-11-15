@@ -150,7 +150,7 @@ function ItemsModule:OnBuySelectedItem()
 
 	PlaceAuctionBid('list', selectedItemPos, buyoutPrice)
 
-	if buyoutPrice >= GetMoney() then
+	if GetMoney() >= buyoutPrice then
 		ItemsModule:SendMessage("REMOVE_SELECTED_RESULTS_ROW", scrollTableSelectedID)
 	end
 	ItemsModule:ResetSelectedItemData()
