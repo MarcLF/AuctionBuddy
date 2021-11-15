@@ -62,6 +62,7 @@ function ScanModule:AUCTION_ITEM_LIST_UPDATE()
 
 	if not isScanningRunning then
 		ScanModule.shownPerBlizzardPage, ScanModule.total = GetNumAuctionItems("list")
+		UtilsModule:Log("Total items: ", ScanModule.total, 0)
 		isScanningRunning = true
 	end
 
