@@ -13,6 +13,12 @@ local ScanModule = nil
 local containedInPageNumber = nil
 local prevContainedInPageNumber = nil
 
+local buyoutPrice = nil
+local bidPrice = nil
+local stackSize = nil
+local itemPos = nil
+local selectedItemParentFrame = nil
+
 function ResultsTableModule:Enable()
 
 	UtilsModule = AuctionBuddy:GetModule("UtilsModule")
@@ -21,6 +27,15 @@ function ResultsTableModule:Enable()
 	ItemsModule = AuctionBuddy:GetModule("ItemsModule")
 	DatabaseModule = AuctionBuddy:GetModule("DatabaseModule")
 	ScanModule = AuctionBuddy:GetModule("ScanModule")
+
+end
+
+function ResultsTableModule:AUCTION_ITEM_LIST_UPDATE()
+	UtilsModule:Log(self, "AUCTION_ITEM_LIST_UPDATE", 0)
+
+	ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", selectedItemParentFrame, buyoutPrice, bidPrice, stackSize, itemPos)
+
+	ResultsTableModule:UnregisterEvent("AUCTION_ITEM_LIST_UPDATE")
 
 end
 
@@ -109,10 +124,6 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 				UtilsModule:Log(self, "OnClickResultsTable", 2)
 				parentFrame.scrollTable:SetSelection(rowIndex)
 
-				local buyoutPrice = nil
-				local bidPrice = nil
-				local stackSize = nil
-
 				for key, value in pairs(rowData) do
 					if key == "totalPrice" then
 						buyoutPrice = value
@@ -125,7 +136,9 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 
 				local blizzardPageSize = 50
 				local itemPage = math.floor((parentFrame.scrollTable:GetSelection() - 1) / blizzardPageSize)
-				local itemPos = parentFrame.scrollTable:GetSelection() - itemPage * blizzardPageSize
+				itemPos = parentFrame.scrollTable:GetSelection() - itemPage * blizzardPageSize
+
+				selectedItemParentFrame = parentFrame
 
 				prevContainedInPageNumber = ScanModule.page
 				containedInPageNumber = itemPage
@@ -134,10 +147,8 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 				UtilsModule:Log("Prev page number", prevContainedInPageNumber, 0)
 
 				if prevContainedInPageNumber ~= containedInPageNumber then
+					ResultsTableModule:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 					ResultsTableModule:SendMessage("SCAN_SELECTED_ITEM_AH_PAGE", nil, containedInPageNumber)
-					C_Timer.After(0.5, function() 	
-					ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame, buyoutPrice, bidPrice, stackSize, itemPos)
-				end)
 				else 
 					ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame, buyoutPrice, bidPrice, stackSize, itemPos)
 				end
@@ -148,6 +159,9 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 		end,
 		
 		OnDoubleClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)
+			if parentFrame.scrollTable:GetSelection() == nil then
+				return
+			end
 			local buyoutPrice = nil
 			local bidPrice = nil
 
@@ -158,7 +172,7 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 					bidPrice = value
 				end
 			end
-
+			
 			local blizzardPageSize = 50
 			local itemPage = math.floor((parentFrame.scrollTable:GetSelection() - 1) / blizzardPageSize)
 
