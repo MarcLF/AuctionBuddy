@@ -23,6 +23,7 @@ function BuyInterfaceModule:Enable()
 	self:RegisterMessage("ON_AH_SCAN_RUNNING", self.OnAHScanRunning)
 	self:RegisterMessage("SCAN_SELECTED_ITEM_AH_PAGE", self.ResetSelectedItemData)
 	self:RegisterMessage("REMOVE_SELECTED_RESULTS_ROW", self.ResetSelectedItemData)
+	self:RegisterMessage("ON_AUCTION_HOUSE_SEARCH", self.OnAuctionHouseSearch)
 	
 	if self.interfaceCreated == true then
 		return
@@ -134,14 +135,12 @@ function BuyInterfaceModule:CreateBuyInterfaceGeneral(parentFrame)
 	parentFrame.searchBar:SetScript("OnEscapePressed", function() parentFrame.searchBar:ClearFocus() end)
 	parentFrame.searchBar:SetScript("OnEnterPressed", function()
 		self:SendMessage("ON_AUCTION_HOUSE_SEARCH", parentFrame.searchBar:GetText())
-		parentFrame.searchBar:ClearFocus()
 	end)
 	
 	parentFrame.searchButton = CreateFrame("Button", "AB_BuyInterface_MainFrame_Search_Button", parentFrame, "UIPanelButtonTemplate")
 	BuyInterfaceModule:SetFrameParameters(parentFrame.searchButton, 80, 24, "Search", "TOPLEFT", 235, -34)
 	parentFrame.searchButton:SetScript("OnClick", function() 
 		self:SendMessage("ON_AUCTION_HOUSE_SEARCH", parentFrame.searchBar:GetText())
-		parentFrame.searchBar:ClearFocus()
 		InterfaceFunctionsModule.autoCompleteTextPos = strlen(parentFrame.searchBar:GetText())
 	end)
 
@@ -262,7 +261,7 @@ function BuyInterfaceModule:CreateBuyInterfaceBuyOptions(parentFrame)
 	parentFrame.buySelectedItem = CreateFrame("Button", "AB_BuyInterface_MainFrame_BuySelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
 	BuyInterfaceModule:SetFrameParameters(parentFrame.buySelectedItem, 125, 24, "Buy Selected Item", "RIGHT", -90, -303)
 	parentFrame.buySelectedItem:SetScript("OnClick", function() 
-		self:SendMessage("ON_BUY_SELECTED_ITEM", parentFrame.scrollTable:GetRow(parentFrame.scrollTable:GetSelection()))
+		self:SendMessage("ON_BUY_SELECTED_ITEM", parentFrame.scrollTable:GetSelection())
 		BuyInterfaceModule:DisableBuyBidButtons()
 		parentFrame.scrollTable:ClearSelection() 
 	end)
@@ -271,7 +270,7 @@ function BuyInterfaceModule:CreateBuyInterfaceBuyOptions(parentFrame)
 	parentFrame.bidSelectedItem = CreateFrame("Button", "AB_BuyInterface_MainFrame_BidSelectedItem_Button", parentFrame, "UIPanelButtonTemplate")
 	BuyInterfaceModule:SetFrameParameters(parentFrame.bidSelectedItem, 125, 24, "Bid Selected Item", "RIGHT", -230, -303)
 	parentFrame.bidSelectedItem:SetScript("OnClick", function() 
-		self:SendMessage("ON_BID_SELECTED_ITEM", parentFrame.scrollTable:GetRow(parentFrame.scrollTable:GetSelection()))
+		self:SendMessage("ON_BID_SELECTED_ITEM", parentFrame.scrollTable:GetSelection())
 		BuyInterfaceModule:DisableBuyBidButtons()
 		parentFrame.scrollTable:ClearSelection() 
 	end)
@@ -497,6 +496,7 @@ end
 
 function BuyInterfaceModule:ResetSelectedItemData()
 
+	BuyInterfaceModule.mainFrame.alreadyBidText:Hide()
 	BuyInterfaceModule:ResetItemCosts()
 	BuyInterfaceModule:DisableBuyBidButtons()
 
@@ -522,6 +522,22 @@ function BuyInterfaceModule:DisableBuyBidButtons()
 
 	BuyInterfaceModule.mainFrame.buySelectedItem:Disable()
 	BuyInterfaceModule.mainFrame.bidSelectedItem:Disable()
+
+end
+
+function BuyInterfaceModule:OnAuctionHouseSearch()
+
+	BuyInterfaceModule.mainFrame.scrollTable:ClearSelection()
+	BuyInterfaceModule:ClearAllEditBoxesFocus()
+
+end
+
+function BuyInterfaceModule:ClearAllEditBoxesFocus()
+
+	BuyInterfaceModule.mainFrame.searchBar:ClearFocus()
+	BuyInterfaceModule.mainFrame.minILvl:ClearFocus()
+	BuyInterfaceModule.mainFrame.maxILvl:ClearFocus()
+	BuyInterfaceModule.mainFrame.addFavoriteBar:ClearFocus()
 
 end
 

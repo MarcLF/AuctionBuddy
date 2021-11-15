@@ -141,14 +141,16 @@ function InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame, bu
 	local buyoutPrice = select(10, GetAuctionItemInfo("list", itemPos))
 	local bidAmount = select(11, GetAuctionItemInfo("list", itemPos))
 	local highBidder = select(12, GetAuctionItemInfo("list", itemPos))
-	
+
 	-- Checking if the selected button auction has been sold or someone else already bid on it
-	if buyoutPrice ~= buttonBuyoutPrice or minBid ~= buttonBidPrice or stackSize ~= buttonStackSize then
+	if buyoutPrice ~= buttonBuyoutPrice or math.max(minBid,bidAmount) ~= buttonBidPrice or stackSize ~= buttonStackSize then
 		UtilsModule:Log(self, "RemovingSelectedRow", 0)
 		InterfaceFunctionsModule:SendMessage("REMOVE_SELECTED_RESULTS_ROW", parentFrame.scrollTable:GetSelection())
 		InterfaceFunctionsModule:SendMessage("AUCTIONBUDDY_ERROR", "SelectedItemRemoved")
 		parentFrame.scrollTable:ClearSelection()
 		UtilsModule:Log(buyoutPrice, buttonBuyoutPrice, 0)
+		UtilsModule:Log(minBid, buttonBidPrice, 0)
+		UtilsModule:Log(stackSize, buttonStackSize, 0)
 		return
 	end
 

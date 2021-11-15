@@ -9,11 +9,12 @@ local auctionBuddyErrors = {
 	InvalidStackOrSizeQuantity = "AuctionBuddy: Can't place auctions without a valid stack size and quantity.",
 	CannotSellSoulboundItems = "AuctionBuddy: Can't auction Soulbound items.",
 	TimeoutPostItem = "AuctionBuddy: Can't post new items at this moment, try again in few seconds.",
-	InvalidAuctionPrice = "AuctionBuddy: Can't post this item. Please insert a valid auction price bid and buyout.",
+	InvalidAuctionPrice = "AuctionBuddy: Can't post this item. Please, insert a valid auction price bid and buyout.",
 	SelectedItemRemoved = "AuctionBuddy: Failed to select that auction because someone already bought or bid on it. Rescan again to get more up to date results.",
 	FailedToBuyAuction = "AuctionBuddy: Failed to buy that auction because someone already bought it. Rescan again to get more up to date results.",
 	FailedToBidAuction = "AuctionBuddy: Failed to bid on that auction with that price because someone else has already done it. Rescan again to get more up to date results.",
-	FailedToSelectItem = "AuctionBuddy: Failed to select that item, please try again"
+	FailedToSelectItem = "AuctionBuddy: Failed to select that item, please try again",
+	FailedToDoubleClick = "AuctionBuddy: Failed double click to buy/bid an item. Please, wait until an item is selected and try again."
 }
 
 function ErrorModule:Enable()

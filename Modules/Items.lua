@@ -74,13 +74,9 @@ function ItemsModule:OnBidSelectedItem(selectedItemData, buttonBidPrice)
 		return
 	end
 
-	local selectedItemPos = nil
-
-	for key, value in pairs(selectedItemData) do
-		if key == "itemPos" then
-			selectedItemPos = value
-		end
-	end
+	local blizzardPageSize = 50
+	local itemPage = math.floor((selectedItemData - 1) / blizzardPageSize)
+	local selectedItemPos = selectedItemData - itemPage * blizzardPageSize
 
 	local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemPos))
 	local minIncrement = select(9, GetAuctionItemInfo("list", selectedItemPos))
@@ -99,13 +95,11 @@ function ItemsModule:OnBuySelectedItem(selectedItemData, buttonBuyoutPrice)
 		return
 	end
 
-	local selectedItemPos = nil
+	local prevPlayerGold = GetMoney()
 
-	for key, value in pairs(selectedItemData) do
-		if key == "itemPos" then
-			selectedItemPos = value
-		end
-	end
+	local blizzardPageSize = 50
+	local itemPage = math.floor((selectedItemData - 1) / blizzardPageSize)
+	local selectedItemPos = selectedItemData - itemPage * blizzardPageSize
 
 	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemPos))
 
@@ -115,6 +109,10 @@ function ItemsModule:OnBuySelectedItem(selectedItemData, buttonBuyoutPrice)
 	end
 
 	PlaceAuctionBid('list', selectedItemPos, buyoutPrice)
+
+	if prevPlayerGold ~= GetMoney() then
+		InterfaceFunctionsModule:SendMessage("REMOVE_SELECTED_RESULTS_ROW", selectedItemData)
+	end
 	
 end
 

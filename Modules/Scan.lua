@@ -104,7 +104,7 @@ function ScanModule:AuctionHouseSearchStart(textToSearch, pageToSearch, exactMat
 		ScanModule:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 		ScanModule:AuctionHouseSearch(textToSearch, pageToSearch)
 	else
-		AuctionBuddy:SendMessage("AUCTIONBUDDY_ERROR", "CannotSendAHQuery")
+		ScanModule:SendMessage("AUCTIONBUDDY_ERROR", "CannotSendAHQuery")
 	end
 
 end
@@ -119,7 +119,7 @@ function ScanModule:AuctionHouseSearch(textToSearch, pageToSearch)
 	local checkWhiteSpaces = string.gsub(ScanModule.searchText, " ", "")
 
 	if string.len(ScanModule.searchText) > 0 and string.len(checkWhiteSpaces) > 0 then
-		DatabaseModule:InsertNewSearch(DatabaseModule.recentSearches, AuctionBuddy.searchText)
+		DatabaseModule:InsertNewSearch(DatabaseModule.recentSearches, ScanModule.searchText)
 		DatabaseModule:InsertDataFromDatabase(BuyInterfaceModule.mainFrame.recentSearchesTable, DatabaseModule.recentSearches)
 	end
 		
@@ -216,9 +216,7 @@ function ScanModule:InsertResultsPage()
 				itlvl = itemLevel,
 				bid = totalBidItem,
 				buy = buyOutPerItem,
-				totalPrice = buyoutPrice,
-				itemPos = i,
-				itemPage = ScanModule.page
+				totalPrice = buyoutPrice
 			})
 		end
 
@@ -228,7 +226,7 @@ function ScanModule:InsertResultsPage()
 end
 
 function ScanModule:RemoveSelectedResultsRow(rowToRemove)
-	UtilsModule:Log("ScanModule", "RemoveSelectedResultsRow", 2)
+	UtilsModule:Log("ScanModule", "RemoveSelectedResultsRow", 0)
 
 	table.remove(resultsTableData, rowToRemove)
 	ScanModule:SendResultsTable()

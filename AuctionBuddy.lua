@@ -108,6 +108,7 @@ function AuctionBuddy:AuctionFrameTab_OnClick(tab)
 		CloseAuctionHouse = NoResponse
 		AuctionFrame_Hide()
 		CloseAuctionHouse = CloseAuctionHouseFunctional
+		self:SendMessage("SHOW_AB_BUY_FRAME")
 	end
 	
 	if tab.sellTabButton then
@@ -118,6 +119,7 @@ function AuctionBuddy:AuctionFrameTab_OnClick(tab)
 		CloseAuctionHouse = NoResponse
 		AuctionFrame_Hide()
 		CloseAuctionHouse = CloseAuctionHouseFunctional
+		self:SendMessage("SHOW_AB_SELL_FRAME")
 	end
 	
 end
