@@ -123,8 +123,6 @@ function ItemsModule:OnBuySelectedItem()
 		return
 	end
 
-	local prevPlayerGold = GetMoney()
-
 	local itemName, myTexture, stackSize, itemQuality, canUse, itemLevel, levelColHeader, minBid,
 	minIncrement, buyoutPrice, bidAmount, highBidder, bidderFullName, aucOwner,
 	ownerFullName, saleStatus, itemId, hasAllInfo = GetAuctionItemInfo("list", selectedItemPos);
@@ -152,7 +150,9 @@ function ItemsModule:OnBuySelectedItem()
 
 	PlaceAuctionBid('list', selectedItemPos, buyoutPrice)
 
-	ItemsModule:SendMessage("REMOVE_SELECTED_RESULTS_ROW", scrollTableSelectedID)
+	if buyoutPrice >= GetMoney() then
+		ItemsModule:SendMessage("REMOVE_SELECTED_RESULTS_ROW", scrollTableSelectedID)
+	end
 	ItemsModule:ResetSelectedItemData()
 	
 end
