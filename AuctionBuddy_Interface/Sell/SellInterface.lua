@@ -28,6 +28,7 @@ function SellInterfaceModule:Enable()
 	self:RegisterMessage("ON_AH_SCAN_RUNNING", self.OnAHScanRunning)
 	self:RegisterMessage("SCAN_SELECTED_ITEM_AH_PAGE", self.ResetSelectedItemData)
 	self:RegisterMessage("REMOVE_SELECTED_RESULTS_ROW", self.ResetSelectedItemData)
+	self:RegisterMessage("ON_AUCTION_HOUSE_SEARCH", self.OnAuctionHouseSearch)
 
 	if self.interfaceCreated == true then
 		return
@@ -664,6 +665,12 @@ function SellInterfaceModule:DisableBuyBidButtons()
 
 	SellInterfaceModule.mainFrame.buySelectedItem:Disable()
 	SellInterfaceModule.mainFrame.bidSelectedItem:Disable()
+
+end
+
+function SellInterfaceModule:OnAuctionHouseSearch()
+
+	SellInterfaceModule.mainFrame.scrollTable:ClearSelection()
 
 end
 
