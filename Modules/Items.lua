@@ -10,6 +10,13 @@ local InterfaceFunctionsModule = nil
 local BuyInterfaceModule = nil
 local SellInterfaceModule = nil
 
+local selectedItemPos = nil
+local selectedBuyoutPrice = nil
+local selectedTotalAmountToBid = nil
+local selectedStackSize = nil
+local selectedItemName = nil
+local scrollTableSelectedID = nil
+
 function ItemsModule:Enable()
 
 	UtilsModule = AuctionBuddy:GetModule("UtilsModule")
@@ -31,6 +38,7 @@ function ItemsModule:Enable()
 	self:RegisterMessage("ON_CLICK_MAX_STACK_QUANTITY", self.OnClickMaxStackQuantity)
 	self:RegisterMessage("REMOVE_INSERTED_ITEM", self.RemoveInsertedItem)
 	self:RegisterMessage("UPDATE_SELL_ITEM_PRICE", self.UpdateSellItemPriceAfterSearch)
+	self:RegisterMessage("ITEM_SELECTED_DATA", self.UpdateItemSelectedData)
 	
 end
 
@@ -67,52 +75,85 @@ function ItemsModule:OnClickItemToSell(frameClicked)
 
 end
 
-function ItemsModule:OnBidSelectedItem(selectedItemData, buttonBidPrice)
-	UtilsModule:Log(self, "OnBidSelectedItem", 1)
+function ItemsModule:OnBidSelectedItem()
+	UtilsModule:Log(self, "OnBidSelectedItem", 0)
 
-	if selectedItemData == nil then
+	if selectedItemPos == nil then
 		return
 	end
 
-	local blizzardPageSize = 50
-	local itemPage = math.floor((selectedItemData - 1) / blizzardPageSize)
-	local selectedItemPos = selectedItemData - itemPage * blizzardPageSize
+	local itemName, myTexture, stackSize, itemQuality, canUse, itemLevel, levelColHeader, minBid,
+	minIncrement, buyoutPrice, bidAmount, highBidder, bidderFullName, aucOwner,
+	ownerFullName, saleStatus, itemId, hasAllInfo = GetAuctionItemInfo("list", selectedItemPos);
 
-	local bidAmount = select(11, GetAuctionItemInfo("list", selectedItemPos))
-	local minIncrement = select(9, GetAuctionItemInfo("list", selectedItemPos))
-	local minBid = select(8, GetAuctionItemInfo("list", selectedItemPos))
+	local itemsShownPerBlizzardPage = 50
 
-	local totalAmountToBid = max(bidAmount, minBid) + minIncrement
+	local totalAmountToBid = math.max(minBid, bidAmount) + minIncrement
+
+	if buyoutPrice ~= selectedBuyoutPrice or totalAmountToBid ~= selectedTotalAmountToBid or stackSize ~= selectedStackSize or itemName ~= selectedItemName then
+		local itemsShownPerBlizzardPage = 50
+		for i = 1, itemsShownPerBlizzardPage do
+			itemName, myTexture, stackSize, itemQuality, canUse, itemLevel, levelColHeader, minBid,
+			minIncrement, buyoutPrice, bidAmount, highBidder, bidderFullName, aucOwner,
+			ownerFullName, saleStatus, itemId, hasAllInfo = GetAuctionItemInfo("list", i);
+
+			if buyoutPrice == selectedBuyoutPrice and totalAmountToBid == selectedTotalAmountToBid and stackSize == selectedStackSize and itemName == selectedItemName then
+				selectedItemPos = i
+				break
+			end
+		end
+	end
+
+	totalAmountToBid = max(bidAmount, minBid) + minIncrement
+
+	if buyoutPrice ~= selectedBuyoutPrice or totalAmountToBid ~= selectedTotalAmountToBid or stackSize ~= selectedStackSize or itemName ~= selectedItemName then
+		ItemsModule:SendMessage("AUCTIONBUDDY_ERROR", "FailedToBidAuction")
+		return
+	end
 
 	PlaceAuctionBid('list', selectedItemPos, totalAmountToBid)
+	ItemsModule:ResetSelectedItemData()
 
 end
 
-function ItemsModule:OnBuySelectedItem(selectedItemData, buttonBuyoutPrice)
-	UtilsModule:Log(self, "BuySelectedItem", 1)
+function ItemsModule:OnBuySelectedItem()
+	UtilsModule:Log(self, "BuySelectedItem", 0)
 
-	if selectedItemData == nil then
+	if selectedItemPos == nil then
 		return
 	end
 
 	local prevPlayerGold = GetMoney()
 
-	local blizzardPageSize = 50
-	local itemPage = math.floor((selectedItemData - 1) / blizzardPageSize)
-	local selectedItemPos = selectedItemData - itemPage * blizzardPageSize
+	local itemName, myTexture, stackSize, itemQuality, canUse, itemLevel, levelColHeader, minBid,
+	minIncrement, buyoutPrice, bidAmount, highBidder, bidderFullName, aucOwner,
+	ownerFullName, saleStatus, itemId, hasAllInfo = GetAuctionItemInfo("list", selectedItemPos);
 
-	local buyoutPrice = select(10, GetAuctionItemInfo("list", selectedItemPos))
+	local itemsShownPerBlizzardPage = 50
 
-	if buttonBuyoutPrice ~= nil and buyoutPrice ~= buttonBuyoutPrice then
-		InterfaceFunctionsModule:SendMessage("AUCTIONBUDDY_ERROR", "FailedToBuyAuction")
+	if buyoutPrice ~= selectedBuyoutPrice or stackSize ~= selectedStackSize or itemName ~= selectedItemName then
+		local itemsShownPerBlizzardPage = 50
+		for i = 1, itemsShownPerBlizzardPage do
+			itemName, myTexture, stackSize, itemQuality, canUse, itemLevel, levelColHeader, minBid,
+			minIncrement, buyoutPrice, bidAmount, highBidder, bidderFullName, aucOwner,
+			ownerFullName, saleStatus, itemId, hasAllInfo = GetAuctionItemInfo("list", i);
+
+			if buyoutPrice == selectedBuyoutPrice and stackSize == selectedStackSize and itemName == selectedItemName then
+				selectedItemPos = i
+				break
+			end
+		end
+	end
+
+	if buyoutPrice ~= selectedBuyoutPrice or stackSize ~= selectedStackSize or itemName ~= selectedItemName then
+		ItemsModule:SendMessage("AUCTIONBUDDY_ERROR", "FailedToBuyAuction")
 		return
 	end
 
 	PlaceAuctionBid('list', selectedItemPos, buyoutPrice)
 
-	if prevPlayerGold ~= GetMoney() then
-		InterfaceFunctionsModule:SendMessage("REMOVE_SELECTED_RESULTS_ROW", selectedItemData)
-	end
+	ItemsModule:SendMessage("REMOVE_SELECTED_RESULTS_ROW", scrollTableSelectedID)
+	ItemsModule:ResetSelectedItemData()
 	
 end
 
@@ -187,6 +228,18 @@ function ItemsModule:UpdateSellItemPriceAfterSearch(resultsTable)
 	MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPriceBid, math.max(bidPrice - 1, 0))
 	MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, math.max(buyoutPrice - 1, 0))
 	
+end
+
+function ItemsModule:UpdateItemSelectedData(itemPos, buyoutPrice, totalAmountToBid, stackSize, itemName, scrolltableID)
+	UtilsModule:Log(self, "UpdateItemSelectedData", 2)
+
+	selectedItemPos = itemPos
+	selectedBuyoutPrice = buyoutPrice
+	selectedTotalAmountToBid = totalAmountToBid
+	selectedStackSize = stackSize
+	selectedItemName = itemName
+	scrollTableSelectedID = scrolltableID
+
 end
 
 function ItemsModule:InsertSelectedItem(parentFrame)
@@ -347,5 +400,17 @@ function ItemsModule:AddCursorItem(frame)
 	else
 		ItemsModule:SendMessage("AUCTIONBUDDY_ERROR", "CannotSellSoulboundItems")
 	end
+
+end
+
+function ItemsModule:ResetSelectedItemData()
+	UtilsModule:Log(self, "ResetSelectedItemData", 2)
+
+	selectedItemPos = nil
+	selectedBuyoutPrice = nil
+	selectedTotalAmountToBid = nil
+	selectedStackSize = nil
+	selectedItemName = nil
+	scrollTableSelectedID = nil
 
 end

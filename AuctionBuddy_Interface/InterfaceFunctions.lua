@@ -45,6 +45,9 @@ function InterfaceFunctionsModule:AUCTION_ITEM_LIST_UPDATE()
 	C_Timer.After(0.5, function() 	
 		BuyInterfaceModule.mainFrame.currentPlayerGold.value = GetCoinTextureString(GetMoney(), 15)
 		BuyInterfaceModule.mainFrame.currentPlayerGold:SetText(BuyInterfaceModule.mainFrame.currentPlayerGold.value)
+
+		SellInterfaceModule.mainFrame.currentPlayerGold.value = GetCoinTextureString(GetMoney(), 15)
+		SellInterfaceModule.mainFrame.currentPlayerGold:SetText(SellInterfaceModule.mainFrame.currentPlayerGold.value)
 	end)
 
 	local valueGoldFormat = GetCoinTextureString(0, 15)
@@ -55,10 +58,10 @@ function InterfaceFunctionsModule:AUCTION_ITEM_LIST_UPDATE()
 	
 end
 
-function InterfaceFunctionsModule:OnResultsTableItemSelected(parentFrame, buyoutPrice, bidPrice, stackSize, itemPos)
+function InterfaceFunctionsModule:OnResultsTableItemSelected(parentFrame, buyoutPrice, bidPrice, stackSize, itemPos, itemName)
 	UtilsModule:Log("InterfaceFunctionsModule", "OnResultsTableItemSelected", 0)
 
-	InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame, buyoutPrice, bidPrice, stackSize, itemPos)
+	InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame, buyoutPrice, bidPrice, stackSize, itemPos, itemName)
 
 end
 
@@ -126,7 +129,7 @@ function InterfaceFunctionsModule:ItemPriceUpdated(itemPriceFrame, stackSizeFram
 	
 end
 
-function InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame, buttonBuyoutPrice, buttonBidPrice, buttonStackSize, itemPos)
+function InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame, buttonBuyoutPrice, buttonBidPrice, buttonStackSize, itemPos, buttonItemName)
 	UtilsModule:Log(self, "UpdateTotalBuyoutAndBidCostBuy", 0)
 
 	if parentFrame.scrollTable:GetSelection() == nil then
@@ -135,24 +138,33 @@ function InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame, bu
 
 	UtilsModule:Log("Select Item Pos: ", itemPos, 0)
 
-	local stackSize = select(3, GetAuctionItemInfo("list", itemPos))
-	local minBid = select(8, GetAuctionItemInfo("list", itemPos))
-	local minBidIncrement = select(9, GetAuctionItemInfo("list", itemPos))
-	local buyoutPrice = select(10, GetAuctionItemInfo("list", itemPos))
-	local bidAmount = select(11, GetAuctionItemInfo("list", itemPos))
-	local highBidder = select(12, GetAuctionItemInfo("list", itemPos))
+	local itemName, myTexture, stackSize, itemQuality, canUse, itemLevel, levelColHeader, minBid,
+	minIncrement, buyoutPrice, bidAmount, highBidder, bidderFullName, aucOwner,
+	ownerFullName, saleStatus, itemId, hasAllInfo = GetAuctionItemInfo("list", itemPos);
+
+	if buyoutPrice ~= buttonBuyoutPrice or math.max(minBid,bidAmount) ~= buttonBidPrice or stackSize ~= buttonStackSize or itemName ~= buttonItemName then
+		local itemsShownPerBlizzardPage = 50
+		for i = 1, itemsShownPerBlizzardPage do
+			itemName, myTexture, stackSize, itemQuality, canUse, itemLevel, levelColHeader, minBid,
+			minIncrement, buyoutPrice, bidAmount, highBidder, bidderFullName, aucOwner,
+			ownerFullName, saleStatus, itemId, hasAllInfo = GetAuctionItemInfo("list", i);
+
+			if buyoutPrice == buttonBuyoutPrice and math.max(minBid,bidAmount) == buttonBidPrice and stackSize == buttonStackSize and itemName == buttonItemName then
+				itemPos = i
+				break
+			end
+		end
+	end
 
 	-- Checking if the selected button auction has been sold or someone else already bid on it
-	if buyoutPrice ~= buttonBuyoutPrice or math.max(minBid,bidAmount) ~= buttonBidPrice or stackSize ~= buttonStackSize then
+	if buyoutPrice ~= buttonBuyoutPrice or math.max(minBid,bidAmount) ~= buttonBidPrice or stackSize ~= buttonStackSize or itemName ~= buttonItemName then
 		UtilsModule:Log(self, "RemovingSelectedRow", 0)
-		local name = select(1, GetAuctionItemInfo("list", itemPos))
-		local saleStatus = select(16, GetAuctionItemInfo("list", itemPos))
 
 		InterfaceFunctionsModule:SendMessage("REMOVE_SELECTED_RESULTS_ROW", parentFrame.scrollTable:GetSelection())
 		InterfaceFunctionsModule:SendMessage("AUCTIONBUDDY_ERROR", "SelectedItemRemoved")
 		parentFrame.scrollTable:ClearSelection()
 
-		UtilsModule:Log("Item name: ", name, 0)
+		UtilsModule:Log("Item name: ", itemName, 0)
 		UtilsModule:Log("Sale status: ", saleStatus, 0)
 		UtilsModule:Log("Item pos: ", itemPos, 0)
 		UtilsModule:Log(buyoutPrice, buttonBuyoutPrice, 0)
@@ -161,7 +173,9 @@ function InterfaceFunctionsModule:UpdateTotalBuyoutAndBidCostBuy(parentFrame, bu
 		return
 	end
 
-	local totalAmountToBid = max(minBid, bidAmount) + minBidIncrement
+	local totalAmountToBid = math.max(minBid, bidAmount) + minIncrement
+
+	InterfaceFunctionsModule:SendMessage("ITEM_SELECTED_DATA", itemPos, buyoutPrice, totalAmountToBid, stackSize, itemName, parentFrame.scrollTable:GetSelection())
 
 	local bidValueGoldFormat = GetCoinTextureString(totalAmountToBid, 15)
 	local buyValueGoldFormat = GetCoinTextureString(buyoutPrice, 15)

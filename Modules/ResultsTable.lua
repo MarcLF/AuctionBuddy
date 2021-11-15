@@ -17,6 +17,7 @@ local buyoutPrice = nil
 local bidPrice = nil
 local stackSize = nil
 local itemPos = nil
+local itemName = nil
 local selectedItemParentFrame = nil
 
 function ResultsTableModule:Enable()
@@ -33,7 +34,7 @@ end
 function ResultsTableModule:AUCTION_ITEM_LIST_UPDATE()
 	UtilsModule:Log(self, "AUCTION_ITEM_LIST_UPDATE", 0)
 
-	ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", selectedItemParentFrame, buyoutPrice, bidPrice, stackSize, itemPos)
+	ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", selectedItemParentFrame, buyoutPrice, bidPrice, stackSize, itemPos, itemName)
 
 	ResultsTableModule:UnregisterEvent("AUCTION_ITEM_LIST_UPDATE")
 
@@ -131,6 +132,8 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 						bidPrice = value
 					elseif key == "count" then
 						stackSize = value
+					elseif key == "name" then
+						itemName = value
 					end
 				end
 
@@ -150,7 +153,7 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 					ResultsTableModule:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 					ResultsTableModule:SendMessage("SCAN_SELECTED_ITEM_AH_PAGE", nil, containedInPageNumber)
 				else 
-					ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame, buyoutPrice, bidPrice, stackSize, itemPos)
+					ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame, buyoutPrice, bidPrice, stackSize, itemPos, itemName)
 				end
 			else
 				ResultsTableModule:SendMessage("AUCTIONBUDDY_ERROR", "FailedToSelectItem")
@@ -185,10 +188,10 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 			end
 
 			if button == "LeftButton" and DatabaseModule.buyOptions.doubleClickToBuy == true then
-				ResultsTableModule:SendMessage("ON_BUY_SELECTED_ITEM", parentFrame.scrollTable:GetSelection(), buyoutPrice)
+				ResultsTableModule:SendMessage("ON_BUY_SELECTED_ITEM")
 				parentFrame.scrollTable:ClearSelection()
 			elseif button == "RightButton" and DatabaseModule.buyOptions.doubleClickToBid == true then
-				ResultsTableModule:SendMessage("ON_BID_SELECTED_ITEM", parentFrame.scrollTable:GetSelection(), bidPrice)
+				ResultsTableModule:SendMessage("ON_BID_SELECTED_ITEM")
 				parentFrame.scrollTable:ClearSelection()
 			end
 			return true
