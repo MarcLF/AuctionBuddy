@@ -135,7 +135,7 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 
 				if prevContainedInPageNumber ~= containedInPageNumber then
 					ResultsTableModule:SendMessage("SCAN_SELECTED_ITEM_AH_PAGE", nil, containedInPageNumber)
-					C_Timer.After(0.2, function() 	
+					C_Timer.After(0.5, function() 	
 					ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame, buyoutPrice, bidPrice, stackSize, itemPos)
 				end)
 				else 
