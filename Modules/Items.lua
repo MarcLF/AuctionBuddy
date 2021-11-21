@@ -225,8 +225,8 @@ function ItemsModule:UpdateSellItemPriceAfterSearch(resultsTable)
 		bidPrice = buyoutPrice
 	end
 
-	MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPriceBid, math.max(bidPrice - 1, 0))
-	MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, math.max(buyoutPrice - 1, 0))
+	MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPriceBid, math.floor(math.max(bidPrice - 1, 0)))
+	MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, math.floor(math.max(buyoutPrice - 1, 0)))
 	
 end
 
