@@ -69,7 +69,7 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 			name         = "Name",
 			width        = 150,
 			align        = "LEFT",
-			index        = "name",
+			index        = "itemLink", -- Item link so it shows it's name with rarity matching colors.
 			format       = "string",
 		},
 		{

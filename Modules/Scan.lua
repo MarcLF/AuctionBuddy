@@ -207,10 +207,11 @@ function ScanModule:InsertResultsPage()
 
 		-- This data is compared to each index of columnType array from the CreateResultsScrollFrameTable function inside ResultsTable.lua
 		if tostring(GetAuctionItemLink("list", i)) ~= nil then
+			itemLinkString = tostring(GetAuctionItemLink("list", i))
 			tinsert(resultsTableData, 
 			{
 				texture = myTexture,
-				itemLink = tostring(GetAuctionItemLink("list", i)),
+				itemLink = UtilsModule:RemoveCharacterFromString(itemLinkString, "%[", "%]"),
 				name = itemName,
 				owner = tostring(aucOwner),
 				count = aucCount,
