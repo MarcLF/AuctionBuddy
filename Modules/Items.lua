@@ -173,7 +173,7 @@ function ItemsModule:OnSellSelectedItem(parentFrame)
 		ItemsModule:SendMessage("AUCTIONBUDDY_ERROR", "InvalidStackOrSizeQuantity")
 	end
 
-	if stackPriceBid < 1 or stackPrice < 1 then
+	if stackPriceBid < 1 or stackPrice < 0 then
 		checkPostingErrors = true
 		ItemsModule:SendMessage("AUCTIONBUDDY_ERROR", "InvalidAuctionPrice")
 	end
@@ -221,11 +221,15 @@ function ItemsModule:UpdateSellItemPriceAfterSearch(resultsTable)
 		end
 	end
 
-	if bidPrice > buyoutPrice then
+	if bidPrice > 2 then
+		bidPrice = bidPrice - 1
+	end
+
+	if bidPrice > buyoutPrice and buyoutPrice > 0 then
 		bidPrice = buyoutPrice
 	end
 
-	MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPriceBid, math.floor(math.max(bidPrice - 1, 0)))
+	MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPriceBid, math.floor(math.max(bidPrice, 0)))
 	MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPrice, math.floor(math.max(buyoutPrice - 1, 0)))
 	
 end
