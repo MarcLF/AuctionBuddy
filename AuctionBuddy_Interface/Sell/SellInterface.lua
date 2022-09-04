@@ -28,7 +28,10 @@ function SellInterfaceModule:Enable()
 	self:RegisterMessage("ON_AH_SCAN_RUNNING", self.OnAHScanRunning)
 	self:RegisterMessage("SCAN_SELECTED_ITEM_AH_PAGE", self.ResetSelectedItemData)
 	self:RegisterMessage("REMOVE_SELECTED_RESULTS_ROW", self.ResetSelectedItemData)
+	self:RegisterMessage("FAILED_TO_SELECT_RESULT_ITEM", self.ResetSelectedItemData)
 	self:RegisterMessage("ON_AUCTION_HOUSE_SEARCH", self.OnAuctionHouseSearch)
+	self:RegisterMessage("ON_ENABLE_SEARCH_MORE_BUTTON", self.OnEnableSearchMoreButton)
+	self:RegisterMessage("ON_DISABLE_SEARCH_MORE_BUTTON", self.OnDisableSearchMoreButton)
 
 	if self.interfaceCreated == true then
 		return
@@ -109,6 +112,13 @@ function SellInterfaceModule:CreateSellInterface()
 	
 	self.mainFrame.resultsTableFrame = CreateFrame("Frame", "AB_SellInterface_MainFrame_ResultsFrame", self.mainFrame, "InsetFrameTemplate3")
 	SellInterfaceModule:SetFrameParameters(self.mainFrame.resultsTableFrame, 668, 570, nil, "CENTER", 277, -30, "BACKGROUND")
+
+	self.mainFrame.resultsTableFrame.searchMore = CreateFrame("Button", "AB_SellInterface_MainFrame_ResultsFrame_SearchMore_Button", self.mainFrame.resultsTableFrame, "UIPanelButtonTemplate")
+	BuyInterfaceModule:SetFrameParameters(self.mainFrame.resultsTableFrame.searchMore, 170, 24, "Search higher prices", "CENTER", 0, -262)
+	self.mainFrame.resultsTableFrame.searchMore:SetScript("OnClick", function()
+		self:SendMessage("ON_SEARCH_MORE_RESULTS")
+	end)
+	self.mainFrame.resultsTableFrame.searchMore:Disable()
 	
 	self.mainFrame.containerFrame = CreateFrame("Frame", "AB_SellInterface_MainFrame_ContainerFrame", self.mainFrame, "InsetFrameTemplate3")
 	SellInterfaceModule:SetFrameParameters(self.mainFrame.containerFrame, 265, 570, nil, "CENTER", -193, -30, "BACKGROUND")
@@ -255,7 +265,7 @@ function SellInterfaceModule:CreateSellInterfaceOptions(parentFrame)
 	parentFrame.alreadyBidText = parentFrame:CreateFontString("AB_SellInterface_MainFrame_AlreadyBid_Text", "OVERLAY")
 	parentFrame.alreadyBidText:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
 	parentFrame.alreadyBidText:SetWidth(250)
-	parentFrame.alreadyBidText:SetPoint("BOTTOMLEFT", 35, 170)
+	parentFrame.alreadyBidText:SetPoint("BOTTOMLEFT", 25, 170)
 	parentFrame.alreadyBidText:SetJustifyH("LEFT")
 	parentFrame.alreadyBidText:SetText("You already have a bid on this item.")
 	parentFrame.alreadyBidText:Hide()
@@ -263,28 +273,28 @@ function SellInterfaceModule:CreateSellInterfaceOptions(parentFrame)
 	parentFrame.totalBidCost = parentFrame:CreateFontString("AB_SellInterface_MainFrame_TotalBidCost", "OVERLAY")
 	parentFrame.totalBidCost:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
 	parentFrame.totalBidCost:SetWidth(250)
-	parentFrame.totalBidCost:SetPoint("BOTTOMLEFT", 150, 142)
-	parentFrame.totalBidCost:SetJustifyH("LEFT")
+	parentFrame.totalBidCost:SetPoint("BOTTOMLEFT", 25, 142)
+	parentFrame.totalBidCost:SetJustifyH("RIGHT")
 	parentFrame.totalBidCost.value = GetCoinTextureString(0, 15)
 	parentFrame.totalBidCost:SetText(parentFrame.totalBidCost.value)
 
 	parentFrame.totalBidCost.text = parentFrame:CreateFontString("AB_SellInterface_MainFrame_TotalBidCost_Text", "OVERLAY", "GameFontNormal")
 	parentFrame.totalBidCost.text:SetWidth(250)
-	parentFrame.totalBidCost.text:SetPoint("BOTTOMLEFT", 35, 145)
+	parentFrame.totalBidCost.text:SetPoint("BOTTOMLEFT", 25, 145)
 	parentFrame.totalBidCost.text:SetJustifyH("LEFT")
 	parentFrame.totalBidCost.text:SetText("Total Bid Cost:")
 
 	parentFrame.totalBuyCost = parentFrame:CreateFontString("AB_SellInterface_MainFrame_TotalBuyCost", "OVERLAY")
 	parentFrame.totalBuyCost:SetFont("Fonts\\ARIALN.ttf", 15, "OUTLINE")
 	parentFrame.totalBuyCost:SetWidth(250)
-	parentFrame.totalBuyCost:SetPoint("BOTTOMLEFT", 150, 117)
-	parentFrame.totalBuyCost:SetJustifyH("LEFT")
+	parentFrame.totalBuyCost:SetPoint("BOTTOMLEFT", 25, 117)
+	parentFrame.totalBuyCost:SetJustifyH("RIGHT")
 	parentFrame.totalBuyCost.value = GetCoinTextureString(0, 15)
 	parentFrame.totalBuyCost:SetText(parentFrame.totalBuyCost.value)
 
 	parentFrame.totalBuyCost.text = parentFrame:CreateFontString("AB_SellInterface_MainFrame_TotalBuyCost_Text", "OVERLAY", "GameFontNormal")
 	parentFrame.totalBuyCost.text:SetWidth(250)
-	parentFrame.totalBuyCost.text:SetPoint("BOTTOMLEFT", 35, 120)
+	parentFrame.totalBuyCost.text:SetPoint("BOTTOMLEFT", 25, 120)
 	parentFrame.totalBuyCost.text:SetJustifyH("LEFT")
 	parentFrame.totalBuyCost.text:SetText("Total Buyout Cost:")
 
@@ -671,6 +681,18 @@ end
 function SellInterfaceModule:OnAuctionHouseSearch()
 
 	SellInterfaceModule.mainFrame.scrollTable:ClearSelection()
+
+end
+
+function SellInterfaceModule:OnEnableSearchMoreButton()
+
+	SellInterfaceModule.mainFrame.resultsTableFrame.searchMore:Enable()
+
+end
+
+function SellInterfaceModule:OnDisableSearchMoreButton()
+
+	SellInterfaceModule.mainFrame.resultsTableFrame.searchMore:Disable()
 
 end
 

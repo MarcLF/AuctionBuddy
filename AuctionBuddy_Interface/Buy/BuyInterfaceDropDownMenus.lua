@@ -14,6 +14,7 @@ local itemTypeTable =
 	"Armor (All)",
 	"Container (All)",
 	"Consumable (All)",
+	"Glyphs (All)",
 	"Trade Goods (All)",
 	"Projectile (All)",
 	"Quiver (All)",
@@ -22,8 +23,6 @@ local itemTypeTable =
 	"Miscellaneous (All)",
 	"Quest Items"
 }
-
--- Weapons Tables
 
 local weaponsTypeTable = 
 {
@@ -102,6 +101,20 @@ local consumableTypeTable =
 	"Item Enhancement",
 	"Scroll",
 	"Other"
+}
+
+local glyphsTypeTable = 
+{
+	"Warrior",
+	"Paladin",
+	"Hunter",
+	"Rogue",
+	"Priest",
+	"Shaman",
+	"Mage",
+	"Warlock",
+	"Druid",
+	"Death Knight"
 }
 
 local tradeGoodsTypeTable = 
@@ -333,33 +346,38 @@ function BuyInterfaceDropDownMenusModule:GetNestedTableInfoFromMenuValue(menuVal
 		nestedTable = consumableTypeTable
 		nestedOfNestedTable = {}
 
-	elseif menuValue == "Trade Goods (All)" then
+	elseif menuValue == "Glyphs (All)" then
 		itemTypeValue = 5
+		nestedTable = glyphsTypeTable
+		nestedOfNestedTable = {}
+
+	elseif menuValue == "Trade Goods (All)" then
+		itemTypeValue = 6
 		nestedTable = tradeGoodsTypeTable
 		nestedOfNestedTable = {}
 
 	elseif menuValue == "Projectile (All)" then
-		itemTypeValue = 6
+		itemTypeValue = 7
 		nestedTable = projectileTable
 		nestedOfNestedTable = {}
 
 	elseif menuValue == "Quiver (All)" then
-		itemTypeValue = 7
+		itemTypeValue = 8
 		nestedTable = quiverTable
 		nestedOfNestedTable = {}
 
 	elseif menuValue == "Recipe (All)" then
-		itemTypeValue = 8
+		itemTypeValue = 9
 		nestedTable = recipesTypeTable
 		nestedOfNestedTable = {}
 
 	elseif menuValue == "Gems" then
-		itemTypeValue = 9
+		itemTypeValue = 10
 		nestedTable = gemsTypeTable
 		nestedOfNestedTable = {}
 
 	elseif menuValue == "Miscellaneous (All)" then
-		itemTypeValue = 10
+		itemTypeValue = 11
 		nestedTable = miscellaneousTypeTable
 		nestedOfNestedTable = {}
 	end

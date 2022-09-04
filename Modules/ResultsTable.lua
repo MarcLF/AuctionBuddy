@@ -19,6 +19,7 @@ local stackSize = nil
 local itemPos = nil
 local itemName = nil
 local selectedItemParentFrame = nil
+local blizzardPageSize = 50
 
 function ResultsTableModule:Enable()
 
@@ -116,12 +117,12 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 		},
 	}
 	
-	parentFrame.scrollTable = StdUi:ScrollTable(parentFrame, columnType, 18, 28)
+	parentFrame.scrollTable = StdUi:ScrollTable(parentFrame, columnType, 17, 28)
 	StdUi:GlueTop(parentFrame.scrollTable, parentFrame, xPos, yPos, 0, 0)
 	parentFrame.scrollTable:EnableSelection(true)
 	parentFrame.scrollTable:RegisterEvents({
 		OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)	
-			if (button == "LeftButton" or button == "RightButton") and CanSendAuctionQuery() then
+			if (button == "LeftButton" or button == "RightButton") then
 				UtilsModule:Log(self, "OnClickResultsTable", 2)
 				parentFrame.scrollTable:SetSelection(rowIndex)
 
@@ -137,26 +138,26 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 					end
 				end
 
-				local blizzardPageSize = 50
 				local itemPage = math.floor((parentFrame.scrollTable:GetSelection() - 1) / blizzardPageSize)
 				itemPos = parentFrame.scrollTable:GetSelection() - itemPage * blizzardPageSize
-
-				selectedItemParentFrame = parentFrame
 
 				prevContainedInPageNumber = ScanModule.page
 				containedInPageNumber = itemPage
 
+				selectedItemParentFrame = parentFrame
+
 				UtilsModule:Log("Selected item page number", itemPage, 0)
 				UtilsModule:Log("Prev page number", prevContainedInPageNumber, 0)
 
-				if prevContainedInPageNumber ~= containedInPageNumber then
+				if prevContainedInPageNumber == containedInPageNumber then
+					ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame, buyoutPrice, bidPrice, stackSize, itemPos, itemName)
+				elseif CanSendAuctionQuery() == true then
 					ResultsTableModule:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 					ResultsTableModule:SendMessage("SCAN_SELECTED_ITEM_AH_PAGE", nil, containedInPageNumber)
-				else 
-					ResultsTableModule:SendMessage("RESULTSTABLE_ITEM_SELECTED", parentFrame, buyoutPrice, bidPrice, stackSize, itemPos, itemName)
+				else
+					ResultsTableModule:SendMessage("AUCTIONBUDDY_ERROR", "FailedToSelectItem")
+					ResultsTableModule:SendMessage("FAILED_TO_SELECT_RESULT_ITEM")
 				end
-			else
-				ResultsTableModule:SendMessage("AUCTIONBUDDY_ERROR", "FailedToSelectItem")
 			end
 			return true
 		end,
@@ -176,7 +177,6 @@ function ResultsTableModule:CreateResultsScrollFrameTable(parentFrame, xPos, yPo
 				end
 			end
 			
-			local blizzardPageSize = 50
 			local itemPage = math.floor((parentFrame.scrollTable:GetSelection() - 1) / blizzardPageSize)
 
 			UtilsModule:Log("Selected item page number", itemPage, 0)

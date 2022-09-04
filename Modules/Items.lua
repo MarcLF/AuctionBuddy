@@ -226,7 +226,7 @@ function ItemsModule:UpdateSellItemPriceAfterSearch(resultsTable)
 	end
 
 	if bidPrice > buyoutPrice and buyoutPrice > 0 then
-		bidPrice = buyoutPrice
+		bidPrice = buyoutPrice - 1
 	end
 
 	MoneyInputFrame_SetCopper(SellInterfaceModule.mainFrame.itemPriceBid, math.floor(math.max(bidPrice, 0)))
