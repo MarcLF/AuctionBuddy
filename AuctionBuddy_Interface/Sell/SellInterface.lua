@@ -32,7 +32,8 @@ function SellInterfaceModule:Enable()
 	self:RegisterMessage("ON_AUCTION_HOUSE_SEARCH", self.OnAuctionHouseSearch)
 	self:RegisterMessage("ON_ENABLE_SEARCH_MORE_BUTTON", self.OnEnableSearchMoreButton)
 	self:RegisterMessage("ON_DISABLE_SEARCH_MORE_BUTTON", self.OnDisableSearchMoreButton)
-
+	self:RegisterMessage("ON_ENABLE_CREATE_AUCTION_BUTTON", self.OnEnableCreateAuctionButton)
+	
 	if self.interfaceCreated == true then
 		return
 	end
@@ -480,7 +481,7 @@ function SellInterfaceModule:CreateItemToSellParameters(parentFrame)
 	parentFrame.auctionDuration = CreateFrame("Frame", "AB_SellInterface_MainFrame_ItemToSell_AuctionDuration", parentFrame, "UIDropDownMenuTemplate")
 	parentFrame.auctionDuration:SetPoint("CENTER", parentFrame.itemToSellButton, "CENTER", 95, -300)
 	parentFrame.auctionDuration.durationValue = 2
-	parentFrame.auctionDuration.durationText = "8 Hours"
+	parentFrame.auctionDuration.durationText = "24 Hours"
 	UIDropDownMenu_SetWidth(parentFrame.auctionDuration, 100)
 	UIDropDownMenu_SetText(parentFrame.auctionDuration, parentFrame.auctionDuration.durationText) 
 	UIDropDownMenu_Initialize(parentFrame.auctionDuration, SellInterfaceModule.AuctionDurationDropDown)
@@ -518,13 +519,13 @@ local function SelectAuctionDuration(self, arg1, checked, value)
 	SellInterfaceModule.mainFrame.auctionDuration.durationValue = arg1
 
 	if arg1 == 1 then
-		SellInterfaceModule.mainFrame.auctionDuration.durationText = "2 Hours"
+		SellInterfaceModule.mainFrame.auctionDuration.durationText = "12 Hours"
 		
 	elseif arg1 == 2 then
-		SellInterfaceModule.mainFrame.auctionDuration.durationText = "8 Hours"
+		SellInterfaceModule.mainFrame.auctionDuration.durationText = "24 Hours"
 		
 	elseif arg1 == 3 then
-		SellInterfaceModule.mainFrame.auctionDuration.durationText = "24 Hours"
+		SellInterfaceModule.mainFrame.auctionDuration.durationText = "48 Hours"
 	end
 
 	SellInterfaceModule:SendMessage("UPDATE_DEPOSIT_COST", SellInterfaceModule.mainFrame)
@@ -537,17 +538,17 @@ function SellInterfaceModule:AuctionDurationDropDown(frame, level, menuList)
 	local info = UIDropDownMenu_CreateInfo()
 	info.func = SelectAuctionDuration
 	
-	info.text = "2 Hours"
+	info.text = "12 Hours"
 	info.arg1 = 1
 	info.checked = SellInterfaceModule.mainFrame.auctionDuration.durationValue == 1
 	UIDropDownMenu_AddButton(info)
 	
-	info.text = "8 Hours"
+	info.text = "24 Hours"
 	info.arg1 = 2
 	info.checked = SellInterfaceModule.mainFrame.auctionDuration.durationValue == 2
 	UIDropDownMenu_AddButton(info)
 	
-	info.text = "24 Hours"
+	info.text = "48 Hours"
 	info.arg1 = 3
 	info.checked = SellInterfaceModule.mainFrame.auctionDuration.durationValue == 3
 	UIDropDownMenu_AddButton(info)
@@ -696,6 +697,17 @@ function SellInterfaceModule:OnDisableSearchMoreButton()
 
 end
 
+function SellInterfaceModule:OnEnableCreateAuctionButton()
+	UtilsModule:Log("SellInterfaceModule", "OnEnableCreateAuctionButton", 2)
+
+	if CanSendAuctionQuery() then
+		SellInterfaceModule.mainFrame.createAuction:Enable()
+	else
+		C_Timer.After(0.5, SellInterfaceModule.OnEnableCreateAuctionButton)
+	end
+
+end
+
 function SellInterfaceModule:ResetData()
 	UtilsModule:Log("SellInterfaceModule", "ResetData", 1)
 
@@ -704,6 +716,12 @@ function SellInterfaceModule:ResetData()
 
 	self.itemPriceValue = 0
 	self.stackPriceValue = 0
+
+	MoneyInputFrame_SetCopper(self.mainFrame.itemPriceBid, self.itemPriceBidValue)
+	MoneyInputFrame_SetCopper(self.mainFrame.stackPriceBid, self.stackPriceBidValue) 
+
+	MoneyInputFrame_SetCopper(self.mainFrame.itemPrice, self.itemPriceValue)
+	MoneyInputFrame_SetCopper(self.mainFrame.stackPrice, self.stackPriceValue)
 
 	self.mainFrame.itemToSellButton:SetScript("OnEnter", function(self)
 	end)
@@ -719,6 +737,9 @@ function SellInterfaceModule:ResetData()
 
 	self.mainFrame.stackSize.maxStackBtn:Disable()
 	self.mainFrame.stackQuantity.maxStackBtn:Disable()
+
+	self.mainFrame.auctionDepositCost.value = GetCoinTextureString(0, 15)
+	self.mainFrame.auctionDepositCost:SetText(self.mainFrame.auctionDepositCost.value)
 
 	self.mainFrame.createAuction:Disable()
 

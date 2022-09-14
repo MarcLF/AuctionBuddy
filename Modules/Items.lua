@@ -279,7 +279,7 @@ function ItemsModule:InsertSelectedItem(parentFrame)
 		
 		InterfaceFunctionsModule:UpdateDepositCost(SellInterfaceModule.mainFrame)
 
-		parentFrame.createAuction:Enable()
+		ItemsModule:SendMessage("ON_ENABLE_CREATE_AUCTION_BUTTON")
 	end
 
 	ClearCursor()	
