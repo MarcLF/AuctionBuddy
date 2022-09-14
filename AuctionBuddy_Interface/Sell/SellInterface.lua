@@ -703,6 +703,7 @@ function SellInterfaceModule:OnEnableCreateAuctionButton()
 	if CanSendAuctionQuery() then
 		SellInterfaceModule.mainFrame.createAuction:Enable()
 	else
+		SellInterfaceModule.mainFrame.createAuction:Disable()
 		C_Timer.After(0.5, SellInterfaceModule.OnEnableCreateAuctionButton)
 	end
 
