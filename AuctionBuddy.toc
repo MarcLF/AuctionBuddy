@@ -1,6 +1,6 @@
-## Interface: 30400
+## Interface: 30401
 ## Title: AuctionBuddy
-## Version: 1.0.0b_WOTLKC
+## Version: 1.0.1_WOTLKC
 ## Author: Erazhen
 ## Notes: Auction house addon for The Wrath of the Lich King Classic.
 ## SavedVariables: AB_GeneralOptions, AB_BuyOptions, AB_SellOptions, AB_RecentSearches, AB_FavoriteSearchesLists
