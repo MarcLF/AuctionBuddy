@@ -288,17 +288,19 @@ end
 
 function ItemsModule:CalculateMaxStackValues(parentFrame, bagID, bagSlot)
 	UtilsModule:Log(self, "CalculateMaxStackValues", 0)
-
-	local itemAmountInBag = 0
-	local itemLink = select(7, GetContainerItemInfo(bagID, bagSlot))
 	
-	local itemStackCount = select(8, GetItemInfo(itemLink))
+	local itemAmountInBag = 0
+	local containerInfo = C_Container.GetContainerItemInfo(bagID, bagSlot)
+
+	local itemLink = containerInfo.hyperlink
+
+	local itemStackCount = select(8,GetItemInfo(itemLink))
 
 	itemAmountInBag = ItemsModule:GetTotalItemAmountInBag(parentFrame, itemLink)
 
 	local maxStackSizeValue = math.max(math.min(itemAmountInBag, itemStackCount), 1)
 	local maxStackNumberValue = math.max(math.floor(itemAmountInBag / tonumber(parentFrame.stackSize:GetText())), 1)
-
+	
 	parentFrame.stackSize.maxStackValue:SetText(tostring(maxStackSizeValue))
 	parentFrame.stackQuantity.maxStackValue:SetText(tostring(maxStackNumberValue))
 

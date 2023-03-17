@@ -121,25 +121,36 @@ function ContainerModule:ScanContainer()
 
 	local tableData = {}
 
-	for i = 0, 4, 1 do
-	
-		containerNumOfSlots = GetContainerNumSlots(i)
-		
-		for j = 1, containerNumOfSlots, 1 do
-			local myTexture, itemCount, locked, itemQuality, readable, lootable, itemLinkContainer = GetContainerItemInfo(i, j)
-		
-			if myTexture ~= nil and not lootable then
-				if not C_Item.IsBound(ItemLocation:CreateFromBagAndSlot(i, j)) then
-					tinsert(tableData, 
-					{			
-						texture = myTexture,
-						itemName = UtilsModule:RemoveCharacterFromString(itemLinkContainer, "%[", "%]"),
-						itemLink = itemLinkContainer,
-						count = tonumber(itemCount),
-						quality = itemQuality,
-						bagID = i,
-						slot = j
-					})
+	if C_Container and C_Container.GetContainerItemInfo then
+		for i = 0, 4, 1 do
+			containerNumOfSlots = C_Container.GetContainerNumSlots(i)
+
+			for j = 1, containerNumOfSlots, 1 do
+				local containerInfo = C_Container.GetContainerItemInfo(i, j)
+				local myTexture, itemCount, itemQuality, lootable, itemLinkContainer
+
+				if containerInfo ~= nil then
+
+					myTexture = containerInfo.iconFileID
+					itemCount = containerInfo.stackCount
+					itemQuality = containerInfo.quality
+					lootable = containerInfo.hasLoot
+					itemLinkContainer = containerInfo.hyperlink
+
+					if myTexture ~= nil and not lootable then
+						if not C_Item.IsBound(ItemLocation:CreateFromBagAndSlot(i, j)) then
+							tinsert(tableData, 
+							{			
+								texture = myTexture,
+								itemName = UtilsModule:RemoveCharacterFromString(itemLinkContainer, "%[", "%]"),
+								itemLink = itemLinkContainer,
+								count = tonumber(itemCount),
+								quality = itemQuality,
+								bagID = i,
+								slot = j
+							})
+						end
+					end
 				end
 			end
 		end
@@ -264,7 +275,7 @@ function ContainerModule:CreateSellContainerScrollFrameTable(parentFrame, xPos, 
 		OnClick = function(table, cellFrame, rowFrame, rowData, columnData, rowIndex, button)
 			if ContainerModule:CanSelectContainerItem() then
 				if button == "LeftButton" and ItemsModule.currentItemPostedLink ~= rowData.itemLink then
-					PickupContainerItem(rowData.bagID, rowData.slot)
+					C_Container.PickupContainerItem(rowData.bagID, rowData.slot)
 					
 					ContainerModule:SendMessage("CONTAINER_ITEM_SELECTED", parentFrame, rowData.bagID, rowData.slot)			
 
