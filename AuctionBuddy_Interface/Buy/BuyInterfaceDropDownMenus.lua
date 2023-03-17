@@ -88,7 +88,12 @@ local containersTypeTable =
 	"Bag",
 	"Soul Bag",
 	"Herb Bag",
-	"Enchanting Bag"
+	"Enchanting Bag",
+	"Engineering Bag",
+	"Gem Bag",
+	"Mining Bag",
+	"Leatherworking Bag",
+	"Inscription Bag"
 }
 
 local consumableTypeTable = 
@@ -130,7 +135,9 @@ local tradeGoodsTypeTable =
 	"Devices",
 	"Explosives",
 	"Materials",
-	"Other"
+	"Other",
+	"Armor Enchantment",
+	"Weapon Enchantment"
 }
 
 local projectileTable = 
@@ -157,7 +164,8 @@ local recipesTypeTable =
 	"First Aid",
 	"Enchanting",
 	"Fishing",
-	"Jewelcrafting"
+	"Jewelcrafting",
+	"Inscription"
 }
 
 local gemsTypeTable =
