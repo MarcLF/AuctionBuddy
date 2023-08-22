@@ -22,8 +22,6 @@ local itemTypeTable =
 	"Miscellaneous (All)"
 }
 
--- Weapons Tables
-
 local weaponsTypeTable = 
 {
 	"O.H. Axes",
@@ -62,36 +60,23 @@ local armorTypeTable =
 local armorSlotsTable =
 {
 	"Head",
-	"Neck",
 	"Shoulder",
-	"Shirt",
 	"Chest",
 	"Waist",
 	"Legs",
 	"Feet",
 	"Wrist",
 	"Hands",
-	"Finger",
-	"Trinket",
 	"Back",
-	"Off Hand"
 }
 
 local armorMiscellaneousSlotsTable =
 {
 	"Head",
 	"Neck",
-	"Shoulder",
 	"Shirt",
-	"Chest",
-	"Waist",
-	"Legs",
-	"Feet",
-	"Wrist",
-	"Hands",
 	"Finger",
 	"Trinket",
-	"Back",
 	"Off Hand"
 }
 --
@@ -289,6 +274,16 @@ function BuyInterfaceDropDownMenusModule:GetNestedTableInfoFromMenuValue(menuVal
 		nestedTable = containersTypeTable
 		nestedOfNestedTable = {}
 
+	elseif menuValue == "Consumable (All)" then
+		itemTypeValue = 4
+		nestedTable = consumableTypeTable
+		nestedOfNestedTable = {}
+
+	elseif menuValue == "Trade Goods (All)" then
+		itemTypeValue = 5
+		nestedTable = tradeGoodsTypeTable
+		nestedOfNestedTable = {}
+
 	elseif menuValue == "Projectile (All)" then
 		itemTypeValue = 6
 		nestedTable = projectileTable
@@ -303,6 +298,17 @@ function BuyInterfaceDropDownMenusModule:GetNestedTableInfoFromMenuValue(menuVal
 		itemTypeValue = 8
 		nestedTable = recipesTypeTable
 		nestedOfNestedTable = {}
+
+	elseif menuValue == "Reagent (All)" then
+		itemTypeValue = 9
+		nestedTable = gemsTypeTable
+		nestedOfNestedTable = {}
+
+	elseif menuValue == "Miscellaneous (All)" then
+		itemTypeValue = 10
+		nestedTable = miscellaneousTypeTable
+		nestedOfNestedTable = {}
+
 	end
 
 	return itemTypeValue, nestedTable, nestedOfNestedTable

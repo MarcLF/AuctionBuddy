@@ -10,7 +10,7 @@ local UtilsModule = AuctionBuddy:NewModule("UtilsModule")
 -- 0 = LOW
 -- -1 = NONE
 
-UtilsModule.verbose = 0
+UtilsModule.verbose = 3
 
 function UtilsModule:Log(...)
 

@@ -73,11 +73,11 @@ function AuctionBuddy:AUCTION_HOUSE_SHOW()
 		self.onTabClickHooked = true
 	end
 
+	SortAuctionSetSort("list", "unitprice")
 end
 
 function AuctionBuddy:AUCTION_HOUSE_CLOSED()
 	UtilsModule:Log("AuctionBuddy", "AUCTION_HOUSE_CLOSED", 1)
-	
 end
 
 function AuctionBuddy:TableCombine(keys, values)

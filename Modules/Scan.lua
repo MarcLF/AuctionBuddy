@@ -25,6 +25,7 @@ local gettingDataFromPageNum = 0
 
 local resultsTableData = {}
 
+
 function ScanModule:Enable()
 
 	UtilsModule = AuctionBuddy:GetModule("UtilsModule")
@@ -41,19 +42,9 @@ function ScanModule:Enable()
 
 	self:RegisterMessage("REMOVE_SELECTED_RESULTS_ROW", self.RemoveSelectedResultsRow)
 	self:RegisterMessage("POSTING_ITEM_TO_AH", self.ResetData)
-	
-	ScanResultsCoroutine = coroutine.create(ScanModule.ScanResults)
+	self:RegisterMessage("ON_SEARCH_MORE_RESULTS", self.ScanResults)
 
-	scanFrame = CreateFrame("Frame")
-	scanFrame:SetScript("OnUpdate", function(self)
-		if CanSendAuctionQuery() and coroutine.status(ScanResultsCoroutine) == "suspended" and isScanningRunning and hasCurrentPageBeenAdded then 
-			coroutine.resume(ScanResultsCoroutine)
-		elseif CanSendAuctionQuery() and coroutine.status(ScanResultsCoroutine) == "dead" and isScanningRunning then
-			ScanResultsCoroutine = coroutine.create(ScanModule.ScanResults)
-		end
-	end)
-
-	self.page = 0
+	ScanModule.page = 0
 
 end
 
@@ -62,23 +53,22 @@ function ScanModule:AUCTION_ITEM_LIST_UPDATE()
 
 	if not isScanningRunning then
 		ScanModule.shownPerBlizzardPage, ScanModule.total = GetNumAuctionItems("list")
+
+		UtilsModule:Log("shownPerBlizzardPage: ", ScanModule.shownPerBlizzardPage, 0)
 		UtilsModule:Log("Total items: ", ScanModule.total, 0)
+    
 		isScanningRunning = true
 	end
 
 	if isScanningRunning and gettingDataFromPageNum == ScanModule.page then
 		ScanModule:InsertResultsPage()
-		gettingDataFromPageNum = gettingDataFromPageNum + 1
 	end
-
-	scanFrame:Show()
 		
 end
 
 function ScanModule:AUCTION_HOUSE_CLOSED()
 	UtilsModule:Log(self, "AUCTION_HOUSE_CLOSED", 0)
 
-	scanFrame:Hide()
 	isScanningRunning = false
 	hasCurrentPageBeenAdded = false
 	gettingDataFromPageNum = 0
@@ -94,6 +84,8 @@ function ScanModule:AuctionHouseSearchStart(textToSearch, pageToSearch, exactMat
 	UtilsModule:Log(self, "AuctionHouseSearchStart", 0)
 
 	if CanSendAuctionQuery() then
+		ScanModule:SendMessage("ON_DISABLE_SEARCH_MORE_BUTTON")
+
 		resultsTableData = {}
 		ScanModule:SendResultsTable()
 		ScanModule.page = 0
@@ -159,19 +151,17 @@ end
 function ScanModule:ScanResults()
 	UtilsModule:Log("ScanModule", "ScanResults", 0)
 
-	local interval = math.max(ScanModule.shownPerBlizzardPage, 1)
+	if CanSendAuctionQuery() then
+		ScanModule:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 
-	for currentScanSize = 0, ScanModule.total, interval do
-
-		coroutine.yield()
 		ScanModule.page = ScanModule.page + 1
+		gettingDataFromPageNum = gettingDataFromPageNum + 1
 
-		if currentScanSize + interval < ScanModule.total then
-			ScanModule:AuctionHouseSearch()
-		end
+		ScanModule:AuctionHouseSearch()
+	else
+		ScanModule:SendMessage("AUCTIONBUDDY_ERROR", "CannotSendAHQuery")
 	end
 
-	ScanModule:SendResultsTable()
 	
 end
 
@@ -223,7 +213,8 @@ function ScanModule:InsertResultsPage()
 		end
 
 	end
-	hasCurrentPageBeenAdded = true
+
+	ScanModule:SendResultsTable()
 
 end
 
@@ -251,10 +242,15 @@ function ScanModule:SendResultsTable()
 	scrollTable:Show()
 	scrollTable:SetData(resultsTableData, true)
 
-	scanFrame:Hide()
 	isScanningRunning = false
 
 	ScanModule:UnregisterEvent("AUCTION_ITEM_LIST_UPDATE")
+
+	if #resultsTableData < ScanModule.total then
+		ScanModule:SendMessage("ON_ENABLE_SEARCH_MORE_BUTTON")
+	else
+		ScanModule:SendMessage("ON_DISABLE_SEARCH_MORE_BUTTON")
+	end
 
 end
 

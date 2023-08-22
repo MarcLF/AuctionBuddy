@@ -1,8 +1,9 @@
-## Interface: 11401
+## Interface: 11404
 ## Title: AuctionBuddy
-## Version: 3.0.0_Classic
+## Version: 4.0.0_Classic
+
 ## Author: Erazhen
-## Notes: Auction house addon for The Burning Crusade Classic.
+## Notes: Auction house addon for The Wrath of the Lich King Classic.
 ## SavedVariables: AB_GeneralOptions, AB_BuyOptions, AB_SellOptions, AB_RecentSearches, AB_FavoriteSearchesLists
 
 ## X-Curse-Project-ID: 336627
