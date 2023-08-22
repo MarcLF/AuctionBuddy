@@ -135,7 +135,7 @@ function ItemsModule:OnBuySelectedItem()
 			itemName, myTexture, stackSize, itemQuality, canUse, itemLevel, levelColHeader, minBid,
 			minIncrement, buyoutPrice, bidAmount, highBidder, bidderFullName, aucOwner,
 			ownerFullName, saleStatus, itemId, hasAllInfo = GetAuctionItemInfo("list", i);
-
+      
 			if buyoutPrice == selectedBuyoutPrice and stackSize == selectedStackSize and itemName == selectedItemName then
 				selectedItemPos = i
 				break
@@ -218,6 +218,7 @@ function ItemsModule:UpdateSellItemPriceAfterSearch(resultsTable)
 			if prevBidPrice <= bidPrice or bidPrice == 0 then
 				bidPrice = prevBidPrice
 			end
+			
 		end
 	end
 
