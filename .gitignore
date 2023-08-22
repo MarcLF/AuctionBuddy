@@ -44,3 +44,6 @@ luac.out
 .vs/slnx.sqlite
 .vs/VSWorkspaceState.json
 .vs/AuctionBuddy/v16/.suo
+*.vsidx
+*.vsidx
+*.vsidx
