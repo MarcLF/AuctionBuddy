@@ -519,13 +519,13 @@ local function SelectAuctionDuration(self, arg1, checked, value)
 	SellInterfaceModule.mainFrame.auctionDuration.durationValue = arg1
 
 	if arg1 == 1 then
-		SellInterfaceModule.mainFrame.auctionDuration.durationText = "12 Hours"
+		SellInterfaceModule.mainFrame.auctionDuration.durationText = "2 Hours"
 		
 	elseif arg1 == 2 then
-		SellInterfaceModule.mainFrame.auctionDuration.durationText = "24 Hours"
+		SellInterfaceModule.mainFrame.auctionDuration.durationText = "8 Hours"
 		
 	elseif arg1 == 3 then
-		SellInterfaceModule.mainFrame.auctionDuration.durationText = "48 Hours"
+		SellInterfaceModule.mainFrame.auctionDuration.durationText = "24 Hours"
 	end
 
 	SellInterfaceModule:SendMessage("UPDATE_DEPOSIT_COST", SellInterfaceModule.mainFrame)
@@ -538,17 +538,17 @@ function SellInterfaceModule:AuctionDurationDropDown(frame, level, menuList)
 	local info = UIDropDownMenu_CreateInfo()
 	info.func = SelectAuctionDuration
 	
-	info.text = "12 Hours"
+	info.text = "2 Hours"
 	info.arg1 = 1
 	info.checked = SellInterfaceModule.mainFrame.auctionDuration.durationValue == 1
 	UIDropDownMenu_AddButton(info)
 	
-	info.text = "24 Hours"
+	info.text = "8 Hours"
 	info.arg1 = 2
 	info.checked = SellInterfaceModule.mainFrame.auctionDuration.durationValue == 2
 	UIDropDownMenu_AddButton(info)
 	
-	info.text = "48 Hours"
+	info.text = "24 Hours"
 	info.arg1 = 3
 	info.checked = SellInterfaceModule.mainFrame.auctionDuration.durationValue == 3
 	UIDropDownMenu_AddButton(info)
