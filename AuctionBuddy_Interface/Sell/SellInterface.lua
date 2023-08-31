@@ -481,7 +481,7 @@ function SellInterfaceModule:CreateItemToSellParameters(parentFrame)
 	parentFrame.auctionDuration = CreateFrame("Frame", "AB_SellInterface_MainFrame_ItemToSell_AuctionDuration", parentFrame, "UIDropDownMenuTemplate")
 	parentFrame.auctionDuration:SetPoint("CENTER", parentFrame.itemToSellButton, "CENTER", 95, -300)
 	parentFrame.auctionDuration.durationValue = 2
-	parentFrame.auctionDuration.durationText = "24 Hours"
+	parentFrame.auctionDuration.durationText = "8 Hours"
 	UIDropDownMenu_SetWidth(parentFrame.auctionDuration, 100)
 	UIDropDownMenu_SetText(parentFrame.auctionDuration, parentFrame.auctionDuration.durationText) 
 	UIDropDownMenu_Initialize(parentFrame.auctionDuration, SellInterfaceModule.AuctionDurationDropDown)
