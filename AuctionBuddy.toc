@@ -1,6 +1,6 @@
 ## Interface: 11501
 ## Title: AuctionBuddy
-## Version: 4.0.0c_Classic
+## Version: 4.0.0d_Classic
 
 ## Author: Erazhen
 ## Notes: Auction house addon for The Wrath of the Lich King Classic.
